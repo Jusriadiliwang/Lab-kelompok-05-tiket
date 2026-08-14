@@ -1,0 +1,563 @@
+openapi: "3.0.3"
+info:
+  title: War Tiket Konser API
+  description: |
+    Sistem penjualan tiket konser dengan antrean virtual dan kursi terbatas.
+    Kelompok 5 — Praktikum Microservices.
+    
+    **Masalah utama:** Satu kursi hanya boleh terjual satu kali walau seribu orang memintanya bersamaan.
+    
+    **Services:**
+    - event-service (port 3001) — Kelola konser, jadwal, kategori kursi, dan harga
+    - ticket-service (port 3002) — Kunci kursi sementara, konfirmasi, lepas kunci saat kedaluwarsa
+    - payment-service (port 3003) — Terima pembayaran, konfirmasi, batalkan bila gagal/timeout
+    - notification-service (port 3004) — Kirim e-ticket, pengingat, dan pemberitahuan gagal bayar
+  version: "1.0.0"
+  contact:
+    name: Kelompok 5
+    
+servers:
+  - url: http://localhost:3001
+    description: event-service
+  - url: http://localhost:3002
+    description: ticket-service
+  - url: http://localhost:3003
+    description: payment-service
+  - url: http://localhost:3004
+    description: notification-service
+
+tags:
+  - name: catalog
+    description: "event-service — Lihat daftar konser dan kursi tersedia"
+  - name: events
+    description: "event-service — Kelola data konser (admin)"
+  - name: orders
+    description: "ticket-service — Kunci kursi dan kelola pesanan"
+  - name: tickets
+    description: "ticket-service — Status tiket"
+  - name: payments
+    description: "payment-service — Proses pembayaran"
+  - name: notifications
+    description: "notification-service — Notifikasi pengguna"
+
+paths:
+
+  # ══════════════════════════════════════════════════════
+  # EVENT-SERVICE (port 3001)
+  # ══════════════════════════════════════════════════════
+
+  /catalog:
+    get:
+      tags: [catalog]
+      summary: Daftar konser aktif dengan kursi tersedia
+      description: |
+        **ENDPOINT KRITIS** — Endpoint ini diakses ratusan ribu kali saat tiket dibuka.
+        Menampilkan semua konser yang masih memiliki kursi tersedia beserta harga dan jumlahnya.
+      operationId: getCatalog
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Daftar konser berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EventWithSeats"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+
+  /events:
+    get:
+      tags: [events]
+      summary: Semua konser (termasuk yang sudah habis)
+      operationId: getEvents
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Event"
+    post:
+      tags: [events]
+      summary: Buat konser baru (admin)
+      operationId: createEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEventRequest"
+      responses:
+        "201":
+          description: Konser berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /events/{eventId}:
+    get:
+      tags: [events]
+      summary: Detail satu konser
+      operationId: getEventById
+      parameters:
+        - $ref: "#/components/parameters/eventId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventWithSeats"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /events/{eventId}/seats:
+    get:
+      tags: [catalog]
+      summary: Kursi tersedia untuk satu konser
+      operationId: getEventSeats
+      parameters:
+        - $ref: "#/components/parameters/eventId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  event_id:
+                    type: integer
+                  categories:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SeatCategory"
+
+  # ══════════════════════════════════════════════════════
+  # TICKET-SERVICE (port 3002)
+  # ══════════════════════════════════════════════════════
+
+  /orders:
+    post:
+      tags: [orders]
+      summary: Buat pesanan — kunci kursi sementara (15 menit)
+      description: |
+        **ENDPOINT PALING KRITIS** — Ini adalah bottleneck utama sistem.
+        Hanya satu orang yang bisa mengunci satu kursi.
+        Menggunakan SELECT FOR UPDATE + Redis distributed lock untuk mencegah overselling.
+        Kunci otomatis kedaluwarsa dalam 15 menit jika tidak dibayar.
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "201":
+          description: Kursi berhasil dikunci — lanjutkan ke pembayaran
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "409":
+          description: Kursi sudah dikunci orang lain atau sudah habis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    get:
+      tags: [orders]
+      summary: Daftar pesanan milik pengguna
+      operationId: getOrders
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+
+  /orders/{orderId}:
+    get:
+      tags: [orders]
+      summary: Status satu pesanan
+      operationId: getOrderById
+      parameters:
+        - $ref: "#/components/parameters/orderId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /orders/{orderId}/cancel:
+    post:
+      tags: [orders]
+      summary: Batalkan pesanan dan lepas kunci kursi
+      operationId: cancelOrder
+      parameters:
+        - $ref: "#/components/parameters/orderId"
+      responses:
+        "200":
+          description: Pesanan dibatalkan dan kursi dilepas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /tickets/{ticketId}:
+    get:
+      tags: [tickets]
+      summary: Status tiket yang sudah dikonfirmasi
+      operationId: getTicketById
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ══════════════════════════════════════════════════════
+  # PAYMENT-SERVICE (port 3003)
+  # ══════════════════════════════════════════════════════
+
+  /payments:
+    post:
+      tags: [payments]
+      summary: Proses pembayaran untuk pesanan yang terkunci
+      description: |
+        **ENDPOINT KRITIS** — Menerima pembayaran untuk order yang sudah ada.
+        Jika pembayaran berhasil, mengirim event ke RabbitMQ untuk konfirmasi tiket dan notifikasi.
+        Jika gagal atau timeout, kunci kursi dilepas otomatis.
+      operationId: createPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Pembayaran berhasil diproses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Order sudah kedaluwarsa atau sudah dibayar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /payments/{paymentId}:
+    get:
+      tags: [payments]
+      summary: Status pembayaran
+      operationId: getPaymentById
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /payments/{paymentId}/cancel:
+    post:
+      tags: [payments]
+      summary: Batalkan pembayaran (refund)
+      operationId: cancelPayment
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Pembayaran dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  # ══════════════════════════════════════════════════════
+  # NOTIFICATION-SERVICE (port 3004)
+  # ══════════════════════════════════════════════════════
+
+  /notifications:
+    get:
+      tags: [notifications]
+      summary: Daftar notifikasi milik pengguna
+      operationId: getNotifications
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Notification"
+
+  /health:
+    get:
+      tags: [catalog]
+      summary: Health check semua service
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service hidup
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+
+# ══════════════════════════════════════════════════════
+# COMPONENTS
+# ══════════════════════════════════════════════════════
+
+components:
+  parameters:
+    eventId:
+      name: eventId
+      in: path
+      required: true
+      schema: { type: integer }
+    orderId:
+      name: orderId
+      in: path
+      required: true
+      schema: { type: integer }
+
+  responses:
+    NotFound:
+      description: Data tidak ditemukan
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: Request tidak valid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+
+    Event:
+      type: object
+      properties:
+        id:          { type: integer, example: 1 }
+        name:        { type: string, example: "Konser Dewa 19 Reuni" }
+        venue:       { type: string, example: "Gelora Bung Karno, Jakarta" }
+        event_date:  { type: string, format: date-time }
+        description: { type: string }
+        banner_url:  { type: string }
+        status:
+          type: string
+          enum: [upcoming, on_sale, sold_out, completed, cancelled]
+        created_at:  { type: string, format: date-time }
+
+    EventWithSeats:
+      allOf:
+        - $ref: "#/components/schemas/Event"
+        - type: object
+          properties:
+            categories:
+              type: array
+              items:
+                $ref: "#/components/schemas/SeatCategory"
+
+    SeatCategory:
+      type: object
+      properties:
+        id:              { type: integer }
+        event_id:        { type: integer }
+        name:            { type: string, example: "VIP" }
+        total_seats:     { type: integer, example: 500 }
+        available_seats: { type: integer, example: 247 }
+        price:           { type: number, format: double, example: 750000 }
+
+    CreateEventRequest:
+      type: object
+      required: [name, venue, event_date]
+      properties:
+        name:        { type: string }
+        venue:       { type: string }
+        event_date:  { type: string, format: date-time }
+        description: { type: string }
+        banner_url:  { type: string }
+        categories:
+          type: array
+          items:
+            type: object
+            required: [name, total_seats, price]
+            properties:
+              name:        { type: string }
+              total_seats: { type: integer }
+              price:       { type: number }
+
+    Order:
+      type: object
+      properties:
+        id:                { type: integer }
+        user_id:           { type: string }
+        event_id:          { type: integer }
+        seat_category_id:  { type: integer }
+        event_name:        { type: string }
+        seat_category_name:{ type: string }
+        price:             { type: number }
+        status:
+          type: string
+          enum: [locked, confirmed, cancelled, expired]
+        lock_expires_at:   { type: string, format: date-time }
+        created_at:        { type: string, format: date-time }
+
+    CreateOrderRequest:
+      type: object
+      required: [user_id, event_id, seat_category_id]
+      properties:
+        user_id:          { type: string, example: "user_105841117023" }
+        event_id:         { type: integer, example: 1 }
+        seat_category_id: { type: integer, example: 2 }
+
+    Ticket:
+      type: object
+      properties:
+        id:               { type: integer }
+        order_id:         { type: integer }
+        user_id:          { type: string }
+        event_name:       { type: string }
+        seat_category:    { type: string }
+        seat_number:      { type: string }
+        qr_code:          { type: string }
+        status:
+          type: string
+          enum: [active, used, cancelled]
+        issued_at:        { type: string, format: date-time }
+
+    Payment:
+      type: object
+      properties:
+        id:             { type: integer }
+        order_id:       { type: integer }
+        user_id:        { type: string }
+        amount:         { type: number }
+        method:
+          type: string
+          enum: [bank_transfer, credit_card, gopay, ovo, dana]
+        status:
+          type: string
+          enum: [pending, success, failed, cancelled, refunded]
+        paid_at:        { type: string, format: date-time, nullable: true }
+        created_at:     { type: string, format: date-time }
+
+    CreatePaymentRequest:
+      type: object
+      required: [order_id, user_id, method]
+      properties:
+        order_id: { type: integer, example: 42 }
+        user_id:  { type: string, example: "user_105841117023" }
+        method:
+          type: string
+          enum: [bank_transfer, credit_card, gopay, ovo, dana]
+          example: gopay
+
+    Notification:
+      type: object
+      properties:
+        id:         { type: integer }
+        user_id:    { type: string }
+        type:
+          type: string
+          enum: [ticket_confirmed, payment_failed, order_expiring, eticket]
+        title:      { type: string }
+        message:    { type: string }
+        is_read:    { type: boolean }
+        created_at: { type: string, format: date-time }
+
+    Error:
+      type: object
+      properties:
+        error:   { type: string }
+        message: { type: string }
+        code:    { type: integer }

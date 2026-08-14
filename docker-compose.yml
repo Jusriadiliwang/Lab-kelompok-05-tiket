@@ -1,0 +1,226 @@
+# ============================================================
+# War Tiket Konser — Kelompok 5
+# Arsitek: Miftahul Jannah | DevOps: (kosong)
+# ============================================================
+
+networks:
+  tiket-net:
+    driver: bridge
+
+volumes:
+  pg_event_data:
+  pg_ticket_data:
+  pg_payment_data:
+  pg_notif_data:
+  rabbitmq_data:
+  redis_data:
+
+services:
+
+  # ── Infrastructure ──────────────────────────────────────────
+
+  postgres-event:
+    image: postgres:15-alpine
+    container_name: postgres-event
+    environment:
+      POSTGRES_DB: event_db
+      POSTGRES_USER: kelompok5
+      POSTGRES_PASSWORD: tiketkonser123
+    volumes:
+      - pg_event_data:/var/lib/postgresql/data
+      - ./db-init/event_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tiket-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kelompok5 -d event_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-ticket:
+    image: postgres:15-alpine
+    container_name: postgres-ticket
+    environment:
+      POSTGRES_DB: ticket_db
+      POSTGRES_USER: kelompok5
+      POSTGRES_PASSWORD: tiketkonser123
+    volumes:
+      - pg_ticket_data:/var/lib/postgresql/data
+      - ./db-init/ticket_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tiket-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kelompok5 -d ticket_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-payment:
+    image: postgres:15-alpine
+    container_name: postgres-payment
+    environment:
+      POSTGRES_DB: payment_db
+      POSTGRES_USER: kelompok5
+      POSTGRES_PASSWORD: tiketkonser123
+    volumes:
+      - pg_payment_data:/var/lib/postgresql/data
+      - ./db-init/payment_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tiket-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kelompok5 -d payment_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-notification:
+    image: postgres:15-alpine
+    container_name: postgres-notification
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: kelompok5
+      POSTGRES_PASSWORD: tiketkonser123
+    volumes:
+      - pg_notif_data:/var/lib/postgresql/data
+      - ./db-init/notification_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tiket-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kelompok5 -d notification_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: kelompok5
+      RABBITMQ_DEFAULT_PASS: tiketkonser123
+    ports:
+      - "5672:5672"
+      - "15672:15672"   # Management UI: http://localhost:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - tiket-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: redis-server --requirepass tiketkonser123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tiket-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "tiketkonser123", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Microservices ────────────────────────────────────────────
+
+  event-service:
+    build: ./event-service
+    container_name: event-service
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      DB_HOST: postgres-event
+      DB_PORT: 5432
+      DB_NAME: event_db
+      DB_USER: kelompok5
+      DB_PASSWORD: tiketkonser123
+      RABBITMQ_URL: amqp://kelompok5:tiketkonser123@rabbitmq:5672
+    depends_on:
+      postgres-event:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - tiket-net
+    restart: unless-stopped
+
+  ticket-service:
+    build: ./ticket-service
+    container_name: ticket-service
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      DB_HOST: postgres-ticket
+      DB_PORT: 5432
+      DB_NAME: ticket_db
+      DB_USER: kelompok5
+      DB_PASSWORD: tiketkonser123
+      RABBITMQ_URL: amqp://kelompok5:tiketkonser123@rabbitmq:5672
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: tiketkonser123
+      EVENT_SERVICE_URL: http://event-service:3001
+      LOCK_TTL_MINUTES: 15
+    depends_on:
+      postgres-ticket:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tiket-net
+    restart: unless-stopped
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      DB_HOST: postgres-payment
+      DB_PORT: 5432
+      DB_NAME: payment_db
+      DB_USER: kelompok5
+      DB_PASSWORD: tiketkonser123
+      RABBITMQ_URL: amqp://kelompok5:tiketkonser123@rabbitmq:5672
+      TICKET_SERVICE_URL: http://ticket-service:3002
+      PAYMENT_TIMEOUT_MINUTES: 15
+    depends_on:
+      postgres-payment:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - tiket-net
+    restart: unless-stopped
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "3004:3004"
+    environment:
+      PORT: 3004
+      DB_HOST: postgres-notification
+      DB_PORT: 5432
+      DB_NAME: notification_db
+      DB_USER: kelompok5
+      DB_PASSWORD: tiketkonser123
+      RABBITMQ_URL: amqp://kelompok5:tiketkonser123@rabbitmq:5672
+    depends_on:
+      postgres-notification:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - tiket-net
+    restart: unless-stopped
