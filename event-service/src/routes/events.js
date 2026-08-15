@@ -8,6 +8,28 @@ const router  = express.Router();
 const db      = require('../db');
 
 // ─────────────────────────────────────────────────────────────
+// GET /  — Info service
+// ─────────────────────────────────────────────────────────────
+router.get('/', (req, res) => {
+  res.json({
+    service: 'event-service',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: [
+      'GET  /catalog',
+      'GET  /events',
+      'GET  /events/:id',
+      'GET  /events/:id/seats',
+      'POST /events',
+      'PUT  /events/:id/status',
+      'PATCH /events/:id/seats/decrement',
+      'PATCH /events/:id/seats/increment',
+      'GET  /health',
+    ],
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
 // GET /catalog  — ENDPOINT KRITIS #1
 // Daftar konser aktif + kursi tersedia (yang paling sering diakses)
 // ─────────────────────────────────────────────────────────────
@@ -185,7 +207,8 @@ router.patch('/events/:id/seats/decrement', async (req, res) => {
     }
     const { rows: [updated] } = await client.query(
       `UPDATE seat_categories SET available_seats = available_seats - 1, updated_at=NOW()
-       WHERE id=$1 RETURNING *`,
+       WHERE id=$1
+       RETURNING *, (SELECT name FROM events WHERE id=event_id) AS event_name`,
       [seat_category_id]
     );
     await client.query('COMMIT');

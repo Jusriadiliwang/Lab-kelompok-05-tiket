@@ -59,14 +59,22 @@ async function cleanupExpiredOrders() {
       console.log(`[ticket-service] Order #${order.id} kedaluwarsa — melepas kursi`);
 
       // Kembalikan kursi ke event-service
-      await fetch(
-        `${EVENT_SERVICE_URL}/events/${order.event_id}/seats/increment`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ seat_category_id: order.seat_category_id })
+      try {
+        const incrRes = await fetch(
+          `${EVENT_SERVICE_URL}/events/${order.event_id}/seats/increment`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ seat_category_id: order.seat_category_id })
+          }
+        );
+        if (!incrRes.ok) {
+          const errBody = await incrRes.json().catch(() => ({}));
+          console.error(`[ticket-service] GAGAL kembalikan kursi untuk order #${order.id} (HTTP ${incrRes.status}):`, errBody);
         }
-      ).catch(err => console.error('[ticket-service] Gagal kembalikan kursi:', err.message));
+      } catch (fetchErr) {
+        console.error(`[ticket-service] GAGAL kembalikan kursi untuk order #${order.id} (network):`, fetchErr.message);
+      }
 
       // Kirim notifikasi
       await mq.publish('order.expired', {

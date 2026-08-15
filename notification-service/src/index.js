@@ -93,7 +93,7 @@ async function handleMessage(routingKey, data) {
     case 'order.cancelled':
       await saveNotification(
         data.user_id,
-        'order_expiring',
+        'order_cancelled',
         'Pesanan Dibatalkan',
         `Pesananmu #${data.order_id} telah dibatalkan. Kursi telah dilepas kembali ke sistem.`
       );
@@ -102,7 +102,7 @@ async function handleMessage(routingKey, data) {
     case 'payment.cancelled':
       await saveNotification(
         data.user_id,
-        'payment_failed',
+        'payment_refunded',
         'Refund Diproses',
         `Refund sebesar Rp ${Number(data.amount).toLocaleString('id-ID')} untuk pembayaran #${data.payment_id} sedang diproses.`
       );

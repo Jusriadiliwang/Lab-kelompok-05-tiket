@@ -7,6 +7,23 @@ const express = require('express');
 const router  = express.Router();
 const db      = require('../db');
 
+// ─────────────────────────────────────────────────────────────
+// GET /  — Info service
+// ─────────────────────────────────────────────────────────────
+router.get('/', (req, res) => {
+  res.json({
+    service: 'notification-service',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: [
+      'GET   /notifications?user_id=xxx',
+      'PATCH /notifications/:id/read',
+      'PATCH /notifications/read-all',
+      'GET   /health',
+    ],
+  });
+});
+
 // GET /notifications?user_id=xxx
 router.get('/notifications', async (req, res) => {
   const { user_id, limit = 20, unread_only } = req.query;
@@ -36,7 +53,7 @@ router.get('/notifications', async (req, res) => {
 router.patch('/notifications/:id/read', async (req, res) => {
   try {
     const { rows: [notif] } = await db.query(
-      'UPDATE notifications SET is_read=TRUE WHERE id=$1 RETURNING *',
+      'UPDATE notifications SET is_read=TRUE, updated_at=NOW() WHERE id=$1 RETURNING *',
       [req.params.id]
     );
     if (!notif) return res.status(404).json({ error: 'not_found', message: 'Notifikasi tidak ditemukan' });
@@ -53,7 +70,7 @@ router.patch('/notifications/read-all', async (req, res) => {
 
   try {
     const { rowCount } = await db.query(
-      'UPDATE notifications SET is_read=TRUE WHERE user_id=$1 AND is_read=FALSE',
+      'UPDATE notifications SET is_read=TRUE, updated_at=NOW() WHERE user_id=$1 AND is_read=FALSE',
       [user_id]
     );
     res.json({ message: `${rowCount} notifikasi ditandai dibaca` });

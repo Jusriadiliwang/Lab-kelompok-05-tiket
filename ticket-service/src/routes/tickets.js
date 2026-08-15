@@ -63,6 +63,26 @@ async function releaseLock(lockKey, token) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// GET /  — Info service
+// ─────────────────────────────────────────────────────────────
+router.get('/', (req, res) => {
+  res.json({
+    service: 'ticket-service',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: [
+      'POST /orders',
+      'GET  /orders',
+      'GET  /orders/:id',
+      'POST /orders/:id/cancel',
+      'POST /orders/:id/confirm',
+      'GET  /tickets/:id',
+      'GET  /health',
+    ],
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
 // POST /orders  — ENDPOINT PALING KRITIS
 // Kunci kursi sementara (15 menit)
 // ─────────────────────────────────────────────────────────────
@@ -101,6 +121,7 @@ router.post('/orders', async (req, res) => {
   }
 
   const client = await db.connect();
+  let seatData = null; // dideklarasi di luar try agar catch bisa cek apakah decrement sudah terjadi
   try {
     await client.query('BEGIN');
 
@@ -123,7 +144,7 @@ router.post('/orders', async (req, res) => {
       });
     }
 
-    const seatData = await seatRes.json();
+    seatData = await seatRes.json(); // simpan agar catch bisa kompensasi
 
     // 4. Buat order di ticket-service DB
     const expiresAt = new Date(Date.now() + LOCK_TTL_MINUTES * 60 * 1000);
@@ -132,7 +153,7 @@ router.post('/orders', async (req, res) => {
          (user_id, event_id, seat_category_id, event_name, seat_category_name, price, status, lock_expires_at)
        VALUES ($1, $2, $3, $4, $5, $6, 'locked', $7)
        RETURNING *`,
-      [user_id, event_id, seat_category_id, seatData.event_id || event_id,
+      [user_id, event_id, seat_category_id, seatData.event_name || `Event #${event_id}`,
        seatData.name, seatData.price, expiresAt]
     );
 
@@ -155,6 +176,17 @@ router.post('/orders', async (req, res) => {
 
   } catch (err) {
     await client.query('ROLLBACK');
+    // Kompensasi: kembalikan kursi jika decrement sudah terjadi sebelum kegagalan
+    if (seatData) {
+      await fetch(
+        `${EVENT_SERVICE_URL}/events/${event_id}/seats/increment`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ seat_category_id })
+        }
+      ).catch(e => console.error('[POST /orders] Gagal kompensasi kursi:', e.message));
+    }
     console.error('[POST /orders]', err.message);
     res.status(500).json({ error: 'internal_error', message: err.message });
   } finally {
@@ -223,7 +255,7 @@ router.post('/orders/:id/cancel', async (req, res) => {
     );
 
     // Kembalikan kursi ke event-service
-    await fetch(
+    const incrRes = await fetch(
       `${EVENT_SERVICE_URL}/events/${order.event_id}/seats/increment`,
       {
         method: 'PATCH',
@@ -231,6 +263,16 @@ router.post('/orders/:id/cancel', async (req, res) => {
         body: JSON.stringify({ seat_category_id: order.seat_category_id })
       }
     );
+
+    if (!incrRes.ok) {
+      await client.query('ROLLBACK');
+      const errBody = await incrRes.json().catch(() => ({}));
+      console.error(`[POST /orders/:id/cancel] Gagal kembalikan kursi untuk order #${order.id}:`, errBody);
+      return res.status(502).json({
+        error: 'seat_restore_failed',
+        message: 'Gagal mengembalikan kursi ke stok, coba lagi'
+      });
+    }
 
     await client.query('COMMIT');
 
@@ -275,8 +317,10 @@ router.post('/orders/:id/confirm', async (req, res) => {
     );
 
     // Buat tiket resmi
+    // seat_number di-generate dari order.id agar unik secara global
+    // format: SEAT-{order_id} — deterministik, tidak mungkin collision
     const qrCode  = `QR-${uuidv4()}`;
-    const seatNum = `${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${Math.floor(Math.random() * 100) + 1}`;
+    const seatNum = `SEAT-${order.id}`;
     const { rows: [ticket] } = await client.query(
       `INSERT INTO tickets (order_id, user_id, event_name, seat_category, seat_number, qr_code)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,

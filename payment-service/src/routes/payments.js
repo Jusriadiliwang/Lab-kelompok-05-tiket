@@ -14,6 +14,24 @@ const TICKET_SERVICE_URL   = process.env.TICKET_SERVICE_URL   || 'http://localho
 const PAYMENT_TIMEOUT_MIN  = parseInt(process.env.PAYMENT_TIMEOUT_MINUTES) || 15;
 
 // ─────────────────────────────────────────────────────────────
+// GET /  — Info service
+// ─────────────────────────────────────────────────────────────
+router.get('/', (req, res) => {
+  res.json({
+    service: 'payment-service',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: [
+      'POST /payments',
+      'GET  /payments',
+      'GET  /payments/:id',
+      'POST /payments/:id/cancel',
+      'GET  /health',
+    ],
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
 // POST /payments  — ENDPOINT KRITIS #3
 // Proses pembayaran untuk pesanan yang terkunci
 // ─────────────────────────────────────────────────────────────
@@ -106,6 +124,17 @@ router.post('/payments', async (req, res) => {
         body: JSON.stringify({ payment_id: payment.id })
       });
 
+      if (!confirmRes.ok) {
+        // KRITIS: pembayaran sudah berhasil tapi tiket gagal diterbitkan.
+        // Log untuk alerting/manual recovery — jangan kembalikan error ke user
+        // karena payment sudah COMMIT dan tidak bisa di-rollback di sini.
+        const errBody = await confirmRes.json().catch(() => ({}));
+        console.error(
+          `[POST /payments] KRITIS: Payment ${payment.id} sukses tapi konfirmasi tiket GAGAL!`,
+          `order_id=${order_id}`, `status=${confirmRes.status}`, errBody
+        );
+      }
+
       // Publish event pembayaran berhasil
       await mq.publish('payment.success', {
         payment_id: updated.id,
@@ -183,7 +212,7 @@ router.get('/payments/:id', async (req, res) => {
 router.post('/payments/:id/cancel', async (req, res) => {
   try {
     const { rows: [payment] } = await db.query(
-      `UPDATE payments SET status='cancelled', updated_at=NOW()
+      `UPDATE payments SET status='refunded', updated_at=NOW()
        WHERE id=$1 AND status='success' RETURNING *`,
       [req.params.id]
     );
@@ -219,7 +248,7 @@ router.get('/payments', async (req, res) => {
     const params = [];
     if (order_id)  { params.push(order_id);  query += ` AND order_id=$${params.length}`; }
     if (user_id)   { params.push(user_id);   query += ` AND user_id=$${params.length}`; }
-    query += ' ORDER BY created_at DESC';
+    query += ' ORDER BY created_at DESC LIMIT 100';
 
     const { rows } = await db.query(query, params);
     res.json({ data: rows });
