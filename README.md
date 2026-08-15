@@ -6,10 +6,10 @@
 
 | Nama | NIM | Peran |
 |---|---|---|
+| Miftahul Jannah | 105841116023 | Arsitek Sistem |
 | Ashabul Kahfi | 105841108523 | Backend/API Engineer |
 | Jusriadi Liwang | 105841117023 | Data & Persistence Engineer |
 | Marhepi Rahmadani | 105841109523 | QA, Load-Test & Dokumentasi |
-| Miftahul Jannah | 105841116023 | Arsitek Sistem |
 
 ## Arsitektur
 
