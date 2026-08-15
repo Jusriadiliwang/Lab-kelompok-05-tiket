@@ -1,17 +1,6 @@
 # ============================================================
 # War Tiket Konser — Kelompok 5
-# Arsitek Sistem : Miftahul Jannah
-# DevOps / Infra  : Kelompok 5
-# Versi           : 1.0.0
-# Terakhir diubah : 2026-08-15
-#
-# Topologi layanan:
-#   event-service        :3001  ── PostgreSQL event_db
-#   ticket-service       :3002  ── PostgreSQL ticket_db + Redis (distributed lock)
-#   payment-service      :3003  ── PostgreSQL payment_db
-#   notification-service :3004  ── PostgreSQL notification_db
-#   rabbitmq             :5672 / :15672 (management UI)
-#   redis                :6379
+# Arsitek: Miftahul Jannah | DevOps: (kosong)
 # ============================================================
 
 networks:
@@ -160,12 +149,6 @@ services:
     networks:
       - tiket-net
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health || exit 1"]
-      interval: 20s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
 
   ticket-service:
     build: ./ticket-service
@@ -192,17 +175,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      event-service:
-        condition: service_healthy
     networks:
       - tiket-net
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3002/health || exit 1"]
-      interval: 20s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
 
   payment-service:
     build: ./payment-service
@@ -224,17 +199,9 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      ticket-service:
-        condition: service_healthy
     networks:
       - tiket-net
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3003/health || exit 1"]
-      interval: 20s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
 
   notification-service:
     build: ./notification-service
@@ -257,9 +224,3 @@ services:
     networks:
       - tiket-net
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3004/health || exit 1"]
-      interval: 20s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
