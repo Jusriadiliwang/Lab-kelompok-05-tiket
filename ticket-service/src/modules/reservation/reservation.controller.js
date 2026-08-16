@@ -80,6 +80,13 @@ router.post('/orders', async (req, res) => {
 
     await client.query('COMMIT');
 
+    // Set long-term Redis lock (durasi = masa reservasi) setelah DB sukses
+    await seatLockService.setReservationLock(
+      `${event_id}:${seat_category_id}:${user_id}`,
+      user_id,
+      LOCK_TTL_MINUTES * 60
+    );
+
     await ticketLockedProducer.publish({ order_id: order.id, user_id, event_id, seat_category_id, price: seatData.price, expires_at: expiresAt });
 
     res.status(201).json({ ...order, message: `Kursi dikunci selama ${LOCK_TTL_MINUTES} menit. Segera bayar sebelum kedaluwarsa.` });

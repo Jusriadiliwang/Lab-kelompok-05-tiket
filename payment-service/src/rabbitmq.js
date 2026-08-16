@@ -18,8 +18,12 @@ async function connect(onMessage) {
 
       // Consumer untuk event dari ticket-service (jika diperlukan)
       if (onMessage) {
-        const q = await channel.assertQueue('payment.events', { durable: true });
-        await channel.bindQueue(q.queue, EXCHANGE, 'order.#');
+        const q = await channel.assertQueue('payment-service.ticket_events', { durable: true });
+        const patterns = ['ticket.locked', 'order.created'];
+        for (const pattern of patterns) {
+          await channel.bindQueue(q.queue, EXCHANGE, pattern);
+        }
+        channel.prefetch(5);
         channel.consume(q.queue, async (msg) => {
           if (!msg) return;
           try {
@@ -31,6 +35,7 @@ async function connect(onMessage) {
             channel.nack(msg, false, false);
           }
         });
+        console.log('[payment-service] RabbitMQ consumer aktif: ticket.locked, order.created');
       }
 
       conn.on('error', (err) => {

@@ -57,4 +57,11 @@ async function deleteLock(seatKey) {
   }
 }
 
-module.exports = { acquireLock, releaseLock, markSold, deleteLock };
+// Set long-term reservation lock setelah DB INSERT berhasil
+// Mencegah double-booking user yang sama via Redis (selain DB-level check)
+async function setReservationLock(seatKey, userId, ttlSeconds) {
+  const lockKey = `lock:seat:${seatKey}`;
+  await getRedis().set(lockKey, userId, 'EX', ttlSeconds);
+}
+
+module.exports = { acquireLock, releaseLock, markSold, deleteLock, setReservationLock };

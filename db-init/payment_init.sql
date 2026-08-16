@@ -93,3 +93,18 @@ VALUES
 ON CONFLICT DO NOTHING;
 
 SELECT setval('payments_id_seq', (SELECT MAX(id) FROM payments));
+
+-- ── Audit log untuk event yang masuk ke payment-service ──────
+CREATE TABLE IF NOT EXISTS payment_audit_log (
+    id         SERIAL PRIMARY KEY,
+    event_type VARCHAR(100) NOT NULL,
+    order_id   INTEGER,
+    user_id    VARCHAR(255),
+    event_id   INTEGER,
+    payload    JSONB,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_log_order  ON payment_audit_log(order_id);
+CREATE INDEX IF NOT EXISTS idx_audit_log_event  ON payment_audit_log(event_type);
+

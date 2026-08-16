@@ -11,6 +11,7 @@ const paymentsRouter = require('./modules/order/order.controller');
 const db             = require('./database');
 const mq             = require('./rabbitmq');
 const { start: startExpireJob } = require('./jobs/expire-order.job');
+const { handleMessage } = require('./consumers');
 
 const app  = express();
 const PORT = process.env.PORT || 3003;
@@ -53,7 +54,7 @@ async function start() {
     }
   }
 
-  await mq.connect();
+  await mq.connect(handleMessage);
 
   startExpireJob();
 

@@ -12,6 +12,7 @@ const ticketsRouter = require('./modules/reservation/reservation.controller');
 const db            = require('./database');
 const mq            = require('./rabbitmq');
 const { start: startExpireJob } = require('./jobs/expire-reservation.job');
+const { handleMessage } = require('./consumers');
 
 const app  = express();
 const PORT = process.env.PORT || 3002;
@@ -57,7 +58,7 @@ async function start() {
     }
   }
 
-  await mq.connect();
+  await mq.connect(handleMessage);
 
   startExpireJob();
 
