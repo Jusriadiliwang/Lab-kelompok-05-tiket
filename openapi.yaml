@@ -4,27 +4,35 @@ info:
   description: |
     Sistem penjualan tiket konser dengan antrean virtual dan kursi terbatas.
     Kelompok 5 — Praktikum Microservices.
-    
+
     **Masalah utama:** Satu kursi hanya boleh terjual satu kali walau seribu orang memintanya bersamaan.
-    
-    **Services:**
-    - event-service (port 3001) — Kelola konser, jadwal, kategori kursi, dan harga
-    - ticket-service (port 3002) — Kunci kursi sementara, konfirmasi, lepas kunci saat kedaluwarsa
-    - payment-service (port 3003) — Terima pembayaran, konfirmasi, batalkan bila gagal/timeout
-    - notification-service (port 3004) — Kirim e-ticket, pengingat, dan pemberitahuan gagal bayar
-  version: "1.0.0"
+
+    **Arsitektur:**
+    Semua request masuk melalui **API Gateway** (port 3000) yang menangani:
+    - JWT authentication
+    - Redis sliding-window rate limiting
+    - Routing ke microservice yang sesuai
+
+    **Rate Limiting:**
+    | Endpoint | Batas | Window |
+    |---|---|---|
+    | `POST /orders` | 10 req | per 10 detik per user |
+    | `POST /payments` | 5 req | per 30 detik per user |
+    | Semua endpoint lain | 100 req | per 60 detik per user |
+
+    Header response: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Window`
+
+    **Pagination default:** 20 item per halaman, maksimal 50. Gunakan `?page=1&limit=20`.
+
+    **Authentication:** Semua endpoint kecuali `GET /catalog`, `GET /events`, `GET /health`
+    membutuhkan header `Authorization: Bearer <JWT>`.
+  version: "2.0.0"
   contact:
     name: Kelompok 5
-    
+
 servers:
-  - url: http://localhost:3001
-    description: event-service
-  - url: http://localhost:3002
-    description: ticket-service
-  - url: http://localhost:3003
-    description: payment-service
-  - url: http://localhost:3004
-    description: notification-service
+  - url: http://localhost:3000
+    description: API Gateway (single entry point — auth + rate-limit + routing)
 
 tags:
   - name: catalog
@@ -54,6 +62,7 @@ paths:
         **ENDPOINT KRITIS** — Endpoint ini diakses ratusan ribu kali saat tiket dibuka.
         Menampilkan semua konser yang masih memiliki kursi tersedia beserta harga dan jumlahnya.
       operationId: getCatalog
+      security: []
       parameters:
         - name: page
           in: query
@@ -185,6 +194,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
         "400":
           $ref: "#/components/responses/BadRequest"
     get:
@@ -299,6 +310,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /payments/{paymentId}:
     get:
@@ -420,6 +433,32 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Token tidak valid atau tidak ada
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    TooManyRequests:
+      description: Rate limit terlampaui
+      headers:
+        X-RateLimit-Limit:
+          schema: { type: integer }
+          description: Batas maksimum request dalam window
+        X-RateLimit-Remaining:
+          schema: { type: integer }
+          description: Sisa request yang dibolehkan
+        X-RateLimit-Window:
+          schema: { type: string }
+          description: Durasi window (contoh 10s, 60s)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: too_many_requests
+            message: "Rate limit terlampaui. Maksimal 10 request per 10 detik."
+            retryAfter: 10
 
   schemas:
 
@@ -561,3 +600,15 @@ components:
         error:   { type: string }
         message: { type: string }
         code:    { type: integer }
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token dari `POST /auth/token` (dev) atau sistem auth.
+        Sertakan di header: `Authorization: Bearer <token>`
+
+security:
+  - BearerAuth: []
