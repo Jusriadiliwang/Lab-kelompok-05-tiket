@@ -553,6 +553,7 @@ components:
           type: string
           enum: [active, used, cancelled]
         issued_at:        { type: string, format: date-time }
+        updated_at:       { type: string, format: date-time }
 
     Payment:
       type: object
@@ -588,11 +589,12 @@ components:
         user_id:    { type: string }
         type:
           type: string
-          enum: [ticket_confirmed, payment_failed, order_expiring, eticket]
+          enum: [ticket_confirmed, eticket, payment_failed, payment_refunded, order_expiring, order_cancelled]
         title:      { type: string }
         message:    { type: string }
         is_read:    { type: boolean }
         created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
 
     Error:
       type: object
