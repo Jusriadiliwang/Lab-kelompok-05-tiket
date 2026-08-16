@@ -13,6 +13,7 @@ volumes:
   pg_payment_data:
   pg_notif_data:
   rabbitmq_data:
+  pg_erp_data:
   redis_data:
 
 services:
@@ -246,6 +247,55 @@ services:
       - payment-service
       - notification-service
       - redis
+    networks:
+      - tiket-net
+    restart: unless-stopped
+  postgres-erp:
+    image: postgres:15-alpine
+    container_name: postgres-erp
+    environment:
+      POSTGRES_DB: erp_db
+      POSTGRES_USER: kelompok5
+      POSTGRES_PASSWORD: tiketkonser123
+    volumes:
+      - pg_erp_data:/var/lib/postgresql/data
+      - ./db-init/erp_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tiket-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kelompok5 -d erp_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  erp-service:
+    build: ./erp-service
+    container_name: erp-service
+    ports:
+      - "3005:3005"
+    environment:
+      PORT: 3005
+      NODE_ENV: production
+      DB_HOST: postgres-erp
+      DB_PORT: 5432
+      DB_NAME: erp_db
+      DB_USER: kelompok5
+      DB_PASSWORD: tiketkonser123
+      JWT_SECRET: erp_wartiket_secret_kelompok5_2024
+      JWT_EXPIRES_IN: 8h
+      RABBITMQ_URL: amqp://kelompok5:tiketkonser123@rabbitmq:5672
+      EVENT_SERVICE_URL: http://event-service:3001
+      TICKET_SERVICE_URL: http://ticket-service:3002
+      PAYMENT_SERVICE_URL: http://payment-service:3003
+    depends_on:
+      postgres-erp:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      event-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
     networks:
       - tiket-net
     restart: unless-stopped
