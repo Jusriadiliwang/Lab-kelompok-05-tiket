@@ -232,7 +232,7 @@ services:
       - "3000:3000"
     environment:
       PORT: 3000
-      NODE_ENV: production
+      NODE_ENV: development
       JWT_SECRET: wartiket_secret_kelompok5_2024
       EVENT_SERVICE_URL: http://event-service:3001
       TICKET_SERVICE_URL: http://ticket-service:3002

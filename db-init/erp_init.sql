@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS erp_seat_snapshots (
 
 CREATE INDEX IF NOT EXISTS idx_erp_seat_event  ON erp_seat_snapshots(erp_event_id);
 CREATE INDEX IF NOT EXISTS idx_erp_seat_status ON erp_seat_snapshots(status);
-ALTER TABLE erp_seat_snapshots ADD CONSTRAINT IF NOT EXISTS uq_seat_event_cat UNIQUE (erp_event_id, source_cat_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_seat_event_cat ON erp_seat_snapshots(erp_event_id, source_cat_id);
 
 -- ── M3: Revenue Reports ────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS revenue_reports (
@@ -101,6 +101,6 @@ INSERT INTO admin_users (name, email, password_hash, role)
 VALUES (
   'Super Admin',
   'admin@wartiket.id',
-  '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+  '$2a$10$CPO4qw4XqDRZSfMzunkhzemptnDRSkl7ifmlLzwepNPR5GDI1wkD.',
   'super-admin'
 ) ON CONFLICT (email) DO NOTHING;
