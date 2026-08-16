@@ -224,3 +224,28 @@ services:
     networks:
       - tiket-net
     restart: unless-stopped
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      JWT_SECRET: wartiket_secret_kelompok5_2024
+      EVENT_SERVICE_URL: http://event-service:3001
+      TICKET_SERVICE_URL: http://ticket-service:3002
+      PAYMENT_SERVICE_URL: http://payment-service:3003
+      NOTIFICATION_SERVICE_URL: http://notification-service:3004
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: tiketkonser123
+    depends_on:
+      - event-service
+      - ticket-service
+      - payment-service
+      - notification-service
+      - redis
+    networks:
+      - tiket-net
+    restart: unless-stopped
