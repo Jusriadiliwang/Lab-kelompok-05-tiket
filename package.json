@@ -1,0 +1,22 @@
+{
+  "name": "war-tiket-konser",
+  "version": "1.0.0",
+  "description": "War Tiket Konser — Monorepo Microservices (Kelompok 5)",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "event-service",
+    "ticket-service",
+    "payment-service",
+    "notification-service"
+  ],
+  "scripts": {
+    "dev:event":        "npm run dev --prefix event-service",
+    "dev:ticket":       "npm run dev --prefix ticket-service",
+    "dev:payment":      "npm run dev --prefix payment-service",
+    "dev:notification": "npm run dev --prefix notification-service",
+    "start:all":        "docker compose up --build",
+    "stop:all":         "docker compose down"
+  }
+}

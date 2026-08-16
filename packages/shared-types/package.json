@@ -1,0 +1,7 @@
+{
+  "name": "@tiket/shared-types",
+  "version": "1.0.0",
+  "description": "Shared types, enums, DTO, dan event schema untuk War Tiket Konser",
+  "main": "src/index.js",
+  "dependencies": {}
+}

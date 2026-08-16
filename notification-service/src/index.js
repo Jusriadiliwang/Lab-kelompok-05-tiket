@@ -9,8 +9,13 @@ const cors    = require('cors');
 const morgan  = require('morgan');
 const amqp    = require('amqplib');
 
-const notifRouter = require('./routes/notifications');
-const db          = require('./db');
+const notifRouter = require('./modules/notification/notification.controller');
+const db          = require('./database');
+
+const ticketConfirmedConsumer = require('./consumers/ticket-confirmed.consumer');
+const ticketExpiredConsumer   = require('./consumers/ticket-expired.consumer');
+const paymentFailedConsumer   = require('./consumers/payment-failed.consumer');
+const { start: startRetryJob } = require('./jobs/retry-failed-notif.job');
 
 const app      = express();
 const PORT     = process.env.PORT || 3004;
@@ -36,78 +41,25 @@ app.use((req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────
-// Helper: simpan notifikasi ke DB
-// ─────────────────────────────────────────────────────────────
-async function saveNotification(user_id, type, title, message) {
-  try {
-    await db.query(
-      'INSERT INTO notifications (user_id, type, title, message) VALUES ($1, $2, $3, $4)',
-      [user_id, type, title, message]
-    );
-    console.log(`[notification-service] Notifikasi disimpan: ${type} → ${user_id}`);
-  } catch (err) {
-    console.error('[notification-service] Gagal simpan notifikasi:', err.message);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
 // Handler pesan RabbitMQ
 // ─────────────────────────────────────────────────────────────
 async function handleMessage(routingKey, data) {
   console.log(`[notification-service] Event: ${routingKey}`, data);
-
   switch (routingKey) {
     case 'ticket.confirmed':
-      await saveNotification(
-        data.user_id,
-        'ticket_confirmed',
-        'Tiket Berhasil Dikonfirmasi!',
-        `Selamat! Tiket kamu untuk ${data.event_name} (${data.seat_category} - Kursi ${data.seat_number}) sudah dikonfirmasi. QR Code: ${data.qr_code}`
-      );
-      await saveNotification(
-        data.user_id,
-        'eticket',
-        'E-Tiket Kamu',
-        `E-Tiket untuk ${data.event_name}. QR: ${data.qr_code}. Tunjukkan ini di pintu masuk.`
-      );
+      await ticketConfirmedConsumer.handle(data);
       break;
-
-    case 'payment.failed':
-      await saveNotification(
-        data.user_id,
-        'payment_failed',
-        'Pembayaran Gagal',
-        `Pembayaranmu untuk order #${data.order_id} gagal diproses. Kursi masih terkunci. Coba bayar lagi sebelum waktu habis.`
-      );
-      break;
-
+    case 'ticket.expired':
     case 'order.expired':
-      await saveNotification(
-        data.user_id,
-        'order_expiring',
-        'Pesanan Kedaluwarsa',
-        `Pesananmu untuk ${data.event_name || 'konser'} (Order #${data.order_id}) sudah kedaluwarsa karena tidak dibayar. Kursi telah dilepas.`
-      );
+      await ticketExpiredConsumer.handle(data);
       break;
-
-    case 'order.cancelled':
-      await saveNotification(
-        data.user_id,
-        'order_cancelled',
-        'Pesanan Dibatalkan',
-        `Pesananmu #${data.order_id} telah dibatalkan. Kursi telah dilepas kembali ke sistem.`
-      );
+    case 'payment.failed':
+      await paymentFailedConsumer.handle(data);
       break;
-
     case 'payment.cancelled':
-      await saveNotification(
-        data.user_id,
-        'payment_refunded',
-        'Refund Diproses',
-        `Refund sebesar Rp ${Number(data.amount).toLocaleString('id-ID')} untuk pembayaran #${data.payment_id} sedang diproses.`
-      );
+    case 'order.cancelled':
+      await paymentFailedConsumer.handle({ ...data, order_id: data.order_id || data.payment_id });
       break;
-
     default:
       console.log(`[notification-service] Event tidak dikenal: ${routingKey}`);
   }
@@ -131,6 +83,7 @@ async function connectRabbitMQ() {
       // Subscribe ke semua event
       const patterns = [
         'ticket.confirmed',
+        'ticket.expired',
         'payment.failed',
         'payment.cancelled',
         'order.expired',
@@ -186,6 +139,8 @@ async function start() {
   }
 
   await connectRabbitMQ();
+
+  startRetryJob();
 
   app.listen(PORT, () => {
     console.log(`[notification-service] Berjalan di http://localhost:${PORT}`);

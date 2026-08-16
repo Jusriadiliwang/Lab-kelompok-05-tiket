@@ -8,8 +8,9 @@ const express = require('express');
 const cors    = require('cors');
 const morgan  = require('morgan');
 
-const eventsRouter = require('./routes/events');
-const db           = require('./db');
+const eventsRouter         = require('./modules/event/event.controller');
+const seatCategoryRouter   = require('./modules/seat-category/seat-category.controller');
+const db                   = require('./database');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -21,6 +22,7 @@ app.use(morgan('combined'));
 
 // ── Routes ────────────────────────────────────────────────────
 app.use('/', eventsRouter);
+app.use('/', seatCategoryRouter);
 
 // Health check
 app.get('/health', async (req, res) => {

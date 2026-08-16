@@ -1,0 +1,9 @@
+{
+  "name": "@tiket/shared-utils",
+  "version": "1.0.0",
+  "description": "Shared utilities: logger, correlation ID, error handler",
+  "main": "src/index.js",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}

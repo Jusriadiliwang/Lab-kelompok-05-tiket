@@ -7,15 +7,14 @@ require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
 const morgan  = require('morgan');
-const fetch   = require('node-fetch');
 
-const ticketsRouter = require('./routes/tickets');
-const db            = require('./db');
+const ticketsRouter = require('./modules/reservation/reservation.controller');
+const db            = require('./database');
 const mq            = require('./rabbitmq');
+const { start: startExpireJob } = require('./jobs/expire-reservation.job');
 
 const app  = express();
 const PORT = process.env.PORT || 3002;
-const EVENT_SERVICE_URL = process.env.EVENT_SERVICE_URL || 'http://localhost:3001';
 
 // ── Middleware ────────────────────────────────────────────────
 app.use(cors());
@@ -43,56 +42,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'internal_error', message: 'Terjadi kesalahan server' });
 });
 
-// ─────────────────────────────────────────────────────────────
-// Background job: expired order cleanup (setiap 1 menit)
-// Membebaskan kursi yang terkunci tapi tidak dibayar
-// ─────────────────────────────────────────────────────────────
-async function cleanupExpiredOrders() {
-  try {
-    const { rows: expired } = await db.query(
-      `UPDATE orders SET status='expired', updated_at=NOW()
-       WHERE status='locked' AND lock_expires_at <= NOW()
-       RETURNING *`
-    );
-
-    for (const order of expired) {
-      console.log(`[ticket-service] Order #${order.id} kedaluwarsa — melepas kursi`);
-
-      // Kembalikan kursi ke event-service
-      try {
-        const incrRes = await fetch(
-          `${EVENT_SERVICE_URL}/events/${order.event_id}/seats/increment`,
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ seat_category_id: order.seat_category_id })
-          }
-        );
-        if (!incrRes.ok) {
-          const errBody = await incrRes.json().catch(() => ({}));
-          console.error(`[ticket-service] GAGAL kembalikan kursi untuk order #${order.id} (HTTP ${incrRes.status}):`, errBody);
-        }
-      } catch (fetchErr) {
-        console.error(`[ticket-service] GAGAL kembalikan kursi untuk order #${order.id} (network):`, fetchErr.message);
-      }
-
-      // Kirim notifikasi
-      await mq.publish('order.expired', {
-        order_id: order.id,
-        user_id: order.user_id,
-        event_id: order.event_id,
-        event_name: order.event_name
-      });
-    }
-
-    if (expired.length > 0) {
-      console.log(`[ticket-service] ${expired.length} order kedaluwarsa diproses`);
-    }
-  } catch (err) {
-    console.error('[ticket-service] Cleanup error:', err.message);
-  }
-}
-
 // ── Start ─────────────────────────────────────────────────────
 async function start() {
   let retries = 10;
@@ -110,10 +59,7 @@ async function start() {
 
   await mq.connect();
 
-  // Jalankan cleanup setiap 60 detik
-  setInterval(cleanupExpiredOrders, 60 * 1000);
-  // Jalankan sekali saat start
-  setTimeout(cleanupExpiredOrders, 5000);
+  startExpireJob();
 
   app.listen(PORT, () => {
     console.log(`[ticket-service] Berjalan di http://localhost:${PORT}`);

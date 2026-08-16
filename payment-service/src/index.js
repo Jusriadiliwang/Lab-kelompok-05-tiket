@@ -7,9 +7,10 @@ const express = require('express');
 const cors    = require('cors');
 const morgan  = require('morgan');
 
-const paymentsRouter = require('./routes/payments');
-const db             = require('./db');
+const paymentsRouter = require('./modules/order/order.controller');
+const db             = require('./database');
 const mq             = require('./rabbitmq');
+const { start: startExpireJob } = require('./jobs/expire-order.job');
 
 const app  = express();
 const PORT = process.env.PORT || 3003;
@@ -53,6 +54,8 @@ async function start() {
   }
 
   await mq.connect();
+
+  startExpireJob();
 
   app.listen(PORT, () => {
     console.log(`[payment-service] Berjalan di http://localhost:${PORT}`);

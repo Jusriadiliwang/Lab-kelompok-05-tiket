@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><title>E-Tiket Kamu</title></head>
+<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+  <h1 style="color:#1a1a2e;">🎫 E-Tiket Konser</h1>
+  <p>Halo, <strong>{{user_name}}</strong>!</p>
+  <p>Selamat, tiketmu untuk <strong>{{event_name}}</strong> telah dikonfirmasi.</p>
+  <table style="border-collapse:collapse;width:100%;margin:20px 0;">
+    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold;">Konser</td><td style="padding:8px;border:1px solid #ddd;">{{event_name}}</td></tr>
+    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold;">Tanggal</td><td style="padding:8px;border:1px solid #ddd;">{{event_date}}</td></tr>
+    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold;">Kategori</td><td style="padding:8px;border:1px solid #ddd;">{{seat_category}}</td></tr>
+    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold;">Nomor Kursi</td><td style="padding:8px;border:1px solid #ddd;">{{seat_number}}</td></tr>
+    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold;">Kode QR</td><td style="padding:8px;border:1px solid #ddd;font-family:monospace;">{{qr_code}}</td></tr>
+  </table>
+  <p>Tunjukkan kode QR di atas saat memasuki venue.</p>
+  <p style="color:#888;font-size:12px;">War Tiket Konser — Kelompok 5</p>
+</body>
+</html>
