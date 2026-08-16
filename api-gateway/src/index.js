@@ -19,6 +19,7 @@ const morgan  = require('morgan');
 const { correlationIdMiddleware } = require('./middleware/correlation-id.middleware');
 const { authMiddleware, signToken } = require('./middleware/auth.middleware');
 const { rateLimitMiddleware }     = require('./middleware/rate-limit.middleware');
+const { catalogCacheHandler }     = require('./middleware/cache.middleware');
 const eventProxy       = require('./proxy/event.proxy');
 const ticketProxy      = require('./proxy/ticket.proxy');
 const paymentProxy     = require('./proxy/payment.proxy');
@@ -60,8 +61,10 @@ if (process.env.NODE_ENV !== 'production') {
 
 // ── Routing → Proxy ──────────────────────────────────────────
 
-// event-service: catalog, events
-app.use('/catalog',  eventProxy);
+// /catalog — Redis cache (TTL 5s) + direct fetch ke event-service
+app.get('/catalog', catalogCacheHandler);
+
+// event-service: events (proxy)
 app.use('/events',   eventProxy);
 
 // ticket-service: orders, tickets
