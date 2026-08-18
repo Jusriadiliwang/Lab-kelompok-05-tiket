@@ -98,4 +98,28 @@ router.post('/erp/payments/:paymentId/refund',
   }
 );
 
+// GET /erp/payments — daftar semua payment dengan filter status
+router.get('/erp/payments',
+  authMiddleware,
+  requireRole('finance', 'super-admin', 'support'),
+  async (req, res) => {
+    const { status, order_id, user_id, limit = 100, page = 1 } = req.query;
+    try {
+      const qs = new URLSearchParams();
+      if (order_id) qs.set('order_id', order_id);
+      if (user_id)  qs.set('user_id', user_id);
+      const url = `${PAYMENT_SERVICE_URL}/payments?${qs.toString()}`;
+      const upstream = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!upstream.ok) return res.status(upstream.status).json(await upstream.json());
+      const data = await upstream.json();
+      // Filter by status jika ada
+      let rows = data.data || [];
+      if (status) rows = rows.filter(p => p.status === status);
+      res.json({ data: rows, total: rows.length });
+    } catch (err) {
+      res.status(502).json({ error: 'bad_gateway', message: err.message });
+    }
+  }
+);
+
 module.exports = router;

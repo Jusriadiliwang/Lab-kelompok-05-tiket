@@ -105,4 +105,65 @@ router.put('/erp/events/:id/status',
   }
 );
 
+// PUT /erp/events/:id — edit detail event (nama, venue, tanggal, deskripsi)
+router.put('/erp/events/:id',
+  authMiddleware,
+  requireRole('event-manager', 'super-admin'),
+  async (req, res) => {
+    const { name, venue, event_date, description, banner_url, sale_open_at, sale_close_at } = req.body;
+    if (!name && !venue && !event_date && !description && !banner_url) {
+      return res.status(400).json({ error: 'bad_request', message: 'Minimal satu field harus diisi' });
+    }
+    try {
+      const before = await snapshotRepo.findEventById(req.params.id);
+
+      // Update status via event-service (jika status juga dikirim)
+      const body = {};
+      if (name)          body.name         = name;
+      if (venue)         body.venue        = venue;
+      if (event_date)    body.event_date   = event_date;
+      if (description)   body.description  = description;
+      if (banner_url)    body.banner_url   = banner_url;
+      if (sale_open_at)  body.sale_open_at = sale_open_at;
+      if (sale_close_at) body.sale_close_at = sale_close_at;
+
+      // event-service belum punya PUT /events/:id — update snapshot lokal dulu
+      // dan panggil event-service jika tersedia
+      let upstreamOk = false;
+      try {
+        const upstream = await fetch(`${EVENT_SERVICE_URL}/events/${req.params.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(3000),
+        });
+        if (upstream.ok) upstreamOk = true;
+      } catch (_) {}
+
+      // Update snapshot lokal ERP
+      const updatedSnapshot = await snapshotRepo.upsertEventSnapshot({
+        id: req.params.id,
+        name:          name           || before?.name,
+        venue:         venue          || before?.venue,
+        event_date:    event_date     || before?.event_date,
+        sale_open_at:  sale_open_at   || before?.sale_open_at,
+        sale_close_at: sale_close_at  || before?.sale_close_at,
+        status:        before?.status || 'upcoming',
+      });
+
+      await auditRepo.log({
+        adminId: req.admin.adminId, action: 'UPDATE', entityType: 'EVENT',
+        entityId: req.params.id,
+        beforeState: before || null,
+        afterState: body,
+        ipAddress: req.ip,
+      });
+
+      res.json({ ...updatedSnapshot, _note: upstreamOk ? 'synced to event-service' : 'snapshot only' });
+    } catch (err) {
+      res.status(500).json({ error: 'internal_error', message: err.message });
+    }
+  }
+);
+
 module.exports = router;

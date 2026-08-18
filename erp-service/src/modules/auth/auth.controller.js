@@ -104,4 +104,55 @@ router.post('/erp/admin/users', authMiddleware, async (req, res) => {
   }
 });
 
+// PUT /erp/admin/users/:id — update role / deactivate admin (super-admin only)
+router.put('/erp/admin/users/:id', authMiddleware, async (req, res) => {
+  if (req.admin.role !== 'super-admin') return res.status(403).json({ error: 'forbidden' });
+  const { role, is_active, name } = req.body;
+  const validRoles = ['super-admin','event-manager','finance','analyst','support'];
+  if (role && !validRoles.includes(role)) {
+    return res.status(400).json({ error: 'bad_request', message: `Role harus: ${validRoles.join(', ')}` });
+  }
+  try {
+    const sets = []; const params = [];
+    if (name)                    { params.push(name);      sets.push(`name=$${params.length}`); }
+    if (role)                    { params.push(role);      sets.push(`role=$${params.length}`); }
+    if (is_active !== undefined) { params.push(is_active); sets.push(`is_active=$${params.length}`); }
+    if (!sets.length) return res.status(400).json({ error: 'bad_request', message: 'Tidak ada field yang diupdate' });
+    params.push(req.params.id);
+    sets.push('updated_at=NOW()');
+    const { rows: [admin] } = await db.query(
+      `UPDATE admin_users SET ${sets.join(',')} WHERE id=$${params.length} RETURNING id, name, email, role, is_active`,
+      params
+    );
+    if (!admin) return res.status(404).json({ error: 'not_found', message: 'Admin tidak ditemukan' });
+    await auditRepo.log({
+      adminId: req.admin.adminId, action: 'UPDATE', entityType: 'USER',
+      entityId: admin.id, afterState: { role, is_active, name }, ipAddress: req.ip,
+    });
+    res.json(admin);
+  } catch (err) {
+    res.status(500).json({ error: 'internal_error', message: err.message });
+  }
+});
+
+// PUT /erp/auth/change-password — ganti password sendiri
+router.put('/erp/auth/change-password', authMiddleware, async (req, res) => {
+  const { old_password, new_password } = req.body;
+  if (!old_password || !new_password || new_password.length < 6) {
+    return res.status(400).json({ error: 'bad_request', message: 'old_password dan new_password (min 6 char) wajib' });
+  }
+  try {
+    const { rows: [admin] } = await db.query('SELECT * FROM admin_users WHERE id=$1', [req.admin.adminId]);
+    if (!admin) return res.status(404).json({ error: 'not_found' });
+    const valid = await bcrypt.compare(old_password, admin.password_hash);
+    if (!valid) return res.status(401).json({ error: 'unauthorized', message: 'Password lama salah' });
+    const newHash = await bcrypt.hash(new_password, 10);
+    await db.query('UPDATE admin_users SET password_hash=$1, updated_at=NOW() WHERE id=$2', [newHash, admin.id]);
+    await auditRepo.log({ adminId: admin.id, action: 'UPDATE', entityType: 'USER', entityId: admin.id, ipAddress: req.ip });
+    res.json({ message: 'Password berhasil diubah' });
+  } catch (err) {
+    res.status(500).json({ error: 'internal_error', message: err.message });
+  }
+});
+
 module.exports = router;
