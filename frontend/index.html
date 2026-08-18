@@ -694,6 +694,127 @@
       .payment-methods { grid-template-columns: repeat(2, 1fr); }
       .search-bar { max-width: 200px; }
     }
+
+    /* ================================================================
+       ADMIN PANEL STYLES
+    ================================================================ */
+    #adminPanel {
+      display: none;
+      position: fixed; inset: 0; z-index: 300;
+      background: #080810;
+      flex-direction: row;
+    }
+    #adminPanel.open { display: flex; }
+    .admin-sidebar {
+      width: 240px; min-height: 100vh;
+      background: linear-gradient(180deg, #0d0d1a 0%, #12122a 100%);
+      border-right: 1px solid rgba(108,99,255,.2);
+      display: flex; flex-direction: column; padding: 24px 0; flex-shrink: 0;
+    }
+    .admin-brand { display: flex; align-items: center; gap: 12px; padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .admin-brand-icon { width: 42px; height: 42px; background: linear-gradient(135deg,#6c63ff,#a78bfa); border-radius: 12px; display:flex;align-items:center;justify-content:center;font-size:20px; }
+    .admin-brand-name { font-size:15px; font-weight:800; color:#fff; }
+    .admin-brand-sub  { font-size:11px; color:rgba(255,255,255,.35); }
+    .admin-nav { padding: 16px 12px; flex: 1; }
+    .admin-nav-item { display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,.5);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;margin-bottom:4px; }
+    .admin-nav-item:hover { color:#fff; background:rgba(255,255,255,.05); }
+    .admin-nav-item.active { color:#fff; background:linear-gradient(135deg,rgba(108,99,255,.25),rgba(108,99,255,.1)); border:1px solid rgba(108,99,255,.3); }
+    .admin-nav-icon { font-size:16px; }
+    .admin-sidebar-footer { padding:16px; border-top:1px solid rgba(255,255,255,.06); display:flex; flex-direction:column; gap:8px; }
+    .admin-logout-btn,.admin-close-btn { padding:9px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all .2s; }
+    .admin-logout-btn { background:rgba(255,61,113,.15); color:#ff3d71; }
+    .admin-logout-btn:hover { background:rgba(255,61,113,.3); }
+    .admin-close-btn  { background:rgba(255,255,255,.07); color:rgba(255,255,255,.5); }
+    .admin-close-btn:hover { background:rgba(255,255,255,.12); color:#fff; }
+    .admin-content-wrap { flex:1; overflow-y:auto; background:#0a0a12; }
+    .admin-content { padding:32px; max-width:1100px; }
+    .admin-loading { display:flex; justify-content:center; padding:60px; }
+    .admin-spinner { width:36px; height:36px; border:3px solid rgba(108,99,255,.2); border-top-color:#6c63ff; border-radius:50%; animation:spin .7s linear infinite; }
+    .adv-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; }
+    .adv-title { font-size:26px; font-weight:900; color:#fff; }
+    .adv-subtitle { color:rgba(255,255,255,.35); font-size:13px; margin-top:3px; }
+    .adv-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+    .adv-stat { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:20px; text-align:center; position:relative; overflow:hidden; }
+    .adv-stat::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background:var(--c); }
+    .adv-stat-icon { font-size:28px; margin-bottom:8px; }
+    .adv-stat-val  { font-size:28px; font-weight:900; color:var(--c); }
+    .adv-stat-lbl  { font-size:12px; color:rgba(255,255,255,.4); margin-top:4px; }
+    .adv-events-mini { display:flex; flex-direction:column; gap:10px; }
+    .adv-event-mini { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:12px; }
+    .adv-event-mini-img { width:52px; height:52px; border-radius:8px; background-size:cover; background-position:center; flex-shrink:0; }
+    .adv-event-mini-info { flex:1; }
+    .adv-event-mini-name { font-size:14px; font-weight:700; }
+    .adv-event-mini-date { font-size:11px; color:rgba(255,255,255,.4); margin-top:2px; }
+    .adv-badge-status { padding:3px 10px; border-radius:99px; font-size:10px; font-weight:700; text-transform:uppercase; flex-shrink:0; }
+    .adv-badge-status.on_sale   { background:rgba(0,214,143,.15); color:#00d68f; }
+    .adv-badge-status.upcoming  { background:rgba(108,99,255,.15); color:#a78bfa; }
+    .adv-badge-status.sold_out  { background:rgba(255,61,113,.15); color:#ff3d71; }
+    .adv-badge-status.cancelled { background:rgba(255,255,255,.08); color:rgba(255,255,255,.35); }
+    .adv-quick-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .adv-quick-btn { padding:10px 18px; background:rgba(108,99,255,.15); border:1px solid rgba(108,99,255,.3); border-radius:10px; color:#a78bfa; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; }
+    .adv-quick-btn:hover { background:rgba(108,99,255,.3); color:#fff; }
+    .adv-section-title { font-size:12px; font-weight:700; color:rgba(255,255,255,.3); text-transform:uppercase; letter-spacing:1.5px; }
+    .adv-btn-primary { padding:10px 20px; background:linear-gradient(135deg,#6c63ff,#a78bfa); border:none; border-radius:10px; color:#fff; font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; box-shadow:0 4px 16px rgba(108,99,255,.3); }
+    .adv-btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(108,99,255,.5); }
+    .adv-btn-ghost { padding:10px 20px; background:transparent; border:1px solid rgba(255,255,255,.12); border-radius:10px; color:rgba(255,255,255,.5); font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; }
+    .adv-btn-ghost:hover { border-color:rgba(255,255,255,.3); color:#fff; }
+    .adv-form-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:24px; margin-bottom:20px; }
+    .adv-form-title { font-size:16px; font-weight:800; margin-bottom:20px; }
+    .adv-form-grid  { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .adv-full       { grid-column:1/-1; }
+    .adv-form-group { display:flex; flex-direction:column; gap:6px; }
+    .adv-label      { font-size:12px; font-weight:600; color:rgba(255,255,255,.5); }
+    .adv-input { padding:10px 14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:8px; color:#fff; font-size:14px; outline:none; transition:border-color .2s; width:100%; }
+    .adv-input:focus { border-color:#6c63ff; }
+    .adv-input::placeholder { color:rgba(255,255,255,.25); }
+    .adv-select { cursor:pointer; }
+    .adv-textarea { min-height:80px; resize:vertical; }
+    .adv-form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
+    .adv-img-upload-wrap { display:flex; gap:8px; }
+    .adv-upload-btn { flex-shrink:0; padding:10px 14px; background:rgba(108,99,255,.2); border:1px dashed rgba(108,99,255,.5); border-radius:8px; color:#a78bfa; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all .2s; }
+    .adv-upload-btn:hover { background:rgba(108,99,255,.35); }
+    .adv-banner-preview { height:140px; border-radius:10px; background-size:cover; background-position:center; margin-top:10px; border:1px solid rgba(255,255,255,.1); }
+    .adv-seat-row { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
+    .adv-s { flex:1; min-width:0; }
+    .adv-event-table { display:flex; flex-direction:column; gap:10px; }
+    .adv-event-row { display:flex; align-items:center; gap:16px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:14px; transition:border-color .2s; }
+    .adv-event-row:hover { border-color:rgba(108,99,255,.25); }
+    .adv-ev-thumb { width:60px; height:60px; border-radius:10px; background-size:cover; background-position:center; flex-shrink:0; }
+    .adv-ev-info { flex:1; }
+    .adv-ev-name { font-size:15px; font-weight:700; }
+    .adv-ev-meta { font-size:11px; color:rgba(255,255,255,.35); margin:3px 0; }
+    .adv-ev-cats { display:flex; flex-wrap:wrap; gap:4px; }
+    .adv-cat-chip { background:rgba(108,99,255,.15); color:#a78bfa; font-size:10px; font-weight:600; padding:2px 8px; border-radius:99px; }
+    .adv-ev-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .adv-icon-btn { width:34px; height:34px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+    .adv-icon-btn:hover { background:rgba(255,255,255,.12); }
+    .adv-icon-btn.danger:hover { background:rgba(255,61,113,.2); border-color:rgba(255,61,113,.4); }
+    .adv-img-zone { border:2px dashed rgba(108,99,255,.3); border-radius:16px; padding:40px 24px; text-align:center; transition:all .2s; display:flex; flex-direction:column; align-items:center; gap:10px; }
+    .adv-img-zone.drag-over { border-color:#6c63ff; background:rgba(108,99,255,.08); }
+    .adv-img-zone-icon { font-size:48px; }
+    .adv-img-zone-text { font-size:16px; font-weight:700; }
+    .adv-img-zone-sub  { font-size:13px; color:rgba(255,255,255,.35); }
+    .adv-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; }
+    .adv-gallery-item { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:12px; overflow:hidden; transition:border-color .2s; }
+    .adv-gallery-item:hover { border-color:rgba(108,99,255,.3); }
+    .adv-gallery-img { height:120px; background-size:cover; background-position:center; background-color:rgba(255,255,255,.05); }
+    .adv-gallery-name { padding:8px 10px; font-size:11px; color:rgba(255,255,255,.5); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .adv-gallery-actions { display:flex; gap:4px; padding:0 8px 8px; }
+    .adv-table { width:100%; border-collapse:collapse; }
+    .adv-table th { text-align:left; padding:10px 14px; font-size:11px; font-weight:700; color:rgba(255,255,255,.35); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid rgba(255,255,255,.07); }
+    .adv-table td { padding:12px 14px; font-size:14px; border-bottom:1px solid rgba(255,255,255,.04); }
+    .adv-table tr:hover td { background:rgba(255,255,255,.03); }
+    .adv-sub-modal { position:fixed; inset:0; z-index:400; background:rgba(0,0,0,.7); display:flex; align-items:center; justify-content:center; }
+    .adv-sub-modal-body { background:#1a1a2e; border:1px solid rgba(108,99,255,.3); border-radius:16px; padding:24px; min-width:300px; }
+    .admin-login-error { color:var(--danger); font-size:13px; margin-top:8px; }
+    @media(max-width:768px){
+      .admin-sidebar{width:60px;}
+      .admin-brand-name,.admin-brand-sub{display:none;}
+      .admin-nav-item span:last-child{display:none;}
+      .admin-nav-item{justify-content:center;}
+      .adv-stats-grid{grid-template-columns:repeat(2,1fr);}
+      .adv-form-grid{grid-template-columns:1fr;}
+    }
   </style>
 </head>
 <body>
@@ -914,6 +1035,62 @@
 
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- ══════════ ADMIN LOGIN MODAL ══════════ -->
+<div class="modal-overlay" id="adminLoginModal">
+  <div class="modal auth-modal" style="max-width:380px">
+    <button class="modal-close" onclick="closeModal('adminLoginModal')">✕</button>
+    <div class="modal-body" style="text-align:center">
+      <div style="font-size:52px;margin-bottom:8px">🔐</div>
+      <div style="font-size:22px;font-weight:900;margin-bottom:4px">Admin Panel</div>
+      <div style="color:var(--text3);font-size:13px;margin-bottom:24px">Akses terbatas — masukkan password</div>
+      <input type="password" id="adminPassInput" class="form-input" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')doAdminLogin()" style="text-align:center;font-size:20px;letter-spacing:6px" />
+      <div class="admin-login-error" style="display:none;color:var(--danger);font-size:13px;margin-top:8px">Password salah. Coba lagi.</div>
+      <button class="btn-primary btn-full" onclick="doAdminLogin()" style="margin-top:16px">Masuk</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:12px">Hint: wartiket2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ADMIN PANEL ══════════ -->
+<div id="adminPanel">
+  <!-- Sidebar -->
+  <div class="admin-sidebar">
+    <div class="admin-brand">
+      <div class="admin-brand-icon">⚙️</div>
+      <div>
+        <div class="admin-brand-name">Admin Panel</div>
+        <div class="admin-brand-sub">WarTiket CMS</div>
+      </div>
+    </div>
+    <nav class="admin-nav">
+      <div class="admin-nav-item active" data-view="dashboard" onclick="renderAdminView('dashboard')">
+        <span class="admin-nav-icon">📊</span> Dashboard
+      </div>
+      <div class="admin-nav-item" data-view="events" onclick="renderAdminView('events')">
+        <span class="admin-nav-icon">🎪</span> Kelola Event
+      </div>
+      <div class="admin-nav-item" data-view="images" onclick="renderAdminView('images')">
+        <span class="admin-nav-icon">🖼️</span> Upload Gambar
+      </div>
+      <div class="admin-nav-item" data-view="orders" onclick="renderAdminView('orders')">
+        <span class="admin-nav-icon">📋</span> Order & Transaksi
+      </div>
+      <div class="admin-nav-item" data-view="settings" onclick="renderAdminView('settings')">
+        <span class="admin-nav-icon">🔧</span> Pengaturan
+      </div>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <button class="admin-logout-btn" onclick="adminLogout()">🚪 Logout Admin</button>
+      <button class="admin-close-btn" onclick="closeAdmin()">✕ Tutup Panel</button>
+    </div>
+  </div>
+  <!-- Content -->
+  <div class="admin-content-wrap">
+    <div id="adminContent" class="admin-content"></div>
+  </div>
+</div>
 
 <!-- ══════════════ JAVASCRIPT ══════════════════════════ -->
 <script>
@@ -1535,10 +1712,524 @@ function scrollToGrid() {
 /* keyboard shortcut: ESC closes top modal */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    if (document.getElementById('adminPanel').classList.contains('open')) {
+      // ESC in admin just closes sub-views, not the whole panel
+      return;
+    }
     const openModals = [...document.querySelectorAll('.modal-overlay.open')];
     if (openModals.length) closeModal(openModals[openModals.length - 1].id);
   }
 });
+
+/* ============================================================
+   ADMIN — SECRET TRIGGER & LOGIC
+============================================================ */
+let logoClicks = 0, logoTimer = null;
+
+function logoClick() {
+  logoClicks++;
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => { logoClicks = 0; }, 2000);
+  if (logoClicks >= 5) {
+    logoClicks = 0;
+    openAdminLogin();
+  }
+}
+
+// Wire secret trigger onto logo
+document.querySelector('.logo').addEventListener('click', logoClick);
+
+// Admin state
+let adminLoggedIn = JSON.parse(sessionStorage.getItem('wt_admin') || 'false');
+const ADMIN_PASS  = 'wartiket2026'; // simple demo password
+let adminView     = 'dashboard';
+
+function openAdminLogin() {
+  if (adminLoggedIn) { openAdmin(); return; }
+  document.getElementById('adminLoginModal').classList.add('open');
+  setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+}
+
+function doAdminLogin() {
+  const p = document.getElementById('adminPassInput').value;
+  if (p === ADMIN_PASS) {
+    adminLoggedIn = true;
+    sessionStorage.setItem('wt_admin', 'true');
+    document.getElementById('adminLoginModal').classList.remove('open');
+    document.getElementById('adminPassInput').value = '';
+    openAdmin();
+    toast('🔑 Selamat datang, Admin!', 'success');
+  } else {
+    document.getElementById('adminLoginModal').querySelector('.admin-login-error').style.display = 'block';
+    document.getElementById('adminPassInput').value = '';
+  }
+}
+
+function openAdmin() {
+  document.getElementById('adminPanel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderAdminView('dashboard');
+}
+
+function closeAdmin() {
+  document.getElementById('adminPanel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function adminLogout() {
+  adminLoggedIn = false;
+  sessionStorage.removeItem('wt_admin');
+  closeAdmin();
+  toast('👋 Admin logout', 'info');
+}
+
+/* Admin nav */
+function renderAdminView(view) {
+  adminView = view;
+  document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === view));
+  const content = document.getElementById('adminContent');
+  content.innerHTML = '<div class="admin-loading"><div class="admin-spinner"></div></div>';
+
+  switch (view) {
+    case 'dashboard': renderAdminDashboard(content); break;
+    case 'events':    renderAdminEvents(content); break;
+    case 'images':    renderAdminImages(content); break;
+    case 'orders':    renderAdminOrders(content); break;
+    case 'settings':  renderAdminSettings(content); break;
+  }
+}
+
+/* ── DASHBOARD ── */
+function renderAdminDashboard(el) {
+  const totalEvents  = allEvents.length;
+  const onSale       = allEvents.filter(e => e.status === 'on_sale').length;
+  const totalSeats   = allEvents.reduce((s, ev) => s + (ev.categories||[]).reduce((a,c) => a + (c.available_seats||0), 0), 0);
+  const soldSeats    = allEvents.reduce((s, ev) => s + (ev.categories||[]).reduce((a,c) => a + ((c.total_seats||0) - (c.available_seats||0)), 0), 0);
+
+  el.innerHTML = `
+    <div class="adv-header"><h1 class="adv-title">Dashboard</h1><span class="adv-subtitle">Selamat datang kembali, Admin</span></div>
+
+    <div class="adv-stats-grid">
+      <div class="adv-stat" style="--c:#6c63ff">
+        <div class="adv-stat-icon">🎪</div>
+        <div class="adv-stat-val">${totalEvents}</div>
+        <div class="adv-stat-lbl">Total Event</div>
+      </div>
+      <div class="adv-stat" style="--c:#ff4d00">
+        <div class="adv-stat-icon">🔥</div>
+        <div class="adv-stat-val">${onSale}</div>
+        <div class="adv-stat-lbl">On Sale</div>
+      </div>
+      <div class="adv-stat" style="--c:#00d68f">
+        <div class="adv-stat-icon">🪑</div>
+        <div class="adv-stat-val">${totalSeats.toLocaleString('id')}</div>
+        <div class="adv-stat-lbl">Kursi Tersedia</div>
+      </div>
+      <div class="adv-stat" style="--c:#ffaa00">
+        <div class="adv-stat-icon">🎟️</div>
+        <div class="adv-stat-val">${soldSeats.toLocaleString('id')}</div>
+        <div class="adv-stat-lbl">Tiket Terjual</div>
+      </div>
+    </div>
+
+    <div class="adv-section-title">Event Aktif</div>
+    <div class="adv-events-mini">
+      ${allEvents.slice(0,4).map(ev => `
+        <div class="adv-event-mini">
+          <div class="adv-event-mini-img" style="${ev.banner_url ? `background-image:url('${ev.banner_url}')` : `background:${getGradient(ev)}`}"></div>
+          <div class="adv-event-mini-info">
+            <div class="adv-event-mini-name">${ev.name}</div>
+            <div class="adv-event-mini-date">${formatDate(ev.event_date)}</div>
+          </div>
+          <div class="adv-badge-status ${ev.status}">${ev.status}</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="adv-section-title" style="margin-top:28px">Aksi Cepat</div>
+    <div class="adv-quick-actions">
+      <button class="adv-quick-btn" onclick="renderAdminView('events')">➕ Tambah Event</button>
+      <button class="adv-quick-btn" onclick="renderAdminView('images')">🖼️ Upload Gambar</button>
+      <button class="adv-quick-btn" onclick="renderAdminView('orders')">📋 Lihat Order</button>
+    </div>`;
+}
+
+/* ── EVENTS MANAGER ── */
+function renderAdminEvents(el) {
+  el.innerHTML = `
+    <div class="adv-header">
+      <h1 class="adv-title">Kelola Event</h1>
+      <button class="adv-btn-primary" onclick="showCreateEventForm()">➕ Buat Event Baru</button>
+    </div>
+    <div id="createEventForm" style="display:none" class="adv-form-card">
+      <h3 class="adv-form-title">🎪 Buat Event Baru</h3>
+      <div class="adv-form-grid">
+        <div class="adv-form-group">
+          <label class="adv-label">Nama Event *</label>
+          <input id="evName" class="adv-input" placeholder="Contoh: Konser Dewa 19" />
+        </div>
+        <div class="adv-form-group">
+          <label class="adv-label">Venue *</label>
+          <input id="evVenue" class="adv-input" placeholder="Gelora Bung Karno, Jakarta" />
+        </div>
+        <div class="adv-form-group">
+          <label class="adv-label">Tanggal & Waktu *</label>
+          <input id="evDate" class="adv-input" type="datetime-local" />
+        </div>
+        <div class="adv-form-group">
+          <label class="adv-label">Status</label>
+          <select id="evStatus" class="adv-input adv-select">
+            <option value="on_sale">On Sale</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="sold_out">Sold Out</option>
+          </select>
+        </div>
+        <div class="adv-form-group adv-full">
+          <label class="adv-label">Deskripsi</label>
+          <textarea id="evDesc" class="adv-input adv-textarea" placeholder="Deskripsi event…"></textarea>
+        </div>
+        <div class="adv-form-group adv-full">
+          <label class="adv-label">URL Banner (gambar)</label>
+          <div class="adv-img-upload-wrap">
+            <input id="evBanner" class="adv-input" placeholder="https://... atau drag & drop gambar" />
+            <label class="adv-upload-btn">
+              📁 Pilih File
+              <input type="file" accept="image/*" style="display:none" onchange="handleBannerUpload(event)" />
+            </label>
+          </div>
+          <div id="bannerPreview" class="adv-banner-preview" style="display:none"></div>
+        </div>
+      </div>
+
+      <div class="adv-section-title" style="margin:16px 0 10px">Kategori Kursi</div>
+      <div id="seatCatList"></div>
+      <button class="adv-btn-ghost" onclick="addSeatCat()">➕ Tambah Kategori</button>
+
+      <div class="adv-form-actions">
+        <button class="adv-btn-ghost" onclick="document.getElementById('createEventForm').style.display='none'">Batal</button>
+        <button class="adv-btn-primary" onclick="saveNewEvent()">💾 Simpan Event</button>
+      </div>
+    </div>
+
+    <div class="adv-section-title" style="margin-bottom:12px">Daftar Event (${allEvents.length})</div>
+    <div class="adv-event-table">
+      ${allEvents.map((ev, i) => `
+        <div class="adv-event-row" id="evRow${i}">
+          <div class="adv-ev-thumb" style="${ev.banner_url ? `background-image:url('${ev.banner_url}')` : `background:${getGradient(ev)}`}"></div>
+          <div class="adv-ev-info">
+            <div class="adv-ev-name">${ev.name}</div>
+            <div class="adv-ev-meta">📍 ${ev.venue} &nbsp;|&nbsp; 📅 ${formatDate(ev.event_date)}</div>
+            <div class="adv-ev-cats">${(ev.categories||[]).map(c => `<span class="adv-cat-chip">${c.name}: Rp${c.price?.toLocaleString('id')}</span>`).join('')}</div>
+          </div>
+          <div class="adv-ev-actions">
+            <div class="adv-badge-status ${ev.status}">${ev.status}</div>
+            <button class="adv-icon-btn" onclick="toggleEventStatus(${i})" title="Toggle status">⚡</button>
+            <button class="adv-icon-btn danger" onclick="removeEvent(${i})" title="Hapus">🗑️</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+
+  initSeatCatInputs();
+}
+
+let seatCatCount = 1;
+function initSeatCatInputs() {
+  seatCatCount = 1;
+  document.getElementById('seatCatList').innerHTML = seatCatRow(0);
+}
+function seatCatRow(i) {
+  return `<div class="adv-seat-row" id="seatRow${i}">
+    <input class="adv-input adv-s" placeholder="Nama (VVIP)" id="scName${i}" />
+    <input class="adv-input adv-s" placeholder="Harga" type="number" id="scPrice${i}" />
+    <input class="adv-input adv-s" placeholder="Jumlah kursi" type="number" id="scTotal${i}" />
+    <button class="adv-icon-btn danger" onclick="document.getElementById('seatRow${i}').remove()">✕</button>
+  </div>`;
+}
+function addSeatCat() {
+  const list = document.getElementById('seatCatList');
+  const div  = document.createElement('div');
+  div.innerHTML = seatCatRow(seatCatCount++);
+  list.appendChild(div.firstChild);
+}
+
+function showCreateEventForm() {
+  const form = document.getElementById('createEventForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function handleBannerUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const url = ev.target.result;
+    document.getElementById('evBanner').value = url;
+    const preview = document.getElementById('bannerPreview');
+    preview.style.cssText = `display:block;background-image:url('${url}');`;
+  };
+  reader.readAsDataURL(file);
+}
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'evBanner') {
+    const url = e.target.value;
+    const preview = document.getElementById('bannerPreview');
+    if (preview && url.startsWith('http')) {
+      preview.style.cssText = `display:block;background-image:url('${url}');`;
+    }
+  }
+});
+
+function saveNewEvent() {
+  const name   = document.getElementById('evName')?.value.trim();
+  const venue  = document.getElementById('evVenue')?.value.trim();
+  const date   = document.getElementById('evDate')?.value;
+  const status = document.getElementById('evStatus')?.value;
+  const desc   = document.getElementById('evDesc')?.value.trim();
+  const banner = document.getElementById('evBanner')?.value.trim();
+
+  if (!name || !venue || !date) { toast('⚠️ Nama, venue, dan tanggal wajib diisi', 'info'); return; }
+
+  // Collect seat categories
+  const cats = [];
+  let ci = 0;
+  while (document.getElementById(`scName${ci}`) !== null) {
+    const n = document.getElementById(`scName${ci}`)?.value.trim();
+    const p = parseInt(document.getElementById(`scPrice${ci}`)?.value || '0');
+    const t = parseInt(document.getElementById(`scTotal${ci}`)?.value || '0');
+    if (n) cats.push({ id: Date.now() + ci, name: n, price: p, total_seats: t, available_seats: t });
+    ci++;
+  }
+  if (!cats.length) { toast('⚠️ Tambahkan minimal satu kategori kursi', 'info'); return; }
+
+  const newEv = {
+    id:          allEvents.length + 100,
+    name, venue,
+    event_date:  new Date(date).toISOString(),
+    status,
+    description: desc,
+    banner_url:  banner || null,
+    categories:  cats,
+    _gradient:   GRADIENTS[allEvents.length % GRADIENTS.length],
+    _local:      true,
+  };
+
+  allEvents.unshift(newEv);
+  filteredEvs = [...allEvents];
+  renderEvents();
+  renderHero();
+  updateStats();
+
+  // Try push to API
+  if (currentUser) {
+    fetch(`${API}/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentUser.token}` },
+      body: JSON.stringify({ name, venue, event_date: newEv.event_date, description: desc, banner_url: banner, categories: cats }),
+    }).catch(() => {});
+  }
+
+  toast(`✅ Event "${name}" berhasil dibuat!`, 'success');
+  document.getElementById('createEventForm').style.display = 'none';
+  renderAdminView('events');
+}
+
+function toggleEventStatus(i) {
+  const cycle = ['on_sale', 'upcoming', 'sold_out', 'cancelled'];
+  const cur   = allEvents[i].status;
+  const next  = cycle[(cycle.indexOf(cur) + 1) % cycle.length];
+  allEvents[i].status = next;
+  filteredEvs = [...allEvents];
+  renderEvents();
+  toast(`🔄 "${allEvents[i].name}" → ${next}`, 'info');
+  renderAdminView('events');
+}
+
+function removeEvent(i) {
+  const name = allEvents[i].name;
+  allEvents.splice(i, 1);
+  filteredEvs = [...allEvents];
+  renderEvents();
+  renderHero();
+  updateStats();
+  toast(`🗑️ "${name}" dihapus`, 'info');
+  renderAdminView('events');
+}
+
+/* ── IMAGE MANAGER ── */
+function renderAdminImages(el) {
+  el.innerHTML = `
+    <div class="adv-header"><h1 class="adv-title">Manajemen Gambar</h1></div>
+    <div class="adv-img-zone" id="imgDropZone"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="handleImgDrop(event)">
+      <div class="adv-img-zone-icon">🖼️</div>
+      <div class="adv-img-zone-text">Drag & Drop gambar di sini</div>
+      <div class="adv-img-zone-sub">atau</div>
+      <label class="adv-btn-primary" style="cursor:pointer">
+        📁 Pilih Gambar
+        <input type="file" accept="image/*" multiple style="display:none" onchange="handleMultiImgUpload(event)" />
+      </label>
+      <div class="adv-img-zone-sub" style="margin-top:12px">Atau tempel URL gambar:</div>
+      <div style="display:flex;gap:8px;width:100%;max-width:500px">
+        <input id="imgUrlInput" class="adv-input" placeholder="https://example.com/banner.jpg" style="flex:1" />
+        <button class="adv-btn-primary" onclick="addImageFromUrl()">Tambah</button>
+      </div>
+    </div>
+
+    <div class="adv-section-title" style="margin:24px 0 12px">
+      Galeri Gambar <span style="color:var(--text3);font-weight:400">(${adminImages.length} gambar)</span>
+    </div>
+    <div class="adv-gallery" id="adminGallery">
+      ${adminImages.length ? adminImages.map((img, i) => `
+        <div class="adv-gallery-item" id="gItem${i}">
+          <div class="adv-gallery-img" style="background-image:url('${img.url}')"></div>
+          <div class="adv-gallery-name">${img.name}</div>
+          <div class="adv-gallery-actions">
+            <button class="adv-icon-btn" onclick="applyImageToEvent(${i})" title="Terapkan ke event">🎪</button>
+            <button class="adv-icon-btn danger" onclick="removeImage(${i})" title="Hapus">🗑️</button>
+          </div>
+        </div>`).join('') : '<div style="color:var(--text3);padding:20px">Belum ada gambar. Upload gambar di atas.</div>'}
+    </div>
+
+    <div id="applyEvModal" style="display:none" class="adv-sub-modal">
+      <div class="adv-sub-modal-body">
+        <h3 style="margin-bottom:16px">Terapkan ke Event</h3>
+        <select id="applyEvSelect" class="adv-input adv-select">
+          ${allEvents.map((ev, i) => `<option value="${i}">${ev.name}</option>`).join('')}
+        </select>
+        <div class="adv-form-actions" style="margin-top:12px">
+          <button class="adv-btn-ghost" onclick="document.getElementById('applyEvModal').style.display='none'">Batal</button>
+          <button class="adv-btn-primary" id="applyImgBtn">Terapkan</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+let adminImages = [];
+
+function handleImgDrop(e) {
+  e.preventDefault();
+  document.getElementById('imgDropZone').classList.remove('drag-over');
+  [...e.dataTransfer.files].forEach(f => readAndAddImage(f));
+}
+
+function handleMultiImgUpload(e) {
+  [...e.target.files].forEach(f => readAndAddImage(f));
+}
+
+function readAndAddImage(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    adminImages.push({ url: ev.target.result, name: file.name });
+    toast(`✅ "${file.name}" berhasil diupload`, 'success');
+    if (adminView === 'images') renderAdminView('images');
+  };
+  reader.readAsDataURL(file);
+}
+
+function addImageFromUrl() {
+  const url = document.getElementById('imgUrlInput')?.value.trim();
+  if (!url) return;
+  adminImages.push({ url, name: url.split('/').pop().substring(0, 30) });
+  toast('✅ Gambar dari URL ditambahkan', 'success');
+  renderAdminView('images');
+}
+
+let pendingImgIdx = null;
+function applyImageToEvent(imgIdx) {
+  pendingImgIdx = imgIdx;
+  document.getElementById('applyEvModal').style.display = 'flex';
+  document.getElementById('applyImgBtn').onclick = () => {
+    const evIdx = parseInt(document.getElementById('applyEvSelect').value);
+    allEvents[evIdx].banner_url = adminImages[imgIdx].url;
+    filteredEvs = [...allEvents];
+    renderEvents();
+    renderHero();
+    document.getElementById('applyEvModal').style.display = 'none';
+    toast(`✅ Gambar diterapkan ke "${allEvents[evIdx].name}"`, 'success');
+  };
+}
+
+function removeImage(i) {
+  adminImages.splice(i, 1);
+  toast('🗑️ Gambar dihapus', 'info');
+  renderAdminView('images');
+}
+
+/* ── ORDERS ── */
+async function renderAdminOrders(el) {
+  el.innerHTML = `<div class="adv-header"><h1 class="adv-title">Semua Order</h1></div>
+    <div class="adv-loading"><div class="admin-spinner"></div></div>`;
+
+  let orders = [];
+  try {
+    const r = await fetch(`${API}/orders?user_id=all`, {
+      headers: { 'Authorization': `Bearer admin_token` },
+      signal: AbortSignal.timeout(4000),
+    });
+    const j = await r.json();
+    orders = j.data || [];
+  } catch (_) {
+    orders = []; // Demo: no orders from API
+  }
+
+  el.innerHTML = `
+    <div class="adv-header"><h1 class="adv-title">Semua Order</h1></div>
+    ${orders.length ? `
+    <table class="adv-table">
+      <thead><tr><th>#</th><th>Event</th><th>User</th><th>Kategori</th><th>Harga</th><th>Status</th></tr></thead>
+      <tbody>
+        ${orders.map(o => `<tr>
+          <td>#${o.id}</td>
+          <td>${o.event_name||'—'}</td>
+          <td>${o.user_id}</td>
+          <td>${o.seat_category_name||'—'}</td>
+          <td>Rp ${(o.price||0).toLocaleString('id')}</td>
+          <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` :
+    `<div class="empty-state" style="color:var(--text3);padding:40px 0;text-align:center">
+      <div style="font-size:48px">📋</div>
+      <div>Belum ada order atau API tidak terhubung.</div>
+    </div>`}`;
+}
+
+/* ── SETTINGS ── */
+function renderAdminSettings(el) {
+  el.innerHTML = `
+    <div class="adv-header"><h1 class="adv-title">Pengaturan</h1></div>
+    <div class="adv-form-card">
+      <h3 class="adv-form-title">🔑 Ganti Password Admin</h3>
+      <div class="adv-form-group">
+        <label class="adv-label">Password Lama</label>
+        <input type="password" id="oldPass" class="adv-input" placeholder="••••••••" />
+      </div>
+      <div class="adv-form-group">
+        <label class="adv-label">Password Baru</label>
+        <input type="password" id="newPass" class="adv-input" placeholder="••••••••" />
+      </div>
+      <button class="adv-btn-primary" onclick="toast('⚠️ Hanya di-demo mode — tidak disimpan permanen','info')">Simpan</button>
+    </div>
+    <div class="adv-form-card" style="margin-top:16px">
+      <h3 class="adv-form-title">🌐 API Gateway</h3>
+      <div class="adv-form-group">
+        <label class="adv-label">URL API Gateway</label>
+        <input id="apiUrlInput" class="adv-input" value="${API}" />
+      </div>
+      <button class="adv-btn-primary" onclick="toast('🔄 URL diperbarui (refresh halaman untuk efek)','success')">Terapkan</button>
+    </div>
+    <div class="adv-form-card" style="margin-top:16px">
+      <h3 class="adv-form-title">🎨 Tampilan</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${['#ff4d00','#6c63ff','#00d68f','#e91e63','#2196f3'].map(c => `
+          <div style="width:40px;height:40px;background:${c};border-radius:50%;cursor:pointer;border:3px solid transparent"
+            onclick="document.documentElement.style.setProperty('--primary','${c}');toast('🎨 Tema diubah','success')" title="${c}"></div>`).join('')}
+      </div>
+    </div>`;
+}
+
 </script>
 </body>
 </html>
