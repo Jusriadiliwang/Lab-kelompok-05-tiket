@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -105,6 +105,63 @@
       color: var(--text3);
     }
     .nav-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(255,77,0,.12);
+      border: 1px solid rgba(255,77,0,.22);
+      border-radius: 999px;
+      color: #ffd9c7;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .nav-pill:hover {
+      border-color: rgba(255,77,0,.45);
+      background: rgba(255,77,0,.18);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .nav-icon-btn {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text1);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .nav-icon-btn:hover {
+      border-color: rgba(255,77,0,.35);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .nav-icon-btn .nav-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: var(--danger);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      border: 2px solid var(--bg);
+    }
+    .user-menu-wrap { position: relative; }
     .btn-ghost {
       padding: 8px 18px;
       background: transparent;
@@ -140,8 +197,47 @@
       padding: 6px 14px;
       font-size: 13px;
       cursor: pointer;
+      transition: all .2s;
     }
     #userBadge .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+    #userBadge:hover { border-color: rgba(255,77,0,.3); }
+    .user-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      min-width: 180px;
+      background: rgba(18,18,26,.98);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.45);
+      padding: 8px;
+      display: none;
+    }
+    .user-menu.open { display: block; }
+    .user-menu-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 12px;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all .2s;
+    }
+    .user-menu-item:hover {
+      background: rgba(255,255,255,.05);
+      color: var(--text1);
+    }
+    .user-menu-item.danger:hover {
+      background: rgba(255,61,113,.12);
+      color: var(--danger);
+    }
 
     /* ============================================================
        CATEGORY TABS
@@ -447,6 +543,29 @@
     .stat-item { text-align: center; }
     .stat-value { font-size: 28px; font-weight: 900; color: var(--primary2); }
     .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+    .loading {
+      position: relative;
+      color: transparent !important;
+      min-width: 88px;
+      min-height: 34px;
+      display: inline-block;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,.05);
+    }
+    .loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.16), rgba(255,255,255,.04));
+      background-size: 200% 100%;
+      animation: pulse-loading 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse-loading {
+      0% { background-position: 200% 0; opacity: .7; }
+      50% { opacity: 1; }
+      100% { background-position: -200% 0; opacity: .7; }
+    }
 
     /* ============================================================
        MODAL OVERLAY
@@ -558,58 +677,113 @@
       background: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,77,0,.08));
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 18px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 14px;
+      margin-bottom: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
     }
     .ticket-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-    .ticket-meta { font-size: 12px; color: var(--text3); line-height: 1.7; }
+    .ticket-event-title { font-size: 18px; font-weight: 800; line-height: 1.3; }
+    .ticket-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .ticket-meta-item {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .ticket-meta-label {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 4px;
+    }
+    .ticket-meta-value { font-size: 13px; font-weight: 700; color: var(--text1); }
     .ticket-qr {
       display: grid;
-      grid-template-columns: 90px 1fr;
+      grid-template-columns: 96px 1fr;
       gap: 14px;
       align-items: center;
-      background: rgba(255,255,255,.03);
-      border: 1px dashed rgba(255,255,255,.14);
-      border-radius: 14px;
-      padding: 12px;
+      background: rgba(12,16,24,.85);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
     }
     .ticket-qr-visual {
-      width: 90px;
-      height: 90px;
+      width: 96px;
+      height: 96px;
       background: #fff;
       color: #111;
-      border-radius: 10px;
-      padding: 6px;
+      border-radius: 12px;
+      padding: 7px;
       font: 7px/7px monospace;
       white-space: pre;
       overflow: hidden;
+      box-shadow: 0 12px 24px rgba(0,0,0,.25);
     }
     .ticket-qr-code {
       margin: 0;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: #111827;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(0,214,143,.08);
+      border: 1px dashed rgba(0,214,143,.28);
       color: #d1fae5;
-      font: 12px/1.5 Consolas, Monaco, monospace;
+      font: 12px/1.6 Consolas, Monaco, monospace;
       white-space: pre-wrap;
       word-break: break-word;
     }
+    .ticket-hint {
+      font-size: 12px;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ticket-hint::before {
+      content: 'ℹ️';
+      font-size: 13px;
+    }
     .notification-card {
-      background: var(--bg3);
+      background: linear-gradient(135deg, rgba(255,255,255,.03), rgba(108,99,255,.07));
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 16px;
       cursor: pointer;
       transition: border-color .2s, transform .2s;
       margin-bottom: 12px;
+      position: relative;
     }
     .notification-card:hover { border-color: var(--primary); transform: translateY(-1px); }
-    .notification-card.unread { border-color: rgba(255,77,0,.45); }
+    .notification-card.unread {
+      border-color: rgba(255,77,0,.45);
+      box-shadow: inset 4px 0 0 var(--primary);
+    }
+    .notification-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .notification-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 18px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,.06);
+    }
+    .notification-content { flex: 1; min-width: 0; }
     .notification-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
-    .notification-message { color: var(--text2); font-size: 13px; line-height: 1.6; }
+    .notification-message { color: var(--text2); font-size: 12px; line-height: 1.6; }
     .notification-time { margin-top: 10px; color: var(--text3); font-size: 11px; }
     .auth-title { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
     .auth-subtitle { color: var(--text2); font-size: 14px; margin-bottom: 28px; }
@@ -769,6 +943,9 @@
       .events-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
       .payment-methods { grid-template-columns: repeat(2, 1fr); }
       .search-bar { max-width: 200px; }
+      .ticket-meta-grid { grid-template-columns: 1fr; }
+      .ticket-qr { grid-template-columns: 1fr; }
+      .ticket-qr-visual { margin: 0 auto; }
     }
 
     /* ================================================================
@@ -906,16 +1083,28 @@
     <input type="text" id="searchInput" placeholder="Cari konser, artis, venue…" oninput="filterEvents()" />
   </div>
   <div class="nav-actions">
-    <div id="userBadge" onclick="showOrders()">
-      <div class="dot"></div>
-      <span id="userLabel"></span>
+    <div class="user-menu-wrap">
+      <div id="userBadge" onclick="toggleUserMenu(event)">
+        <div class="dot"></div>
+        <span id="userLabel"></span>
+      </div>
+      <div class="user-menu" id="userMenu">
+        <button class="user-menu-item" onclick="showOrders()">
+          <span>📦</span>
+          <span>Pesanan Saya</span>
+        </button>
+        <button class="user-menu-item danger" onclick="logoutUser()">
+          <span>🚪</span>
+          <span>Keluar</span>
+        </button>
+      </div>
     </div>
     <button class="btn-ghost" id="btnLogin" onclick="openAuth()">Masuk</button>
     <button class="btn-primary" id="btnRegister" onclick="openAuth()">Daftar</button>
-    <button class="btn-ghost" id="btnTickets" onclick="showTickets()" style="display:none">Tiket Saya</button>
-    <div id="notifBell" onclick="showNotifications()" style="display:none;position:relative;cursor:pointer;font-size:20px;padding:8px">
-      ??<span id="notifBadge" style="position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;border-radius:99px;font-size:10px;padding:2px 5px;display:none">0</span>
-    </div>
+    <button class="nav-pill" id="btnTickets" onclick="showTickets()" style="display:none">🎫 Tiket Saya</button>
+    <button class="nav-icon-btn" id="notifBell" onclick="showNotifications()" style="display:none" aria-label="Notifikasi">
+      <span>🔔</span><span id="notifBadge" class="nav-badge">0</span>
+    </button>
   </div>
 </nav>
 
@@ -945,11 +1134,11 @@
   <!-- Stats -->
   <div class="stats-strip">
     <div class="stat-item">
-      <div class="stat-value" id="statEvents">—</div>
+      <div class="stat-value loading" id="statEvents"></div>
       <div class="stat-label">Konser Aktif</div>
     </div>
     <div class="stat-item">
-      <div class="stat-value" id="statSeats">—</div>
+      <div class="stat-value loading" id="statSeats"></div>
       <div class="stat-label">Kursi Tersedia</div>
     </div>
     <div class="stat-item">
@@ -1116,9 +1305,9 @@
 <!-- TICKETS MODAL -->
 <div class="modal-overlay" id="ticketsModal">
   <div class="modal-box" style="max-width:560px">
-    <button class="modal-close" onclick="closeModal('ticketsModal')">?</button>
+    <button class="modal-close" onclick="closeModal('ticketsModal')">✕</button>
     <div class="modal-header">
-      <div class="modal-icon">??</div>
+      <div class="modal-icon">🎫</div>
       <h2>Tiket Saya</h2>
     </div>
     <div id="ticketsList"></div>
@@ -1128,12 +1317,12 @@
 <!-- Notifications Modal -->
 <div class="modal-overlay" id="notificationsModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('notificationsModal')">?</button>
+    <button class="modal-close" onclick="closeModal('notificationsModal')">✕</button>
     <div class="modal-body">
-      <h2 style="font-size:22px;font-weight:900;margin-bottom:4px">?? Notifikasi</h2>
+      <h2 style="font-size:22px;font-weight:900;margin-bottom:4px">🔔 Notifikasi</h2>
       <p style="color:var(--text2);font-size:14px;margin-bottom:24px">Update terbaru untuk akun kamu</p>
       <div class="orders-list" id="notificationsList">
-        <div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">Belum ada notifikasi</div></div>
+        <div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-text">Belum ada notifikasi</div></div>
       </div>
       <button class="btn-ghost btn-full" onclick="closeModal('notificationsModal')" style="margin-top:16px">Tutup</button>
     </div>
@@ -1332,6 +1521,26 @@ function getGradient(ev) {
   return ev._gradient || GRADIENTS[(ev.id - 1) % GRADIENTS.length];
 }
 
+function hasValidBannerUrl(url) {
+  if (typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (!trimmed || ['null', 'undefined', 'false', 'n/a'].includes(trimmed.toLowerCase())) return false;
+  if (trimmed.startsWith('data:image/')) return true;
+  try {
+    const parsed = new URL(trimmed, window.location.href);
+    return ['http:', 'https:'].includes(parsed.protocol);
+  } catch (_) {
+    return false;
+  }
+}
+
+function getBannerStyle(ev) {
+  const safeUrl = String(ev.banner_url || '').replace(/'/g, '%27');
+  return hasValidBannerUrl(ev.banner_url)
+    ? `background-image:url('${safeUrl}')`
+    : `background:${getGradient(ev)}`;
+}
+
 /* ============================================================
    INIT
 ============================================================ */
@@ -1390,7 +1599,7 @@ function renderEvents() {
     card.onclick   = () => openEventDetail(ev);
     card.innerHTML = `
       <div class="card-image">
-        <div class="card-img-bg" style="${ev.banner_url ? `background-image:url('${ev.banner_url}')` : `background:${getGradient(ev)}`}"></div>
+        <div class="card-img-bg" style="${getBannerStyle(ev)}"></div>
         ${badge}
         <div class="card-cat">🎵 Konser</div>
       </div>
@@ -1428,7 +1637,7 @@ function renderHero() {
     const slide = document.createElement('div');
     slide.className = 'hero-slide';
     slide.innerHTML = `
-      <div class="hero-bg" style="${ev.banner_url ? `background-image:url('${ev.banner_url}')` : `background:${getGradient(ev)}`}"></div>
+      <div class="hero-bg" style="${getBannerStyle(ev)}"></div>
       <div class="hero-content">
         <div class="hero-badge">🔥 On Sale Now</div>
         <div class="hero-title">${ev.name}</div>
@@ -1484,6 +1693,7 @@ function updateStats() {
 
 function animateCount(id, target) {
   const el = document.getElementById(id);
+  el.classList.remove('loading');
   let current = 0;
   const step = Math.ceil(target / 30);
   const t = setInterval(() => {
@@ -1525,8 +1735,8 @@ function openEventDetail(ev) {
   selectedSeat = null;
 
   document.getElementById('modalBannerBg').style.cssText =
-    ev.banner_url
-      ? `background-image:url('${ev.banner_url}');width:100%;height:100%;background-size:cover;background-position:center;`
+    hasValidBannerUrl(ev.banner_url)
+      ? `background-image:url('${String(ev.banner_url || '').replace(/'/g, '%27')}');width:100%;height:100%;background-size:cover;background-position:center;`
       : `background:${getGradient(ev)};width:100%;height:100%;`;
 
   document.getElementById('modalTitle').textContent = ev.name;
@@ -1736,6 +1946,7 @@ async function doLogin() {
 
 function updateAuthUI() {
   const badge      = document.getElementById('userBadge');
+  const userMenu   = document.getElementById('userMenu');
   const btnLogin   = document.getElementById('btnLogin');
   const btnReg     = document.getElementById('btnRegister');
   const btnTickets = document.getElementById('btnTickets');
@@ -1747,10 +1958,11 @@ function updateAuthUI() {
     btnLogin.style.display = 'none';
     btnReg.style.display   = 'none';
     btnTickets.style.display = 'inline-flex';
-    notifBell.style.display = 'block';
+    notifBell.style.display = 'inline-flex';
     loadNotifCount();
   } else {
     badge.style.display = 'none';
+    userMenu.classList.remove('open');
     btnLogin.style.display = '';
     btnReg.style.display   = '';
     btnTickets.style.display = 'none';
@@ -1761,11 +1973,31 @@ function updateAuthUI() {
   }
 }
 
+function toggleUserMenu(event) {
+  if (!currentUser) return;
+  if (event) event.stopPropagation();
+  document.getElementById('userMenu').classList.toggle('open');
+}
+
+function hideUserMenu() {
+  const menu = document.getElementById('userMenu');
+  if (menu) menu.classList.remove('open');
+}
+
+function logoutUser() {
+  hideUserMenu();
+  currentUser = null;
+  localStorage.removeItem('wt_user');
+  updateAuthUI();
+  toast('👋 Sampai jumpa lagi!', 'info');
+}
+
 /* ============================================================
    MY ORDERS
 ============================================================ */
 async function showOrders() {
   if (!currentUser) return;
+  hideUserMenu();
   document.getElementById('ordersModal').classList.add('open');
 
   const list = document.getElementById('ordersList');
@@ -1818,6 +2050,7 @@ function quickPay(order) {
 
 async function showTickets() {
   if (!currentUser) return;
+  hideUserMenu();
   document.getElementById('ticketsModal').classList.add('open');
 
   const list = document.getElementById('ticketsList');
@@ -1833,41 +2066,50 @@ async function showTickets() {
     const orders = (Array.isArray(json) ? json : (json.data || [])).filter(order => order.status === 'confirmed');
     renderTickets(orders);
   } catch (_) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">Gagal memuat tiket</div></div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🎫</div><div class="empty-text">Gagal memuat tiket</div></div>';
   }
 }
 
 function renderTickets(orders) {
   const list = document.getElementById('ticketsList');
   if (!orders.length) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">Belum ada tiket terkonfirmasi</div></div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🎫</div><div class="empty-text">Belum ada tiket terkonfirmasi</div></div>';
     return;
   }
 
   list.innerHTML = orders.map(order => {
     const qrText = order.qr_code || `WT-${order.id}-${order.user_id || currentUser.id}`;
+    const statusText = escapeHtml((order.status || 'confirmed').toUpperCase());
     return `
       <div class="ticket-card">
         <div class="ticket-top">
           <div>
-            <div class="order-title">${escapeHtml(order.event_name || 'Konser')}</div>
-            <div class="ticket-meta">
-              Kategori: ${escapeHtml(order.seat_category_name || '-')}<br>
-              Order ID: #${escapeHtml(order.id)}
-            </div>
+            <div class="ticket-event-title">${escapeHtml(order.event_name || 'Konser')}</div>
           </div>
-          <div class="status-badge status-${escapeHtml(order.status || 'confirmed')}">${escapeHtml(order.status || 'confirmed')}</div>
+          <div class="status-badge status-confirmed">${statusText}</div>
+        </div>
+        <div class="ticket-meta-grid">
+          <div class="ticket-meta-item">
+            <div class="ticket-meta-label">Kategori Kursi</div>
+            <div class="ticket-meta-value">${escapeHtml(order.seat_category_name || '-')}</div>
+          </div>
+          <div class="ticket-meta-item">
+            <div class="ticket-meta-label">Order ID</div>
+            <div class="ticket-meta-value">#${escapeHtml(order.id)}</div>
+          </div>
         </div>
         <div class="ticket-qr">
           <div class="ticket-qr-visual">${renderQrVisual(qrText)}</div>
           <pre class="ticket-qr-code"><code>${escapeHtml(qrText)}</code></pre>
         </div>
+        <div class="ticket-hint">Tunjukkan QR ini di pintu masuk</div>
       </div>`;
   }).join('');
 }
 
 async function showNotifications() {
   if (!currentUser) return;
+  hideUserMenu();
   document.getElementById('notificationsModal').classList.add('open');
 
   const list = document.getElementById('notificationsList');
@@ -1886,19 +2128,43 @@ async function showNotifications() {
 function renderNotifications(notifications) {
   const list = document.getElementById('notificationsList');
   if (!notifications.length) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">Belum ada notifikasi</div></div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-text">Belum ada notifikasi</div></div>';
     return;
   }
 
   list.innerHTML = notifications.map(item => {
     const unread = !(item.read_at || item.is_read || item.read);
+    const type = getNotificationType(item);
+    const meta = getNotificationAppearance(type);
     return `
       <div class="notification-card ${unread ? 'unread' : ''}" onclick='markNotificationRead(${JSON.stringify(String(item.id))})'>
-        <div class="notification-title">${escapeHtml(item.title || 'Notifikasi')}</div>
-        <div class="notification-message">${escapeHtml(item.message || 'Tidak ada detail notifikasi.')}</div>
-        <div class="notification-time">${formatDate(item.created_at || item.updated_at || item.timestamp || new Date().toISOString())}</div>
+        <div class="notification-row">
+          <div class="notification-icon" style="color:${meta.color};background:${meta.background}">${meta.icon}</div>
+          <div class="notification-content">
+            <div class="notification-title">${escapeHtml(item.title || 'Notifikasi')}</div>
+            <div class="notification-message">${escapeHtml(item.message || 'Tidak ada detail notifikasi.')}</div>
+            <div class="notification-time">${formatDate(item.created_at || item.updated_at || item.timestamp || new Date().toISOString())}</div>
+          </div>
+        </div>
       </div>`;
   }).join('');
+}
+
+function getNotificationType(item) {
+  const source = `${item.type || ''} ${item.title || ''} ${item.message || ''}`.toLowerCase();
+  if (source.includes('payment') || source.includes('bayar') || source.includes('pembayaran') || source.includes('paid')) return 'payment';
+  if (source.includes('expire') || source.includes('expired') || source.includes('kadaluwarsa') || source.includes('expired') || source.includes('timeout')) return 'expiry';
+  return 'ticket';
+}
+
+function getNotificationAppearance(type) {
+  if (type === 'payment') {
+    return { icon: '💳', color: '#7dd3fc', background: 'rgba(59,130,246,.12)' };
+  }
+  if (type === 'expiry') {
+    return { icon: '⏰', color: '#fbbf24', background: 'rgba(245,158,11,.12)' };
+  }
+  return { icon: '🎫', color: '#34d399', background: 'rgba(0,214,143,.12)' };
 }
 
 async function markNotificationRead(id) {
@@ -1927,7 +2193,7 @@ async function loadNotifCount(prefetched) {
     notificationsCache = notifications;
     const unread = notifications.filter(item => !(item.read_at || item.is_read || item.read)).length;
     badge.textContent = String(unread);
-    badge.style.display = unread ? 'block' : 'none';
+    badge.style.display = unread ? 'inline-flex' : 'none';
   } catch (_) {
     badge.textContent = '0';
     badge.style.display = 'none';
@@ -1954,7 +2220,7 @@ function renderQrVisual(text) {
     for (let x = 0; x < 11; x++) {
       hash = (hash * 1664525 + 1013904223) >>> 0;
       const isFinder = (x < 3 && y < 3) || (x > 7 && y < 3) || (x < 3 && y > 7);
-      row += isFinder || (hash & 1) ? '??' : '  ';
+      row += isFinder || (hash & 1) ? '██' : '  ';
     }
     rows.push(row);
   }
@@ -1979,6 +2245,10 @@ function closeModal(id) {
 }
 document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.user-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) hideUserMenu();
 });
 
 /* ============================================================
