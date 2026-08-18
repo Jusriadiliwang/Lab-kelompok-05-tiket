@@ -535,6 +535,82 @@
     /* Auth Modal */
     .auth-modal { max-width: 440px; }
     .auth-modal .modal-body { text-align: center; }
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      padding: 28px;
+    }
+    .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .modal-icon {
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,77,0,.12);
+      font-size: 22px;
+    }
+    .modal-header h2 { font-size: 22px; font-weight: 900; }
+    .ticket-card {
+      background: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,77,0,.08));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .ticket-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .ticket-meta { font-size: 12px; color: var(--text3); line-height: 1.7; }
+    .ticket-qr {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 14px;
+      align-items: center;
+      background: rgba(255,255,255,.03);
+      border: 1px dashed rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .ticket-qr-visual {
+      width: 90px;
+      height: 90px;
+      background: #fff;
+      color: #111;
+      border-radius: 10px;
+      padding: 6px;
+      font: 7px/7px monospace;
+      white-space: pre;
+      overflow: hidden;
+    }
+    .ticket-qr-code {
+      margin: 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #111827;
+      color: #d1fae5;
+      font: 12px/1.5 Consolas, Monaco, monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .notification-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: border-color .2s, transform .2s;
+      margin-bottom: 12px;
+    }
+    .notification-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+    .notification-card.unread { border-color: rgba(255,77,0,.45); }
+    .notification-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+    .notification-message { color: var(--text2); font-size: 13px; line-height: 1.6; }
+    .notification-time { margin-top: 10px; color: var(--text3); font-size: 11px; }
     .auth-title { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
     .auth-subtitle { color: var(--text2); font-size: 14px; margin-bottom: 28px; }
     .auth-form { text-align: left; }
@@ -836,6 +912,10 @@
     </div>
     <button class="btn-ghost" id="btnLogin" onclick="openAuth()">Masuk</button>
     <button class="btn-primary" id="btnRegister" onclick="openAuth()">Daftar</button>
+    <button class="btn-ghost" id="btnTickets" onclick="showTickets()" style="display:none">Tiket Saya</button>
+    <div id="notifBell" onclick="showNotifications()" style="display:none;position:relative;cursor:pointer;font-size:20px;padding:8px">
+      ??<span id="notifBadge" style="position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;border-radius:99px;font-size:10px;padding:2px 5px;display:none">0</span>
+    </div>
   </div>
 </nav>
 
@@ -1033,6 +1113,33 @@
   </div>
 </div>
 
+<!-- TICKETS MODAL -->
+<div class="modal-overlay" id="ticketsModal">
+  <div class="modal-box" style="max-width:560px">
+    <button class="modal-close" onclick="closeModal('ticketsModal')">?</button>
+    <div class="modal-header">
+      <div class="modal-icon">??</div>
+      <h2>Tiket Saya</h2>
+    </div>
+    <div id="ticketsList"></div>
+  </div>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal-overlay" id="notificationsModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('notificationsModal')">?</button>
+    <div class="modal-body">
+      <h2 style="font-size:22px;font-weight:900;margin-bottom:4px">?? Notifikasi</h2>
+      <p style="color:var(--text2);font-size:14px;margin-bottom:24px">Update terbaru untuk akun kamu</p>
+      <div class="orders-list" id="notificationsList">
+        <div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">Belum ada notifikasi</div></div>
+      </div>
+      <button class="btn-ghost btn-full" onclick="closeModal('notificationsModal')" style="margin-top:16px">Tutup</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -1110,6 +1217,7 @@ let currentOrder = null;
 let selectedPayMethod = null;
 let countdownTimer = null;
 let currentUser  = JSON.parse(localStorage.getItem('wt_user') || 'null');
+let notificationsCache = [];
 let heroIdx      = 0;
 let heroTimer    = null;
 
@@ -1400,7 +1508,9 @@ function filterEvents() { applyFilters(); }
 function applyFilters() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
   filteredEvs = allEvents.filter(ev => {
-    const matchCat = currentCategory === 'all' || ev.categories?.some(c => c.name.toLowerCase().includes(currentCategory.toLowerCase()));
+    const catMap = { 'konser': ['konser','concert','musik','band','reuni','live'], 'festival': ['festival','fest','edm','electronic'], 'sport': ['sport','bola','basket','liga'], 'theater': ['theater','teater','drama','musical'], 'comedy': ['comedy','stand up','komedi'] };
+    const keywords = catMap[currentCategory?.toLowerCase()] || [currentCategory?.toLowerCase()];
+    const matchCat = currentCategory === 'all' || keywords.some(k => (ev.name+' '+(ev.description||'')+(ev.venue||'')).toLowerCase().includes(k));
     const matchQ   = !q || ev.name.toLowerCase().includes(q) || (ev.venue||'').toLowerCase().includes(q);
     return matchCat && matchQ;
   });
@@ -1625,18 +1735,29 @@ async function doLogin() {
 }
 
 function updateAuthUI() {
-  const badge    = document.getElementById('userBadge');
-  const btnLogin = document.getElementById('btnLogin');
-  const btnReg   = document.getElementById('btnRegister');
+  const badge      = document.getElementById('userBadge');
+  const btnLogin   = document.getElementById('btnLogin');
+  const btnReg     = document.getElementById('btnRegister');
+  const btnTickets = document.getElementById('btnTickets');
+  const notifBell  = document.getElementById('notifBell');
+  const notifBadge = document.getElementById('notifBadge');
   if (currentUser) {
     badge.style.display = 'flex';
     document.getElementById('userLabel').textContent = currentUser.name || currentUser.id;
     btnLogin.style.display = 'none';
     btnReg.style.display   = 'none';
+    btnTickets.style.display = 'inline-flex';
+    notifBell.style.display = 'block';
+    loadNotifCount();
   } else {
     badge.style.display = 'none';
     btnLogin.style.display = '';
     btnReg.style.display   = '';
+    btnTickets.style.display = 'none';
+    notifBell.style.display = 'none';
+    notifBadge.style.display = 'none';
+    notifBadge.textContent = '0';
+    notificationsCache = [];
   }
 }
 
@@ -1693,6 +1814,160 @@ function quickPay(order) {
   closeModal('ordersModal');
   currentOrder = order;
   openPaymentModal(order);
+}
+
+async function showTickets() {
+  if (!currentUser) return;
+  document.getElementById('ticketsModal').classList.add('open');
+
+  const list = document.getElementById('ticketsList');
+  list.innerHTML = '<div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>';
+
+  try {
+    const res = await fetch(`${API}/orders?user_id=${currentUser.id}`, {
+      headers: { 'Authorization': `Bearer ${currentUser.token}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) throw new Error('orders failed');
+    const json = await res.json();
+    const orders = (Array.isArray(json) ? json : (json.data || [])).filter(order => order.status === 'confirmed');
+    renderTickets(orders);
+  } catch (_) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">Gagal memuat tiket</div></div>';
+  }
+}
+
+function renderTickets(orders) {
+  const list = document.getElementById('ticketsList');
+  if (!orders.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">Belum ada tiket terkonfirmasi</div></div>';
+    return;
+  }
+
+  list.innerHTML = orders.map(order => {
+    const qrText = order.qr_code || `WT-${order.id}-${order.user_id || currentUser.id}`;
+    return `
+      <div class="ticket-card">
+        <div class="ticket-top">
+          <div>
+            <div class="order-title">${escapeHtml(order.event_name || 'Konser')}</div>
+            <div class="ticket-meta">
+              Kategori: ${escapeHtml(order.seat_category_name || '-')}<br>
+              Order ID: #${escapeHtml(order.id)}
+            </div>
+          </div>
+          <div class="status-badge status-${escapeHtml(order.status || 'confirmed')}">${escapeHtml(order.status || 'confirmed')}</div>
+        </div>
+        <div class="ticket-qr">
+          <div class="ticket-qr-visual">${renderQrVisual(qrText)}</div>
+          <pre class="ticket-qr-code"><code>${escapeHtml(qrText)}</code></pre>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function showNotifications() {
+  if (!currentUser) return;
+  document.getElementById('notificationsModal').classList.add('open');
+
+  const list = document.getElementById('notificationsList');
+  list.innerHTML = '<div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>';
+
+  try {
+    notificationsCache = await fetchNotifications();
+    renderNotifications(notificationsCache);
+    loadNotifCount(notificationsCache);
+  } catch (_) {
+    notificationsCache = [];
+    renderNotifications([]);
+  }
+}
+
+function renderNotifications(notifications) {
+  const list = document.getElementById('notificationsList');
+  if (!notifications.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">Belum ada notifikasi</div></div>';
+    return;
+  }
+
+  list.innerHTML = notifications.map(item => {
+    const unread = !(item.read_at || item.is_read || item.read);
+    return `
+      <div class="notification-card ${unread ? 'unread' : ''}" onclick='markNotificationRead(${JSON.stringify(String(item.id))})'>
+        <div class="notification-title">${escapeHtml(item.title || 'Notifikasi')}</div>
+        <div class="notification-message">${escapeHtml(item.message || 'Tidak ada detail notifikasi.')}</div>
+        <div class="notification-time">${formatDate(item.created_at || item.updated_at || item.timestamp || new Date().toISOString())}</div>
+      </div>`;
+  }).join('');
+}
+
+async function markNotificationRead(id) {
+  const notif = notificationsCache.find(item => String(item.id) === String(id));
+  if (!notif || notif.read_at || notif.is_read || notif.read) return;
+
+  notif.read_at = new Date().toISOString();
+  renderNotifications(notificationsCache);
+  loadNotifCount(notificationsCache);
+
+  try {
+    await fetch(`${API}/notifications/${id}/read`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${currentUser.token}` },
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch (_) {}
+}
+
+async function loadNotifCount(prefetched) {
+  if (!currentUser) return;
+  const badge = document.getElementById('notifBadge');
+
+  try {
+    const notifications = Array.isArray(prefetched) ? prefetched : await fetchNotifications();
+    notificationsCache = notifications;
+    const unread = notifications.filter(item => !(item.read_at || item.is_read || item.read)).length;
+    badge.textContent = String(unread);
+    badge.style.display = unread ? 'block' : 'none';
+  } catch (_) {
+    badge.textContent = '0';
+    badge.style.display = 'none';
+  }
+}
+
+async function fetchNotifications() {
+  const res = await fetch(`${API}/notifications?user_id=${currentUser.id}`, {
+    headers: { 'Authorization': `Bearer ${currentUser.token}` },
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!res.ok) throw new Error('notifications failed');
+  const json = await res.json();
+  return Array.isArray(json) ? json : (json.data || []);
+}
+
+function renderQrVisual(text) {
+  const seed = String(text || 'WT-QR');
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  const rows = [];
+  for (let y = 0; y < 11; y++) {
+    let row = '';
+    for (let x = 0; x < 11; x++) {
+      hash = (hash * 1664525 + 1013904223) >>> 0;
+      const isFinder = (x < 3 && y < 3) || (x > 7 && y < 3) || (x < 3 && y > 7);
+      row += isFinder || (hash & 1) ? '??' : '  ';
+    }
+    rows.push(row);
+  }
+  return rows.join('\n');
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /* ============================================================
