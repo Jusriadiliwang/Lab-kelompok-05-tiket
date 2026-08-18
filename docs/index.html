@@ -1043,7 +1043,10 @@
     <div class="modal-body" style="text-align:center">
       <div style="font-size:52px;margin-bottom:8px">🔐</div>
       <div style="font-size:22px;font-weight:900;margin-bottom:4px">Admin Panel</div>
-      <div style="color:var(--text3);font-size:13px;margin-bottom:24px">Akses terbatas — masukkan password</div>
+      <div style="color:var(--text3);font-size:13px;margin-bottom:16px">Login ERP atau gunakan password demo</div>
+      <input type="email" id="adminEmailInput" class="form-input" placeholder="Email ERP (admin@wartiket.id)"
+        style="text-align:center;margin-bottom:10px"
+        onkeydown="if(event.key==='Enter')doAdminLogin()" />
       <input type="password" id="adminPassInput" class="form-input" placeholder="••••••••"
         onkeydown="if(event.key==='Enter')doAdminLogin()" style="text-align:center;font-size:20px;letter-spacing:6px" />
       <div class="admin-login-error" style="display:none;color:var(--danger);font-size:13px;margin-top:8px">Password salah. Coba lagi.</div>
@@ -1397,7 +1400,7 @@ function filterEvents() { applyFilters(); }
 function applyFilters() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
   filteredEvs = allEvents.filter(ev => {
-    const matchCat = currentCategory === 'all' || ev.name.toLowerCase().includes(currentCategory.toLowerCase()) || true;
+    const matchCat = currentCategory === 'all' || ev.categories?.some(c => c.name.toLowerCase().includes(currentCategory.toLowerCase()));
     const matchQ   = !q || ev.name.toLowerCase().includes(q) || (ev.venue||'').toLowerCase().includes(q);
     return matchCat && matchQ;
   });
@@ -1592,16 +1595,33 @@ function openAuth() {
   document.getElementById('authModal').classList.add('open');
 }
 
-function doLogin() {
+async function doLogin() {
   const id   = document.getElementById('authUserId').value.trim();
   const name = document.getElementById('authName').value.trim() || id;
   if (!id) { toast('⚠️ Masukkan User ID', 'info'); return; }
 
-  currentUser = { id, name, token: btoa(id + ':wartiket:' + Date.now()) };
+  const btn = document.getElementById('btnDoLogin');
+  if (btn) { btn.disabled = true; btn.textContent = 'Masuk...'; }
+
+  let token;
+  try {
+    const r = await fetch(`${API}/auth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: id, role: 'user' }),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (r.ok) { const d = await r.json(); token = d.token; }
+  } catch (_) {}
+  // Fallback: demo token (jika api-gateway tidak aktif)
+  if (!token) token = btoa(id + ':wartiket:' + Date.now());
+
+  currentUser = { id, name, token };
   localStorage.setItem('wt_user', JSON.stringify(currentUser));
   updateAuthUI();
   closeModal('authModal');
   toast('👋 Selamat datang, ' + name + '!', 'success');
+  if (btn) { btn.disabled = false; btn.textContent = 'Masuk'; }
 }
 
 function updateAuthUI() {
@@ -1744,7 +1764,19 @@ document.querySelector('.logo').addEventListener('click', logoClick);
 
 // Admin state
 let adminLoggedIn = JSON.parse(sessionStorage.getItem('wt_admin') || 'false');
-const ADMIN_PASS  = 'wartiket2026'; // simple demo password
+let adminErpToken = null;
+let adminRole     = 'super-admin';
+try {
+  const stored = sessionStorage.getItem('wt_admin');
+  if (stored && stored !== 'true' && stored !== 'false') {
+    const parsed = JSON.parse(stored);
+    adminErpToken = parsed.token || null;
+    adminRole     = parsed.role  || 'super-admin';
+    adminLoggedIn = !!parsed.token;
+  }
+} catch (_) {}
+const ADMIN_PASS  = 'wartiket2026'; // fallback demo password
+const ERP_URL     = 'http://localhost:3005';
 let adminView     = 'dashboard';
 
 function openAdminLogin() {
@@ -1753,17 +1785,48 @@ function openAdminLogin() {
   setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
 }
 
-function doAdminLogin() {
-  const p = document.getElementById('adminPassInput').value;
+async function doAdminLogin() {
+  const emailInput = document.getElementById('adminEmailInput');
+  const email = emailInput ? emailInput.value.trim() || 'admin@wartiket.id' : 'admin@wartiket.id';
+  const p     = document.getElementById('adminPassInput').value;
+  if (!p) return;
+
+  const errEl = document.getElementById('adminLoginModal').querySelector('.admin-login-error');
+  if (errEl) errEl.style.display = 'none';
+
+  // Coba login via ERP service
+  try {
+    const r = await fetch(`${ERP_URL}/erp/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: p }),
+      signal: AbortSignal.timeout(4000),
+    });
+    if (r.ok) {
+      const data = await r.json();
+      adminLoggedIn = true;
+      adminErpToken = data.token;
+      adminRole     = data.admin.role;
+      sessionStorage.setItem('wt_admin', JSON.stringify({ token: data.token, role: data.admin.role, name: data.admin.name }));
+      document.getElementById('adminLoginModal').classList.remove('open');
+      document.getElementById('adminPassInput').value = '';
+      if (emailInput) emailInput.value = '';
+      openAdmin();
+      toast(`🔑 Selamat datang, ${data.admin.name} (${data.admin.role})!`, 'success');
+      return;
+    }
+  } catch (_) {}
+
+  // Fallback: local demo password
   if (p === ADMIN_PASS) {
     adminLoggedIn = true;
     sessionStorage.setItem('wt_admin', 'true');
     document.getElementById('adminLoginModal').classList.remove('open');
     document.getElementById('adminPassInput').value = '';
     openAdmin();
-    toast('🔑 Selamat datang, Admin!', 'success');
+    toast('🔑 Selamat datang, Admin! (Demo Mode)', 'success');
   } else {
-    document.getElementById('adminLoginModal').querySelector('.admin-login-error').style.display = 'block';
+    if (errEl) errEl.style.display = 'block';
     document.getElementById('adminPassInput').value = '';
   }
 }
@@ -1803,56 +1866,52 @@ function renderAdminView(view) {
 }
 
 /* ── DASHBOARD ── */
-function renderAdminDashboard(el) {
-  const totalEvents  = allEvents.length;
-  const onSale       = allEvents.filter(e => e.status === 'on_sale').length;
-  const totalSeats   = allEvents.reduce((s, ev) => s + (ev.categories||[]).reduce((a,c) => a + (c.available_seats||0), 0), 0);
-  const soldSeats    = allEvents.reduce((s, ev) => s + (ev.categories||[]).reduce((a,c) => a + ((c.total_seats||0) - (c.available_seats||0)), 0), 0);
+async function renderAdminDashboard(el) {
+  el.innerHTML = '<div class="admin-loading"><div class="admin-spinner"></div></div>';
+
+  let erpData = null;
+  if (adminErpToken) {
+    try {
+      const r = await fetch(`${ERP_URL}/erp/analytics/dashboard`, {
+        headers: { 'Authorization': `Bearer ${adminErpToken}` },
+        signal: AbortSignal.timeout(4000),
+      });
+      if (r.ok) erpData = await r.json();
+    } catch (_) {}
+  }
+
+  const totalEvents  = erpData ? (erpData.event_stats||[]).reduce((s,e)=>s+parseInt(e.count||0),0) : allEvents.length;
+  const onSale       = erpData ? ((erpData.event_stats||[]).find(e=>e.status==='on_sale')?.count||0) : allEvents.filter(e=>e.status==='on_sale').length;
+  const totalSeats   = erpData?.seat_stats?.available || allEvents.reduce((s,ev)=>s+(ev.categories||[]).reduce((a,c)=>a+(c.available_seats||0),0),0);
+  const soldSeats    = erpData?.seat_stats?.sold      || allEvents.reduce((s,ev)=>s+(ev.categories||[]).reduce((a,c)=>a+((c.total_seats||0)-(c.available_seats||0)),0),0);
+  const totalRevenue = erpData?.revenue?.total_gross  || 0;
 
   el.innerHTML = `
-    <div class="adv-header"><h1 class="adv-title">Dashboard</h1><span class="adv-subtitle">Selamat datang kembali, Admin</span></div>
-
-    <div class="adv-stats-grid">
-      <div class="adv-stat" style="--c:#6c63ff">
-        <div class="adv-stat-icon">🎪</div>
-        <div class="adv-stat-val">${totalEvents}</div>
-        <div class="adv-stat-lbl">Total Event</div>
-      </div>
-      <div class="adv-stat" style="--c:#ff4d00">
-        <div class="adv-stat-icon">🔥</div>
-        <div class="adv-stat-val">${onSale}</div>
-        <div class="adv-stat-lbl">On Sale</div>
-      </div>
-      <div class="adv-stat" style="--c:#00d68f">
-        <div class="adv-stat-icon">🪑</div>
-        <div class="adv-stat-val">${totalSeats.toLocaleString('id')}</div>
-        <div class="adv-stat-lbl">Kursi Tersedia</div>
-      </div>
-      <div class="adv-stat" style="--c:#ffaa00">
-        <div class="adv-stat-icon">🎟️</div>
-        <div class="adv-stat-val">${soldSeats.toLocaleString('id')}</div>
-        <div class="adv-stat-lbl">Tiket Terjual</div>
-      </div>
+    <div class="adv-header">
+      <h1 class="adv-title">Dashboard</h1>
+      <span class="adv-subtitle">${adminErpToken ? '✅ Terhubung ke ERP' : '⚠️ Demo Mode'}</span>
     </div>
-
-    <div class="adv-section-title">Event Aktif</div>
+    <div class="adv-stats-grid">
+      <div class="adv-stat" style="--c:#6c63ff"><div class="adv-stat-icon">🎪</div><div class="adv-stat-val">${totalEvents}</div><div class="adv-stat-lbl">Total Event</div></div>
+      <div class="adv-stat" style="--c:#ff4d00"><div class="adv-stat-icon">🔥</div><div class="adv-stat-val">${onSale}</div><div class="adv-stat-lbl">On Sale</div></div>
+      <div class="adv-stat" style="--c:#00d68f"><div class="adv-stat-icon">🪑</div><div class="adv-stat-val">${Number(totalSeats).toLocaleString('id')}</div><div class="adv-stat-lbl">Kursi Tersedia</div></div>
+      <div class="adv-stat" style="--c:#ffaa00"><div class="adv-stat-icon">🎟️</div><div class="adv-stat-val">${Number(soldSeats).toLocaleString('id')}</div><div class="adv-stat-lbl">Tiket Terjual</div></div>
+      ${totalRevenue ? `<div class="adv-stat" style="--c:#00d68f;grid-column:span 2"><div class="adv-stat-icon">💰</div><div class="adv-stat-val">Rp ${Number(totalRevenue).toLocaleString('id')}</div><div class="adv-stat-lbl">Total Revenue (ERP)</div></div>` : ''}
+    </div>
+    <div class="adv-section-title" style="margin-top:28px">Event Aktif</div>
     <div class="adv-events-mini">
       ${allEvents.slice(0,4).map(ev => `
         <div class="adv-event-mini">
           <div class="adv-event-mini-img" style="${ev.banner_url ? `background-image:url('${ev.banner_url}')` : `background:${getGradient(ev)}`}"></div>
-          <div class="adv-event-mini-info">
-            <div class="adv-event-mini-name">${ev.name}</div>
-            <div class="adv-event-mini-date">${formatDate(ev.event_date)}</div>
-          </div>
+          <div class="adv-event-mini-info"><div class="adv-event-mini-name">${ev.name}</div><div class="adv-event-mini-date">${formatDate(ev.event_date)}</div></div>
           <div class="adv-badge-status ${ev.status}">${ev.status}</div>
         </div>`).join('')}
     </div>
-
     <div class="adv-section-title" style="margin-top:28px">Aksi Cepat</div>
     <div class="adv-quick-actions">
       <button class="adv-quick-btn" onclick="renderAdminView('events')">➕ Tambah Event</button>
       <button class="adv-quick-btn" onclick="renderAdminView('images')">🖼️ Upload Gambar</button>
-      <button class="adv-quick-btn" onclick="renderAdminView('orders')">📋 Lihat Order</button>
+      <button class="adv-quick-btn" onclick="renderAdminView('orders')">📊 Analitik ERP</button>
     </div>`;
 }
 
@@ -2022,13 +2081,26 @@ function saveNewEvent() {
   renderHero();
   updateStats();
 
-  // Try push to API
-  if (currentUser) {
-    fetch(`${API}/events`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentUser.token}` },
-      body: JSON.stringify({ name, venue, event_date: newEv.event_date, description: desc, banner_url: banner, categories: cats }),
-    }).catch(() => {});
+  // Push ke ERP API (dengan token ERP jika ada, fallback ke gateway)
+  const pushToken = adminErpToken || currentUser?.token;
+  if (pushToken) {
+    try {
+      const pushUrl = adminErpToken ? `${ERP_URL}/erp/events` : `${API}/events`;
+      const pr = await fetch(pushUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${pushToken}` },
+        body: JSON.stringify({ name, venue, event_date: newEv.event_date, description: desc, banner_url: banner || null, categories: cats }),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (pr.ok) {
+        const created = await pr.json();
+        // Update ID dari server agar sync dengan DB
+        const idx = allEvents.indexOf(newEv);
+        if (idx >= 0 && created.id) { allEvents[idx].id = created.id; allEvents[idx]._local = false; }
+        toast(`✅ Event "${name}" tersimpan ke ${adminErpToken ? 'ERP' : 'API'}!`, 'success');
+      }
+    } catch (_) {}
+  }
   }
 
   toast(`✅ Event "${name}" berhasil dibuat!`, 'success');
@@ -2036,25 +2108,39 @@ function saveNewEvent() {
   renderAdminView('events');
 }
 
-function toggleEventStatus(i) {
+async function toggleEventStatus(i) {
   const cycle = ['on_sale', 'upcoming', 'sold_out', 'cancelled'];
-  const cur   = allEvents[i].status;
+  const ev    = allEvents[i];
+  const cur   = ev.status;
   const next  = cycle[(cycle.indexOf(cur) + 1) % cycle.length];
+  const token = adminErpToken || currentUser?.token;
+  if (token && ev.id && !ev._local) {
+    try {
+      const url = adminErpToken ? `${ERP_URL}/erp/events/${ev.id}/status` : `${API}/events/${ev.id}/status`;
+      await fetch(url, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body:JSON.stringify({status:next}), signal:AbortSignal.timeout(3000) });
+    } catch (_) {}
+  }
   allEvents[i].status = next;
   filteredEvs = [...allEvents];
   renderEvents();
-  toast(`🔄 "${allEvents[i].name}" → ${next}`, 'info');
+  toast(`🔄 "${ev.name}" → ${next}`, 'info');
   renderAdminView('events');
 }
 
-function removeEvent(i) {
-  const name = allEvents[i].name;
+async function removeEvent(i) {
+  const ev = allEvents[i];
+  if (!confirm(`Hapus event "${ev.name}"? Status akan diset ke cancelled.`)) return;
+  const token = adminErpToken || currentUser?.token;
+  if (token && ev.id && !ev._local) {
+    try {
+      const url = adminErpToken ? `${ERP_URL}/erp/events/${ev.id}/status` : `${API}/events/${ev.id}/status`;
+      await fetch(url, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body:JSON.stringify({status:'cancelled'}), signal:AbortSignal.timeout(3000) });
+    } catch (_) {}
+  }
   allEvents.splice(i, 1);
   filteredEvs = [...allEvents];
-  renderEvents();
-  renderHero();
-  updateStats();
-  toast(`🗑️ "${name}" dihapus`, 'info');
+  renderEvents(); renderHero(); updateStats();
+  toast(`🗑️ "${ev.name}" dihapus/dibatalkan`, 'info');
   renderAdminView('events');
 }
 
@@ -2200,40 +2286,53 @@ function removeImage(i) {
 
 /* ── ORDERS ── */
 async function renderAdminOrders(el) {
-  el.innerHTML = `<div class="adv-header"><h1 class="adv-title">Semua Order</h1></div>
+  el.innerHTML = `<div class="adv-header"><h1 class="adv-title">Analitik ERP</h1></div>
     <div class="adv-loading"><div class="admin-spinner"></div></div>`;
 
-  let orders = [];
-  try {
-    const r = await fetch(`${API}/orders?user_id=all`, {
-      headers: { 'Authorization': `Bearer admin_token` },
-      signal: AbortSignal.timeout(4000),
-    });
-    const j = await r.json();
-    orders = j.data || [];
-  } catch (_) {
-    orders = []; // Demo: no orders from API
+  // Ambil conversion rate dari ERP
+  let convData = null, dashData = null;
+  if (adminErpToken) {
+    try {
+      const [r1, r2] = await Promise.all([
+        fetch(`${ERP_URL}/erp/analytics/conversion`, { headers:{'Authorization':`Bearer ${adminErpToken}`}, signal:AbortSignal.timeout(4000) }),
+        fetch(`${ERP_URL}/erp/analytics/dashboard`,  { headers:{'Authorization':`Bearer ${adminErpToken}`}, signal:AbortSignal.timeout(4000) }),
+      ]);
+      if (r1.ok) { const d = await r1.json(); convData = d.data || []; }
+      if (r2.ok) dashData = await r2.json();
+    } catch (_) {}
   }
 
+  const totalSold    = dashData?.revenue?.total_sold    || '—';
+  const totalExpired = dashData?.revenue?.total_expired || '—';
+  const totalRevenue = dashData?.revenue?.total_net     || 0;
+
   el.innerHTML = `
-    <div class="adv-header"><h1 class="adv-title">Semua Order</h1></div>
-    ${orders.length ? `
+    <div class="adv-header"><h1 class="adv-title">Analitik ERP</h1>
+      <span class="adv-subtitle">${adminErpToken ? '✅ Data dari ERP' : '⚠️ Login ERP untuk data real'}</span>
+    </div>
+    ${dashData ? `
+    <div class="adv-stats-grid" style="margin-bottom:24px">
+      <div class="adv-stat" style="--c:#00d68f"><div class="adv-stat-icon">🎟️</div><div class="adv-stat-val">${totalSold}</div><div class="adv-stat-lbl">Tiket Terjual</div></div>
+      <div class="adv-stat" style="--c:#ff3d71"><div class="adv-stat-icon">⏰</div><div class="adv-stat-val">${totalExpired}</div><div class="adv-stat-lbl">Expired</div></div>
+      <div class="adv-stat" style="--c:#ffaa00"><div class="adv-stat-icon">💰</div><div class="adv-stat-val">Rp ${Number(totalRevenue).toLocaleString('id')}</div><div class="adv-stat-lbl">Net Revenue</div></div>
+    </div>` : ''}
+    ${convData && convData.length ? `
+    <div class="adv-section-title" style="margin-bottom:12px">Conversion Rate per Event</div>
     <table class="adv-table">
-      <thead><tr><th>#</th><th>Event</th><th>User</th><th>Kategori</th><th>Harga</th><th>Status</th></tr></thead>
+      <thead><tr><th>Event</th><th>Terjual</th><th>Expired</th><th>Conversion</th><th>Drop-off</th></tr></thead>
       <tbody>
-        ${orders.map(o => `<tr>
-          <td>#${o.id}</td>
-          <td>${o.event_name||'—'}</td>
-          <td>${o.user_id}</td>
-          <td>${o.seat_category_name||'—'}</td>
-          <td>Rp ${(o.price||0).toLocaleString('id')}</td>
-          <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+        ${convData.map(r => `<tr>
+          <td>${r.event_name||'—'}</td>
+          <td>${r.tickets_sold}</td>
+          <td>${r.tickets_expired}</td>
+          <td><span style="color:var(--success)">${r.conversion_rate_pct}%</span></td>
+          <td><span style="color:var(--danger)">${r.dropoff_rate_pct}%</span></td>
         </tr>`).join('')}
       </tbody>
     </table>` :
-    `<div class="empty-state" style="color:var(--text3);padding:40px 0;text-align:center">
-      <div style="font-size:48px">📋</div>
-      <div>Belum ada order atau API tidak terhubung.</div>
+    `<div class="empty-state" style="padding:40px 0;text-align:center">
+      <div style="font-size:48px">📊</div>
+      <div style="color:var(--text3)">${adminErpToken ? 'Belum ada data analitik.' : 'Login ERP di atas untuk melihat data.'}</div>
     </div>`}`;
 }
 

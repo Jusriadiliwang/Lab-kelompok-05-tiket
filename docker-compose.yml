@@ -299,3 +299,13 @@ services:
     networks:
       - tiket-net
     restart: unless-stopped
+  frontend:
+    image: nginx:alpine
+    container_name: frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    networks:
+      - tiket-net
+    restart: unless-stopped
