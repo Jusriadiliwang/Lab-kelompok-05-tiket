@@ -1189,10 +1189,10 @@
 <footer>
   <div class="footer-logo">War<span>Tiket</span></div>
   <div class="footer-links">
-    <a href="#">Tentang Kami</a>
-    <a href="#">Cara Beli</a>
-    <a href="#">Syarat & Ketentuan</a>
-    <a href="#">Hubungi Kami</a>
+    <a href="#" onclick="openModal('modalTentang');return false">Tentang Kami</a>
+    <a href="#" onclick="openModal('modalCaraBeli');return false">Cara Beli</a>
+    <a href="#" onclick="openModal('modalSyarat');return false">Syarat &amp; Ketentuan</a>
+    <a href="#" onclick="openModal('modalHubungi');return false">Hubungi Kami</a>
     <a href="https://github.com/Jusriadiliwang/Lab-kelompok-05-tiket" target="_blank">GitHub</a>
   </div>
   <div class="footer-text">© 2026 WarTiket — Kelompok 5 Microservices Lab · Universitas Muhammadiyah Makassar</div>
@@ -2914,6 +2914,169 @@ function renderAdminSettings(el) {
     </div>`;
 }
 
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('open');
+}
+
 </script>
+
+<!-- ══ FOOTER MODALS ════════════════════════════════════ -->
+
+<!-- Tentang Kami -->
+<div class="modal-overlay" id="modalTentang">
+  <div class="modal-box" style="max-width:540px">
+    <button class="modal-close" onclick="closeModal('modalTentang')">✕</button>
+    <div class="modal-header"><div class="modal-icon">🎫</div><h2>Tentang WarTiket</h2></div>
+    <div class="modal-body" style="text-align:left">
+      <p style="color:var(--text2);line-height:1.7;margin-bottom:16px">
+        <strong style="color:var(--text1)">WarTiket</strong> adalah platform penjualan tiket konser berbasis microservices
+        yang dirancang untuk menangani lonjakan traffic tinggi saat tiket konser dibuka.
+      </p>
+      <p style="color:var(--text2);line-height:1.7;margin-bottom:20px">
+        Sistem ini mampu melayani puluhan ribu pengguna secara bersamaan tanpa ada kursi yang terjual dua kali,
+        menggunakan teknologi Redis distributed lock dan 4 lapisan perlindungan anti-oversell.
+      </p>
+      <div style="background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Tim Pengembang — Kelompok 5</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:600">Ashabul Kahfi</div><div style="font-size:12px;color:var(--text3)">105841108523</div></div>
+            <span style="background:rgba(108,99,255,.2);color:#6c63ff;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600">Backend/API Engineer</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:600">Jusriadi Liwang</div><div style="font-size:12px;color:var(--text3)">105841117023</div></div>
+            <span style="background:rgba(0,214,143,.15);color:#00d68f;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600">Data &amp; Persistence Engineer</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:600">Marhepi Rahmadani</div><div style="font-size:12px;color:var(--text3)">105841109523</div></div>
+            <span style="background:rgba(255,170,0,.15);color:#ffaa00;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600">QA, Load-Test &amp; Dokumentasi</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:600">Miftahul Jannah</div><div style="font-size:12px;color:var(--text3)">105841116023</div></div>
+            <span style="background:rgba(255,77,0,.15);color:#ff4d00;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600">Arsitek Sistem</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:var(--bg3);padding:4px 12px;border-radius:99px;font-size:12px;color:var(--text2)">⚡ 6 Microservices</span>
+        <span style="background:var(--bg3);padding:4px 12px;border-radius:99px;font-size:12px;color:var(--text2)">🔒 Anti-Oversell 4 Lapis</span>
+        <span style="background:var(--bg3);padding:4px 12px;border-radius:99px;font-size:12px;color:var(--text2)">🚀 440 req/s Throughput</span>
+        <span style="background:var(--bg3);padding:4px 12px;border-radius:99px;font-size:12px;color:var(--text2)">🏫 Unismuh Makassar</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cara Beli -->
+<div class="modal-overlay" id="modalCaraBeli">
+  <div class="modal-box" style="max-width:500px">
+    <button class="modal-close" onclick="closeModal('modalCaraBeli')">✕</button>
+    <div class="modal-header"><div class="modal-icon">🛒</div><h2>Cara Beli Tiket</h2></div>
+    <div class="modal-body" style="text-align:left">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0">1</div>
+          <div><div style="font-weight:600;margin-bottom:4px">Login ke Akun</div><div style="color:var(--text2);font-size:13px;line-height:1.6">Klik tombol <strong>Masuk</strong> di pojok kanan atas. Masukkan User ID kamu (bebas, tidak perlu daftar dulu).</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0">2</div>
+          <div><div style="font-weight:600;margin-bottom:4px">Pilih Konser</div><div style="color:var(--text2);font-size:13px;line-height:1.6">Klik konser yang kamu inginkan dari daftar event. Lihat detail, tanggal, venue, dan kategori kursi yang tersedia.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0">3</div>
+          <div><div style="font-weight:600;margin-bottom:4px">Pilih Kategori Kursi</div><div style="color:var(--text2);font-size:13px;line-height:1.6">Pilih kategori (Festival, VIP, atau VVIP) sesuai budget. Lihat jumlah kursi tersedia secara real-time.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0">4</div>
+          <div><div style="font-weight:600;margin-bottom:4px">Klik WAR TIKET!</div><div style="color:var(--text2);font-size:13px;line-height:1.6">Kursi akan dikunci selama <strong>15 menit</strong> khusus untukmu. Segera lanjutkan ke pembayaran.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0">5</div>
+          <div><div style="font-weight:600;margin-bottom:4px">Bayar &amp; Dapatkan Tiket</div><div style="color:var(--text2);font-size:13px;line-height:1.6">Pilih metode pembayaran (GoPay, OVO, DANA, Transfer Bank, Kartu Kredit). Setelah berhasil, tiket e-ticket muncul di <strong>Tiket Saya</strong> dengan QR code.</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.3);border-radius:10px;padding:12px;margin-top:20px">
+        <div style="color:#ffaa00;font-weight:600;margin-bottom:4px">⚠️ Perhatian</div>
+        <div style="color:var(--text2);font-size:13px;line-height:1.5">Kursi yang sudah dikunci tapi tidak dibayar dalam 15 menit akan otomatis dilepas kembali. Satu user hanya bisa mengunci 1 kursi per konser.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Syarat & Ketentuan -->
+<div class="modal-overlay" id="modalSyarat">
+  <div class="modal-box" style="max-width:520px;max-height:80vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeModal('modalSyarat')">✕</button>
+    <div class="modal-header"><div class="modal-icon">📋</div><h2>Syarat &amp; Ketentuan</h2></div>
+    <div class="modal-body" style="text-align:left">
+      <div style="color:var(--text3);font-size:12px;margin-bottom:16px">Berlaku sejak: Agustus 2026</div>
+      <div style="display:flex;flex-direction:column;gap:20px;color:var(--text2);font-size:13px;line-height:1.7">
+        <div>
+          <div style="font-weight:700;color:var(--text1);margin-bottom:6px">1. Pembelian Tiket</div>
+          <p>Setiap pembelian tiket bersifat final dan tidak dapat dibatalkan setelah pembayaran berhasil dikonfirmasi. Tiket yang sudah dibeli tidak dapat ditukar dengan tanggal atau kategori lain.</p>
+        </div>
+        <div>
+          <div style="font-weight:700;color:var(--text1);margin-bottom:6px">2. Kunci Kursi</div>
+          <p>Sistem mengunci kursi selama <strong style="color:var(--text1)">15 menit</strong> saat kamu memulai proses pembelian. Jika pembayaran tidak diselesaikan dalam waktu tersebut, kursi akan otomatis dilepas dan tersedia untuk pembeli lain.</p>
+        </div>
+        <div>
+          <div style="font-weight:700;color:var(--text1);margin-bottom:6px">3. Satu Kursi Per User</div>
+          <p>Setiap akun hanya dapat mengunci satu kursi per konser pada waktu yang sama. Upaya mengunci beberapa kursi secara bersamaan akan ditolak oleh sistem.</p>
+        </div>
+        <div>
+          <div style="font-weight:700;color:var(--text1);margin-bottom:6px">4. E-Tiket</div>
+          <p>E-Tiket berupa QR Code akan diterbitkan setelah pembayaran dikonfirmasi. Tunjukkan QR Code pada petugas di pintu masuk venue. WarTiket tidak bertanggung jawab atas tiket yang hilang atau disebarluaskan oleh pembeli.</p>
+        </div>
+        <div>
+          <div style="font-weight:700;color:var(--text1);margin-bottom:6px">5. Rate Limit</div>
+          <p>Demi keadilan bagi semua pengguna, sistem menerapkan batas pengiriman request. Bot atau program otomatis tidak diperbolehkan dan akan diblokir secara otomatis.</p>
+        </div>
+        <div>
+          <div style="font-weight:700;color:var(--text1);margin-bottom:6px">6. Platform Akademik</div>
+          <p>WarTiket adalah proyek akademik Kelompok 5 Praktikum Microservices, Universitas Muhammadiyah Makassar. Transaksi yang terjadi bersifat simulasi dan tidak melibatkan uang nyata.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hubungi Kami -->
+<div class="modal-overlay" id="modalHubungi">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeModal('modalHubungi')">✕</button>
+    <div class="modal-header"><div class="modal-icon">📬</div><h2>Hubungi Kami</h2></div>
+    <div class="modal-body" style="text-align:left">
+      <p style="color:var(--text2);margin-bottom:20px;line-height:1.6">Ada pertanyaan, masukan, atau laporan bug? Hubungi tim pengembang Kelompok 5.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+        <a href="https://github.com/Jusriadiliwang/Lab-kelompok-05-tiket/issues" target="_blank"
+           style="display:flex;gap:14px;align-items:center;background:var(--bg3);padding:14px 16px;border-radius:12px;text-decoration:none;color:var(--text1);transition:.2s"
+           onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
+          <div style="font-size:24px">🐛</div>
+          <div><div style="font-weight:600">Laporkan Bug</div><div style="font-size:12px;color:var(--text3)">Buka GitHub Issues → New Issue</div></div>
+        </a>
+        <a href="https://github.com/Jusriadiliwang/Lab-kelompok-05-tiket" target="_blank"
+           style="display:flex;gap:14px;align-items:center;background:var(--bg3);padding:14px 16px;border-radius:12px;text-decoration:none;color:var(--text1);transition:.2s"
+           onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
+          <div style="font-size:24px">📁</div>
+          <div><div style="font-weight:600">Source Code</div><div style="font-size:12px;color:var(--text3)">github.com/Jusriadiliwang/Lab-kelompok-05-tiket</div></div>
+        </a>
+      </div>
+      <div style="background:var(--bg3);border-radius:12px;padding:16px">
+        <div style="font-size:12px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Kontak Anggota</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text2)">
+          <div>📧 <span style="color:var(--text1)">Ashabul Kahfi</span> — 105841108523@student.unismuh.ac.id</div>
+          <div>📧 <span style="color:var(--text1)">Jusriadi Liwang</span> — 105841117023@student.unismuh.ac.id</div>
+          <div>📧 <span style="color:var(--text1)">Marhepi Rahmadani</span> — 105841109523@student.unismuh.ac.id</div>
+          <div>📧 <span style="color:var(--text1)">Miftahul Jannah</span> — 105841116023@student.unismuh.ac.id</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;font-size:12px;color:var(--text3);text-align:center">
+        Universitas Muhammadiyah Makassar · Praktikum Microservices 2026
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
