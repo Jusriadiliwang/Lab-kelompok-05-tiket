@@ -1240,6 +1240,9 @@ async function loadEvents() {
     allEvents = DEMO_EVENTS;
   }
 
+  // Pulihkan banner & status dari localStorage (agar tidak hilang saat refresh)
+  loadLocalOverrides();
+
   filteredEvs = [...allEvents];
   renderEvents();
   renderHero();
@@ -2106,7 +2109,41 @@ function renderAdminImages(el) {
     </div>`;
 }
 
-let adminImages = [];
+// ── localStorage helpers ──────────────────────────────────
+let adminImages = JSON.parse(localStorage.getItem('wt_admin_images') || '[]');
+
+function saveAdminImages() {
+  try {
+    // Simpan semua gambar (URL maupun base64 kecil)
+    const toSave = adminImages.filter(img => img.url.startsWith('http') || img.url.length < 800000);
+    localStorage.setItem('wt_admin_images', JSON.stringify(toSave));
+  } catch(e) { console.warn('localStorage penuh, gambar base64 tidak disimpan'); }
+}
+
+function saveEventsMeta() {
+  try {
+    const meta = allEvents.map(ev => ({
+      id:         ev.id,
+      banner_url: ev.banner_url || null,
+      status:     ev.status,
+      name:       ev.name,
+    }));
+    localStorage.setItem('wt_events_meta', JSON.stringify(meta));
+  } catch(e) {}
+}
+
+function loadLocalOverrides() {
+  try {
+    const meta = JSON.parse(localStorage.getItem('wt_events_meta') || '[]');
+    meta.forEach(saved => {
+      const ev = allEvents.find(e => e.id === saved.id);
+      if (ev) {
+        if (saved.banner_url) ev.banner_url = saved.banner_url;
+        if (saved.status)     ev.status     = saved.status;
+      }
+    });
+  } catch(e) {}
+}
 
 function handleImgDrop(e) {
   e.preventDefault();
@@ -2122,7 +2159,8 @@ function readAndAddImage(file) {
   const reader = new FileReader();
   reader.onload = ev => {
     adminImages.push({ url: ev.target.result, name: file.name });
-    toast(`✅ "${file.name}" berhasil diupload`, 'success');
+    saveAdminImages();
+    toast(`✅ "${file.name}" berhasil diupload & disimpan`, 'success');
     if (adminView === 'images') renderAdminView('images');
   };
   reader.readAsDataURL(file);
@@ -2132,6 +2170,7 @@ function addImageFromUrl() {
   const url = document.getElementById('imgUrlInput')?.value.trim();
   if (!url) return;
   adminImages.push({ url, name: url.split('/').pop().substring(0, 30) });
+  saveAdminImages();
   toast('✅ Gambar dari URL ditambahkan', 'success');
   renderAdminView('images');
 }
@@ -2143,6 +2182,7 @@ function applyImageToEvent(imgIdx) {
   document.getElementById('applyImgBtn').onclick = () => {
     const evIdx = parseInt(document.getElementById('applyEvSelect').value);
     allEvents[evIdx].banner_url = adminImages[imgIdx].url;
+    saveEventsMeta();   // simpan ke localStorage agar tidak hilang saat refresh
     filteredEvs = [...allEvents];
     renderEvents();
     renderHero();
@@ -2153,6 +2193,7 @@ function applyImageToEvent(imgIdx) {
 
 function removeImage(i) {
   adminImages.splice(i, 1);
+  saveAdminImages();
   toast('🗑️ Gambar dihapus', 'info');
   renderAdminView('images');
 }
