@@ -2041,7 +2041,7 @@ document.addEventListener('input', e => {
   }
 });
 
-function saveNewEvent() {
+async function saveNewEvent() {
   const name   = document.getElementById('evName')?.value.trim();
   const venue  = document.getElementById('evVenue')?.value.trim();
   const date   = document.getElementById('evDate')?.value;
@@ -2100,7 +2100,6 @@ function saveNewEvent() {
         toast(`✅ Event "${name}" tersimpan ke ${adminErpToken ? 'ERP' : 'API'}!`, 'success');
       }
     } catch (_) {}
-  }
   }
 
   toast(`✅ Event "${name}" berhasil dibuat!`, 'success');
