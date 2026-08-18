@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WarTiket — Platform Tiket Konser</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
+    :root {
+      --bg:        #0a0a0f;
+      --bg2:       #12121a;
+      --bg3:       #1a1a28;
+      --card:      #16161f;
+      --border:    rgba(255,255,255,0.08);
+      --primary:   #ff4d00;
+      --primary2:  #ff7a00;
+      --accent:    #6c63ff;
+      --success:   #00d68f;
+      --danger:    #ff3d71;
+      --warning:   #ffaa00;
+      --text1:     #ffffff;
+      --text2:     rgba(255,255,255,0.7);
+      --text3:     rgba(255,255,255,0.4);
+      --radius:    16px;
+      --glow:      0 0 40px rgba(255,77,0,0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text1);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 99px; }
+
+    /* ============================================================
+       HEADER / NAV
+    ============================================================ */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 900;
+      text-decoration: none;
+      color: var(--text1);
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--primary); }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .search-bar {
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 10px 16px 10px 42px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      color: var(--text1);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-bar input:focus { border-color: var(--primary); }
+    .search-bar input::placeholder { color: var(--text3); }
+    .search-icon {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+    }
+    .nav-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .btn-ghost {
+      padding: 8px 18px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      color: var(--text2);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-primary {
+      padding: 8px 20px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      border: none;
+      border-radius: 99px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      box-shadow: 0 4px 16px rgba(255,77,0,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,77,0,0.4); }
+    #userBadge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #userBadge .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+
+    /* ============================================================
+       CATEGORY TABS
+    ============================================================ */
+    .categories {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .categories::-webkit-scrollbar { height: 0; }
+    .cat-btn {
+      flex-shrink: 0;
+      padding: 14px 20px;
+      background: transparent;
+      border: none;
+      color: var(--text3);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all .2s;
+    }
+    .cat-btn:hover { color: var(--text1); }
+    .cat-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* ============================================================
+       HERO / BANNER CAROUSEL
+    ============================================================ */
+    .hero-wrap { position: relative; overflow: hidden; }
+    .hero-carousel {
+      display: flex;
+      transition: transform .6s cubic-bezier(.4,0,.2,1);
+    }
+    .hero-slide {
+      flex-shrink: 0;
+      width: 100%;
+      height: 420px;
+      display: flex;
+      align-items: flex-end;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.85) 0%, transparent 60%);
+      z-index: 1;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 8s ease;
+    }
+    .hero-slide:hover .hero-bg { transform: scale(1.05); }
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 600px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,77,0,.9);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .hero-title {
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 20px rgba(0,0,0,.5);
+    }
+    .hero-meta {
+      color: rgba(255,255,255,.75);
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+    .hero-price {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary2);
+      margin-bottom: 16px;
+    }
+    .btn-war {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #ff4d00, #ff0066);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: .5px;
+      box-shadow: 0 8px 32px rgba(255,0,102,.4);
+      transition: all .2s;
+      animation: pulse-war 2s infinite;
+    }
+    .btn-war:hover { transform: scale(1.05); box-shadow: 0 12px 40px rgba(255,0,102,.6); }
+    @keyframes pulse-war {
+      0%, 100% { box-shadow: 0 8px 32px rgba(255,0,102,.4); }
+      50%       { box-shadow: 0 8px 40px rgba(255,0,102,.7), 0 0 0 8px rgba(255,0,102,.08); }
+    }
+
+    .hero-dots {
+      position: absolute;
+      bottom: 20px; right: 24px;
+      display: flex; gap: 8px; z-index: 10;
+    }
+    .hero-dot {
+      width: 8px; height: 8px;
+      background: rgba(255,255,255,.3);
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all .3s;
+    }
+    .hero-dot.active { width: 24px; background: var(--primary); }
+
+    .hero-arrow {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px;
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 10;
+      color: var(--text1);
+      font-size: 18px;
+      transition: all .2s;
+    }
+    .hero-arrow:hover { background: var(--primary); }
+    .hero-arrow.prev { left: 16px; }
+    .hero-arrow.next { right: 16px; }
+
+    /* ============================================================
+       MAIN CONTENT
+    ============================================================ */
+    .main { max-width: 1280px; margin: 0 auto; padding: 40px 24px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .section-title span { color: var(--primary); }
+    .see-all {
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+      text-decoration: none;
+    }
+    .see-all:hover { text-decoration: underline; }
+
+    /* ============================================================
+       EVENT GRID
+    ============================================================ */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .event-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all .25s;
+    }
+    .event-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,77,0,.35);
+      box-shadow: 0 16px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(255,77,0,.15);
+    }
+    .card-image {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+    }
+    .card-img-bg {
+      width: 100%; height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: transform .4s;
+    }
+    .event-card:hover .card-img-bg { transform: scale(1.08); }
+    .card-badge {
+      position: absolute;
+      bottom: 10px; left: 10px;
+      background: var(--success);
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .card-badge.sold-out { background: var(--danger); color: #fff; }
+    .card-badge.limited  { background: var(--warning); color: #000; }
+    .card-cat {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(8px);
+      color: var(--text2);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+    .card-body { padding: 16px; }
+    .card-location {
+      display: flex; align-items: center; gap: 4px;
+      color: var(--text3); font-size: 11px; font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-size: 15px; font-weight: 700;
+      margin-bottom: 4px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .card-date {
+      color: var(--text3); font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .card-organizer {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text3); font-size: 11px;
+      margin-bottom: 10px;
+    }
+    .org-dot { width: 16px; height: 16px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 4px; }
+    .card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .card-price { font-size: 16px; font-weight: 800; color: var(--primary2); }
+    .card-seats { font-size: 11px; color: var(--text3); }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skeleton-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .sk-img { height: 200px; }
+    .sk-body { padding: 16px; }
+    .sk-line { height: 12px; margin-bottom: 8px; }
+    .sk-w80 { width: 80%; }
+    .sk-w60 { width: 60%; }
+    .sk-w40 { width: 40%; }
+
+    /* ============================================================
+       STATS STRIP
+    ============================================================ */
+    .stats-strip {
+      background: linear-gradient(135deg, rgba(255,77,0,.1), rgba(108,99,255,.1));
+      border: 1px solid rgba(255,77,0,.2);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 28px; font-weight: 900; color: var(--primary2); }
+    .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ============================================================
+       MODAL OVERLAY
+    ============================================================ */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.8);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      width: 100%; max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 36px; height: 36px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 18px;
+      z-index: 1;
+      transition: all .2s;
+    }
+    .modal-close:hover { background: var(--danger); color: #fff; }
+
+    /* Event Detail Modal */
+    .modal-banner {
+      height: 240px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px 24px 0 0;
+    }
+    .modal-banner-bg {
+      width: 100%; height: 100%;
+      background-size: cover; background-position: center;
+    }
+    .modal-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(18,18,26,1) 0%, transparent 50%);
+    }
+    .modal-body { padding: 28px; }
+    .modal-title { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+    .modal-meta { color: var(--text2); font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+    .modal-section-label {
+      font-size: 12px; font-weight: 700;
+      color: var(--text3); text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .seat-categories { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .seat-cat-card {
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .seat-cat-card:hover { border-color: var(--primary); }
+    .seat-cat-card.selected { border-color: var(--primary); background: rgba(255,77,0,.08); }
+    .seat-cat-card.sold-out { opacity: .5; cursor: not-allowed; }
+    .seat-color { width: 12px; height: 44px; border-radius: 6px; flex-shrink: 0; }
+    .seat-info { flex: 1; }
+    .seat-name { font-size: 16px; font-weight: 700; }
+    .seat-avail { font-size: 12px; color: var(--text3); margin-top: 2px; }
+    .seat-price-wrap { text-align: right; }
+    .seat-price { font-size: 18px; font-weight: 800; color: var(--primary2); }
+
+    /* Auth Modal */
+    .auth-modal { max-width: 440px; }
+    .auth-modal .modal-body { text-align: center; }
+    .auth-title { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
+    .auth-subtitle { color: var(--text2); font-size: 14px; margin-bottom: 28px; }
+    .auth-form { text-align: left; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text1);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-input:focus { border-color: var(--primary); }
+    .form-input::placeholder { color: var(--text3); }
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.3)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+    }
+    .btn-full {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px; font-weight: 700;
+      border-radius: 12px;
+    }
+
+    /* Payment Modal */
+    .payment-summary {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .summary-row {
+      display: flex; justify-content: space-between;
+      font-size: 14px; padding: 4px 0;
+      color: var(--text2);
+    }
+    .summary-row.total {
+      border-top: 1px solid var(--border);
+      padding-top: 10px; margin-top: 6px;
+      color: var(--text1); font-weight: 800; font-size: 18px;
+    }
+    .payment-methods {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 24px;
+    }
+    .pay-method {
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .pay-method:hover { border-color: var(--primary); }
+    .pay-method.selected { border-color: var(--primary); background: rgba(255,77,0,.08); }
+    .pay-method-icon { font-size: 22px; margin-bottom: 4px; }
+    .pay-method-name { font-size: 11px; font-weight: 600; color: var(--text2); }
+
+    /* My Tickets Modal */
+    .orders-list { display: flex; flex-direction: column; gap: 12px; }
+    .order-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .order-title { font-size: 15px; font-weight: 700; }
+    .status-badge {
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+    }
+    .status-locked    { background: rgba(255,170,0,.15); color: var(--warning); }
+    .status-confirmed { background: rgba(0,214,143,.15); color: var(--success); }
+    .status-cancelled { background: rgba(255,61,113,.15); color: var(--danger); }
+    .status-expired   { background: rgba(255,255,255,.08); color: var(--text3); }
+    .order-meta { font-size: 12px; color: var(--text3); line-height: 1.8; }
+    .order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .order-price { font-size: 18px; font-weight: 800; color: var(--primary2); }
+
+    /* Toast */
+    .toast-container {
+      position: fixed; bottom: 24px; right: 24px;
+      z-index: 999;
+      display: flex; flex-direction: column; gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      animation: slideIn .3s ease;
+      pointer-events: all;
+    }
+    .toast.success { border-color: var(--success); }
+    .toast.error   { border-color: var(--danger); }
+    .toast.info    { border-color: var(--accent); }
+    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* Footer */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .footer-logo { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+    .footer-logo span { color: var(--primary); }
+    .footer-text { color: var(--text3); font-size: 13px; }
+    .footer-links {
+      display: flex; justify-content: center; gap: 24px;
+      margin: 16px 0;
+    }
+    .footer-links a { color: var(--text3); font-size: 13px; text-decoration: none; }
+    .footer-links a:hover { color: var(--primary); }
+
+    /* Loading spinner */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,.2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text3);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-text { font-size: 16px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-slide { height: 300px; padding: 24px; }
+      .hero-title { font-size: 24px; }
+      .stats-strip { grid-template-columns: repeat(2, 1fr); }
+      .events-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+      .payment-methods { grid-template-columns: repeat(2, 1fr); }
+      .search-bar { max-width: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ─────────────────────────────────────────── -->
+<nav class="navbar">
+  <a class="logo" href="#">
+    <div class="logo-icon">🎫</div>
+    War<span>Tiket</span>
+  </a>
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Cari konser, artis, venue…" oninput="filterEvents()" />
+  </div>
+  <div class="nav-actions">
+    <div id="userBadge" onclick="showOrders()">
+      <div class="dot"></div>
+      <span id="userLabel"></span>
+    </div>
+    <button class="btn-ghost" id="btnLogin" onclick="openAuth()">Masuk</button>
+    <button class="btn-primary" id="btnRegister" onclick="openAuth()">Daftar</button>
+  </div>
+</nav>
+
+<!-- ── CATEGORIES ─────────────────────────────────────── -->
+<div class="categories">
+  <button class="cat-btn active" onclick="setCategory('all', this)">🎵 Semua</button>
+  <button class="cat-btn" onclick="setCategory('Konser', this)">🎤 Konser</button>
+  <button class="cat-btn" onclick="setCategory('Festival', this)">🎪 Festival</button>
+  <button class="cat-btn" onclick="setCategory('Sport', this)">⚽ Sport</button>
+  <button class="cat-btn" onclick="setCategory('Theater', this)">🎭 Theater</button>
+  <button class="cat-btn" onclick="setCategory('Comedy', this)">😄 Comedy</button>
+</div>
+
+<!-- ── HERO CAROUSEL ──────────────────────────────────── -->
+<div class="hero-wrap">
+  <div class="hero-carousel" id="heroCarousel">
+    <!-- slides populated by JS -->
+  </div>
+  <button class="hero-arrow prev" onclick="heroSlide(-1)">‹</button>
+  <button class="hero-arrow next" onclick="heroSlide(+1)">›</button>
+  <div class="hero-dots" id="heroDots"></div>
+</div>
+
+<!-- ── MAIN ───────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-item">
+      <div class="stat-value" id="statEvents">—</div>
+      <div class="stat-label">Konser Aktif</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="statSeats">—</div>
+      <div class="stat-label">Kursi Tersedia</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">4</div>
+      <div class="stat-label">Microservices</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">99.9%</div>
+      <div class="stat-label">Anti Oversell</div>
+    </div>
+  </div>
+
+  <!-- Events -->
+  <div class="section-header">
+    <h2 class="section-title">🔥 <span>Top Events</span> — Jangan Sampai Kehabisan</h2>
+    <a class="see-all" onclick="scrollToGrid()">Lihat semua →</a>
+  </div>
+  <div class="events-grid" id="eventsGrid">
+    <!-- skeleton placeholders -->
+    <div class="skeleton-card">
+      <div class="skeleton sk-img"></div>
+      <div class="sk-body">
+        <div class="skeleton sk-line sk-w80"></div>
+        <div class="skeleton sk-line sk-w60"></div>
+        <div class="skeleton sk-line sk-w40"></div>
+      </div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton sk-img"></div>
+      <div class="sk-body">
+        <div class="skeleton sk-line sk-w80"></div>
+        <div class="skeleton sk-line sk-w60"></div>
+        <div class="skeleton sk-line sk-w40"></div>
+      </div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton sk-img"></div>
+      <div class="sk-body">
+        <div class="skeleton sk-line sk-w80"></div>
+        <div class="skeleton sk-line sk-w60"></div>
+        <div class="skeleton sk-line sk-w40"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ─────────────────────────────────────────── -->
+<footer>
+  <div class="footer-logo">War<span>Tiket</span></div>
+  <div class="footer-links">
+    <a href="#">Tentang Kami</a>
+    <a href="#">Cara Beli</a>
+    <a href="#">Syarat & Ketentuan</a>
+    <a href="#">Hubungi Kami</a>
+    <a href="https://github.com/Jusriadiliwang/Lab-kelompok-05-tiket" target="_blank">GitHub</a>
+  </div>
+  <div class="footer-text">© 2026 WarTiket — Kelompok 5 Microservices Lab · Universitas Muhammadiyah Makassar</div>
+  <div class="footer-text" style="margin-top:6px;color:rgba(255,255,255,.2)">Jusriadi Liwang — Data &amp; Persistence Engineer</div>
+</footer>
+
+<!-- ══════════ MODALS ══════════════════════════════════ -->
+
+<!-- Event Detail Modal -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal" id="eventModalContent">
+    <button class="modal-close" onclick="closeModal('eventModal')">✕</button>
+    <div class="modal-banner">
+      <div class="modal-banner-bg" id="modalBannerBg"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-title" id="modalTitle">—</div>
+      <div class="modal-meta" id="modalMeta">—</div>
+      <div class="modal-section-label">Pilih Kategori Kursi</div>
+      <div class="seat-categories" id="seatCategories"></div>
+      <button class="btn-war btn-full" id="btnOrder" onclick="placeOrder()">
+        🎫 WAR TIKET SEKARANG!
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal auth-modal">
+    <button class="modal-close" onclick="closeModal('authModal')">✕</button>
+    <div class="modal-body">
+      <div style="font-size:48px;margin-bottom:12px">🎫</div>
+      <div class="auth-title">Masuk ke WarTiket</div>
+      <div class="auth-subtitle">Masukkan User ID kamu untuk mulai beli tiket</div>
+      <div class="auth-form">
+        <div class="form-group">
+          <label class="form-label">User ID</label>
+          <input type="text" class="form-input" id="authUserId" placeholder="Contoh: user_105841117023" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama (opsional)</label>
+          <input type="text" class="form-input" id="authName" placeholder="Nama kamu" />
+        </div>
+        <button class="btn-primary btn-full" onclick="doLogin()" style="margin-top:8px">
+          Masuk &amp; Mulai WAR
+        </button>
+        <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3)">
+          Demo mode: tidak perlu password
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
+    <div class="modal-body">
+      <div style="font-size:32px;margin-bottom:8px">💳</div>
+      <h2 style="font-size:22px;font-weight:900;margin-bottom:6px">Konfirmasi Pembayaran</h2>
+      <p style="color:var(--text2);font-size:14px;margin-bottom:20px">Selesaikan pembayaran dalam <span id="countdown" style="color:var(--danger);font-weight:700">15:00</span></p>
+
+      <div class="payment-summary" id="paymentSummary"></div>
+
+      <div class="modal-section-label">Metode Pembayaran</div>
+      <div class="payment-methods" id="paymentMethods">
+        <div class="pay-method" onclick="selectPayMethod('gopay', this)">
+          <div class="pay-method-icon">💚</div>
+          <div class="pay-method-name">GoPay</div>
+        </div>
+        <div class="pay-method" onclick="selectPayMethod('ovo', this)">
+          <div class="pay-method-icon">💜</div>
+          <div class="pay-method-name">OVO</div>
+        </div>
+        <div class="pay-method" onclick="selectPayMethod('dana', this)">
+          <div class="pay-method-icon">🔵</div>
+          <div class="pay-method-name">DANA</div>
+        </div>
+        <div class="pay-method" onclick="selectPayMethod('bank_transfer', this)">
+          <div class="pay-method-icon">🏦</div>
+          <div class="pay-method-name">Transfer Bank</div>
+        </div>
+        <div class="pay-method" onclick="selectPayMethod('credit_card', this)">
+          <div class="pay-method-icon">💳</div>
+          <div class="pay-method-name">Kartu Kredit</div>
+        </div>
+      </div>
+      <button class="btn-primary btn-full" id="btnPay" onclick="doPayment()">Bayar Sekarang</button>
+    </div>
+  </div>
+</div>
+
+<!-- My Orders Modal -->
+<div class="modal-overlay" id="ordersModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('ordersModal')">✕</button>
+    <div class="modal-body">
+      <h2 style="font-size:22px;font-weight:900;margin-bottom:4px">🎟️ Tiket Saya</h2>
+      <p style="color:var(--text2);font-size:14px;margin-bottom:24px">Riwayat pemesanan kamu</p>
+      <div class="orders-list" id="ordersList">
+        <div class="empty-state"><div class="empty-icon">🎫</div><div class="empty-text">Belum ada pesanan</div></div>
+      </div>
+      <button class="btn-ghost btn-full" onclick="closeModal('ordersModal')" style="margin-top:16px">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══════════════ JAVASCRIPT ══════════════════════════ -->
+<script>
+/* ============================================================
+   CONFIG & STATE
+============================================================ */
+const API = 'http://localhost:3000';   // API Gateway
+let allEvents    = [];
+let filteredEvs  = [];
+let currentCategory = 'all';
+let currentEvent = null;
+let selectedSeat = null;
+let currentOrder = null;
+let selectedPayMethod = null;
+let countdownTimer = null;
+let currentUser  = JSON.parse(localStorage.getItem('wt_user') || 'null');
+let heroIdx      = 0;
+let heroTimer    = null;
+
+/* ============================================================
+   DEMO EVENTS (fallback jika API tidak hidup)
+============================================================ */
+const DEMO_EVENTS = [
+  {
+    id: 1,
+    name: 'Dewa 19 Reunion Tour 2026',
+    venue: 'Gelora Bung Karno, Jakarta',
+    event_date: '2026-10-15T19:00:00',
+    status: 'on_sale',
+    banner_url: null,
+    description: 'Reuni legendaris Dewa 19 setelah 10 tahun. Jangan sampai ketinggalan!',
+    categories: [
+      { id: 1, name: 'VVIP',     price: 2500000, available_seats: 50,  total_seats: 200  },
+      { id: 2, name: 'VIP',      price: 1500000, available_seats: 150, total_seats: 500  },
+      { id: 3, name: 'Festival', price:  750000, available_seats: 800, total_seats: 3000 },
+    ],
+    _gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 70%, #533483 100%)',
+  },
+  {
+    id: 2,
+    name: 'Coldplay Music of the Spheres',
+    venue: 'Stadion Utama GBK, Jakarta',
+    event_date: '2026-11-03T20:00:00',
+    status: 'on_sale',
+    banner_url: null,
+    description: 'Coldplay hadir lagi ke Indonesia dengan show spektakuler.',
+    categories: [
+      { id: 4, name: 'Cat 1',  price: 4000000, available_seats: 0,   total_seats: 300 },
+      { id: 5, name: 'Cat 2',  price: 2500000, available_seats: 30,  total_seats: 600 },
+      { id: 6, name: 'Cat 3',  price: 1200000, available_seats: 400, total_seats: 2000 },
+    ],
+    _gradient: 'linear-gradient(135deg, #0d0d0d 0%, #003566 40%, #001d3d 70%, #000814 100%)',
+  },
+  {
+    id: 3,
+    name: 'EDC Jakarta 2026',
+    venue: 'Indonesia Arena, Jakarta',
+    event_date: '2026-09-20T22:00:00',
+    status: 'on_sale',
+    banner_url: null,
+    description: 'Electronic Daydream Come to life. Festival EDM terbesar di Asia Tenggara.',
+    categories: [
+      { id: 7, name: 'VIP Loft',   price: 3000000, available_seats: 80,   total_seats: 200 },
+      { id: 8, name: 'General',    price:  900000, available_seats: 2500, total_seats: 5000 },
+    ],
+    _gradient: 'linear-gradient(135deg, #10002b 0%, #240046 40%, #3c096c 70%, #5a189a 100%)',
+  },
+  {
+    id: 4,
+    name: 'Raisa Live in Concert',
+    venue: 'The Kasablanka Hall, Jakarta',
+    event_date: '2026-09-28T19:30:00',
+    status: 'on_sale',
+    banner_url: null,
+    description: 'Raisa hadir dengan set akustik intim yang tidak terlupakan.',
+    categories: [
+      { id: 9,  name: 'Premium', price: 1500000, available_seats: 120, total_seats: 400 },
+      { id: 10, name: 'Regular', price:  650000, available_seats: 600, total_seats: 1200 },
+    ],
+    _gradient: 'linear-gradient(135deg, #3d0000 0%, #7b2d8b 40%, #c2185b 70%, #e91e63 100%)',
+  },
+  {
+    id: 5,
+    name: 'Sound Drenaline 2026',
+    venue: 'Pantai Carnaval, Ancol Jakarta',
+    event_date: '2026-10-01T17:00:00',
+    status: 'on_sale',
+    banner_url: null,
+    description: 'Festival rock terbesar Indonesia kembali dengan line-up luar biasa.',
+    categories: [
+      { id: 11, name: 'Diamond',  price: 2000000, available_seats: 100, total_seats: 300 },
+      { id: 12, name: 'Gold',     price: 1000000, available_seats: 450, total_seats: 1000 },
+      { id: 13, name: 'Festival', price:  400000, available_seats: 3000, total_seats: 8000 },
+    ],
+    _gradient: 'linear-gradient(135deg, #1a0000 0%, #4a0e0e 40%, #7f1d1d 70%, #dc2626 100%)',
+  },
+  {
+    id: 6,
+    name: 'BTS Yet to Come in Jakarta',
+    venue: 'Indonesia International Expo',
+    event_date: '2026-12-10T18:00:00',
+    status: 'on_sale',
+    banner_url: null,
+    description: 'ARMY siap? BTS hadir kembali ke Jakarta!',
+    categories: [
+      { id: 14, name: 'R1',  price: 5000000, available_seats: 5,   total_seats: 100  },
+      { id: 15, name: 'R2',  price: 3000000, available_seats: 50,  total_seats: 300  },
+      { id: 16, name: 'R3',  price: 1500000, available_seats: 200, total_seats: 1000 },
+      { id: 17, name: 'Fan Zone', price: 800000, available_seats: 800, total_seats: 3000 },
+    ],
+    _gradient: 'linear-gradient(135deg, #0f0c29 0%, #302b63 40%, #24243e 70%, #4a00e0 100%)',
+  },
+];
+
+/* Gradient fallbacks for different event ids */
+const GRADIENTS = [
+  'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)',
+  'linear-gradient(135deg, #000814, #003566, #001d3d)',
+  'linear-gradient(135deg, #10002b, #240046, #5a189a)',
+  'linear-gradient(135deg, #3d0000, #7b2d8b, #e91e63)',
+  'linear-gradient(135deg, #1a0000, #4a0e0e, #dc2626)',
+  'linear-gradient(135deg, #0f0c29, #302b63, #4a00e0)',
+  'linear-gradient(135deg, #0a3d62, #1e3799, #4a69bd)',
+  'linear-gradient(135deg, #006266, #009432, #6ab04c)',
+];
+
+function getGradient(ev) {
+  return ev._gradient || GRADIENTS[(ev.id - 1) % GRADIENTS.length];
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  updateAuthUI();
+  loadEvents();
+});
+
+async function loadEvents() {
+  try {
+    const res = await fetch(`${API}/catalog?limit=50`, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) throw new Error('api error');
+    const json = await res.json();
+    allEvents = (json.data || []).map((ev, i) => ({ ...ev, _gradient: GRADIENTS[i % GRADIENTS.length] }));
+  } catch (_) {
+    // API not running — use demo data
+    allEvents = DEMO_EVENTS;
+  }
+
+  filteredEvs = [...allEvents];
+  renderEvents();
+  renderHero();
+  updateStats();
+}
+
+/* ============================================================
+   RENDER EVENTS
+============================================================ */
+function renderEvents() {
+  const grid = document.getElementById('eventsGrid');
+  grid.innerHTML = '';
+
+  if (!filteredEvs.length) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">🎵</div>
+        <div class="empty-text">Tidak ada event yang cocok.</div>
+      </div>`;
+    return;
+  }
+
+  filteredEvs.forEach(ev => {
+    const minPrice  = Math.min(...(ev.categories||[]).map(c => c.price || 0));
+    const totalSeats = (ev.categories||[]).reduce((s, c) => s + (c.available_seats || 0), 0);
+    const isSoldOut = totalSeats === 0;
+    const isLimited = totalSeats > 0 && totalSeats < 100;
+    const badge     = isSoldOut ? '<span class="card-badge sold-out">Habis</span>'
+                    : isLimited ? '<span class="card-badge limited">Hampir Habis</span>'
+                    : '<span class="card-badge">Tiket Tersedia</span>';
+
+    const card = document.createElement('div');
+    card.className = 'event-card';
+    card.onclick   = () => openEventDetail(ev);
+    card.innerHTML = `
+      <div class="card-image">
+        <div class="card-img-bg" style="${ev.banner_url ? `background-image:url('${ev.banner_url}')` : `background:${getGradient(ev)}`}"></div>
+        ${badge}
+        <div class="card-cat">🎵 Konser</div>
+      </div>
+      <div class="card-body">
+        <div class="card-location">📍 ${(ev.venue || '').substring(0, 30)}</div>
+        <div class="card-title">${ev.name}</div>
+        <div class="card-date">📅 ${formatDate(ev.event_date)}</div>
+        <div class="card-organizer">
+          <div class="org-dot"></div>
+          Kelompok 5 Productions
+        </div>
+        <div class="card-footer">
+          <div>
+            <div class="card-price">${minPrice ? 'Rp ' + minPrice.toLocaleString('id') : 'Gratis'}</div>
+          </div>
+          <div class="card-seats">${isSoldOut ? 'Habis' : totalSeats.toLocaleString('id') + ' kursi'}</div>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   HERO CAROUSEL
+============================================================ */
+function renderHero() {
+  const carousel = document.getElementById('heroCarousel');
+  const dots     = document.getElementById('heroDots');
+  const heroEvs  = allEvents.slice(0, 5);
+  carousel.innerHTML = '';
+  dots.innerHTML = '';
+
+  heroEvs.forEach((ev, i) => {
+    const minPrice = Math.min(...(ev.categories||[]).map(c => c.price||0));
+    const slide = document.createElement('div');
+    slide.className = 'hero-slide';
+    slide.innerHTML = `
+      <div class="hero-bg" style="${ev.banner_url ? `background-image:url('${ev.banner_url}')` : `background:${getGradient(ev)}`}"></div>
+      <div class="hero-content">
+        <div class="hero-badge">🔥 On Sale Now</div>
+        <div class="hero-title">${ev.name}</div>
+        <div class="hero-meta">📍 ${ev.venue}<br>📅 ${formatDate(ev.event_date)}</div>
+        <div class="hero-price">Mulai dari Rp ${minPrice ? minPrice.toLocaleString('id') : '—'}</div>
+        <button class="btn-war" onclick="openEventDetail(allEvents[${i}])">
+          🎫 WAR TIKET!
+        </button>
+      </div>`;
+    carousel.appendChild(slide);
+
+    const dot = document.createElement('div');
+    dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goHeroSlide(i);
+    dots.appendChild(dot);
+  });
+
+  startHeroAuto();
+}
+
+function heroSlide(dir) {
+  const len = allEvents.slice(0, 5).length;
+  heroIdx = (heroIdx + dir + len) % len;
+  goHeroSlide(heroIdx);
+}
+
+function goHeroSlide(i) {
+  heroIdx = i;
+  document.getElementById('heroCarousel').style.transform = `translateX(-${i * 100}%)`;
+  document.querySelectorAll('.hero-dot').forEach((d, j) => d.classList.toggle('active', j === i));
+  resetHeroAuto();
+}
+
+function startHeroAuto() {
+  clearInterval(heroTimer);
+  heroTimer = setInterval(() => heroSlide(1), 5000);
+}
+function resetHeroAuto() {
+  clearInterval(heroTimer);
+  heroTimer = setInterval(() => heroSlide(1), 5000);
+}
+
+/* ============================================================
+   STATS
+============================================================ */
+function updateStats() {
+  const totalEvents = allEvents.filter(e => e.status === 'on_sale').length;
+  const totalSeats  = allEvents.reduce((sum, ev) =>
+    sum + (ev.categories||[]).reduce((s, c) => s + (c.available_seats||0), 0), 0);
+  animateCount('statEvents', totalEvents);
+  animateCount('statSeats', totalSeats);
+}
+
+function animateCount(id, target) {
+  const el = document.getElementById(id);
+  let current = 0;
+  const step = Math.ceil(target / 30);
+  const t = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current >= 1000 ? (current/1000).toFixed(1) + 'K' : current;
+    if (current >= target) clearInterval(t);
+  }, 40);
+}
+
+/* ============================================================
+   FILTER & SEARCH
+============================================================ */
+function setCategory(cat, el) {
+  currentCategory = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function filterEvents() { applyFilters(); }
+
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  filteredEvs = allEvents.filter(ev => {
+    const matchCat = currentCategory === 'all' || ev.name.toLowerCase().includes(currentCategory.toLowerCase()) || true;
+    const matchQ   = !q || ev.name.toLowerCase().includes(q) || (ev.venue||'').toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+  renderEvents();
+}
+
+/* ============================================================
+   EVENT DETAIL MODAL
+============================================================ */
+function openEventDetail(ev) {
+  currentEvent = ev;
+  selectedSeat = null;
+
+  document.getElementById('modalBannerBg').style.cssText =
+    ev.banner_url
+      ? `background-image:url('${ev.banner_url}');width:100%;height:100%;background-size:cover;background-position:center;`
+      : `background:${getGradient(ev)};width:100%;height:100%;`;
+
+  document.getElementById('modalTitle').textContent = ev.name;
+  document.getElementById('modalMeta').innerHTML = `
+    📍 ${ev.venue}<br>
+    📅 ${formatDate(ev.event_date)}<br>
+    ${ev.description ? '📝 ' + ev.description : ''}`;
+
+  const cats = document.getElementById('seatCategories');
+  cats.innerHTML = '';
+  const catColors = ['#ff4d00', '#6c63ff', '#00d68f', '#ffaa00', '#ff3d71'];
+  (ev.categories || []).forEach((cat, i) => {
+    const isSoldOut = cat.available_seats === 0;
+    const div = document.createElement('div');
+    div.className = 'seat-cat-card' + (isSoldOut ? ' sold-out' : '');
+    div.onclick = isSoldOut ? null : () => selectSeat(cat, div);
+    div.innerHTML = `
+      <div class="seat-color" style="background:${catColors[i%catColors.length]}"></div>
+      <div class="seat-info">
+        <div class="seat-name">${cat.name}</div>
+        <div class="seat-avail">${isSoldOut ? 'Habis terjual' : cat.available_seats.toLocaleString('id') + ' kursi tersedia'}</div>
+      </div>
+      <div class="seat-price-wrap">
+        <div class="seat-price">Rp ${(cat.price||0).toLocaleString('id')}</div>
+      </div>`;
+    cats.appendChild(div);
+  });
+
+  document.getElementById('eventModal').classList.add('open');
+}
+
+function selectSeat(cat, el) {
+  selectedSeat = cat;
+  document.querySelectorAll('.seat-cat-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ============================================================
+   PLACE ORDER
+============================================================ */
+async function placeOrder() {
+  if (!currentUser) { closeModal('eventModal'); openAuth(); return; }
+  if (!selectedSeat) { toast('⚠️ Pilih kategori kursi terlebih dahulu', 'info'); return; }
+
+  const btn = document.getElementById('btnOrder');
+  btn.innerHTML = '<div class="spinner"></div> Mengunci kursi...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentUser.token}`,
+      },
+      body: JSON.stringify({
+        user_id:          currentUser.id,
+        event_id:         currentEvent.id,
+        seat_category_id: selectedSeat.id,
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      currentOrder = data;
+      closeModal('eventModal');
+      openPaymentModal(data);
+    } else {
+      toast('❌ ' + (data.message || 'Gagal membuat pesanan'), 'error');
+    }
+  } catch (_) {
+    // Demo mode: simulate successful order
+    currentOrder = {
+      id:                 Math.floor(Math.random() * 9000) + 1000,
+      user_id:            currentUser.id,
+      event_id:           currentEvent.id,
+      event_name:         currentEvent.name,
+      seat_category_name: selectedSeat.name,
+      price:              selectedSeat.price,
+      status:             'locked',
+      lock_expires_at:    new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    };
+    closeModal('eventModal');
+    openPaymentModal(currentOrder);
+    toast('✅ Kursi berhasil dikunci! (Demo mode)', 'success');
+  } finally {
+    btn.innerHTML = '🎫 WAR TIKET SEKARANG!';
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   PAYMENT MODAL
+============================================================ */
+function openPaymentModal(order) {
+  document.getElementById('paymentSummary').innerHTML = `
+    <div class="summary-row"><span>Event</span><span>${order.event_name || currentEvent?.name}</span></div>
+    <div class="summary-row"><span>Kategori</span><span>${order.seat_category_name || selectedSeat?.name}</span></div>
+    <div class="summary-row"><span>Order ID</span><span>#${order.id}</span></div>
+    <div class="summary-row total"><span>Total</span><span>Rp ${(order.price||0).toLocaleString('id')}</span></div>`;
+
+  selectedPayMethod = null;
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+
+  document.getElementById('paymentModal').classList.add('open');
+  startCountdown(15 * 60);
+}
+
+function selectPayMethod(method, el) {
+  selectedPayMethod = method;
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function startCountdown(seconds) {
+  clearInterval(countdownTimer);
+  let remaining = seconds;
+  const el = document.getElementById('countdown');
+  countdownTimer = setInterval(() => {
+    remaining--;
+    const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+    const s = String(remaining % 60).padStart(2, '0');
+    el.textContent = `${m}:${s}`;
+    if (remaining <= 0) { clearInterval(countdownTimer); el.textContent = 'KADALUARSA'; }
+  }, 1000);
+}
+
+async function doPayment() {
+  if (!selectedPayMethod) { toast('⚠️ Pilih metode pembayaran', 'info'); return; }
+
+  const btn = document.getElementById('btnPay');
+  btn.innerHTML = '<div class="spinner"></div> Memproses...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/payments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentUser.token}`,
+      },
+      body: JSON.stringify({
+        order_id: currentOrder.id,
+        user_id:  currentUser.id,
+        method:   selectedPayMethod,
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      clearInterval(countdownTimer);
+      closeModal('paymentModal');
+      toast('🎉 Pembayaran berhasil! Cek tiket di menu Tiket Saya', 'success');
+    } else {
+      toast('❌ ' + (data.message || 'Pembayaran gagal'), 'error');
+    }
+  } catch (_) {
+    // Demo mode
+    clearInterval(countdownTimer);
+    closeModal('paymentModal');
+    toast('🎉 Pembayaran berhasil! (Demo mode)', 'success');
+    // Reload events to show updated seat count
+    setTimeout(loadEvents, 500);
+  } finally {
+    btn.innerHTML = 'Bayar Sekarang';
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   AUTH
+============================================================ */
+function openAuth() {
+  document.getElementById('authModal').classList.add('open');
+}
+
+function doLogin() {
+  const id   = document.getElementById('authUserId').value.trim();
+  const name = document.getElementById('authName').value.trim() || id;
+  if (!id) { toast('⚠️ Masukkan User ID', 'info'); return; }
+
+  currentUser = { id, name, token: btoa(id + ':wartiket:' + Date.now()) };
+  localStorage.setItem('wt_user', JSON.stringify(currentUser));
+  updateAuthUI();
+  closeModal('authModal');
+  toast('👋 Selamat datang, ' + name + '!', 'success');
+}
+
+function updateAuthUI() {
+  const badge    = document.getElementById('userBadge');
+  const btnLogin = document.getElementById('btnLogin');
+  const btnReg   = document.getElementById('btnRegister');
+  if (currentUser) {
+    badge.style.display = 'flex';
+    document.getElementById('userLabel').textContent = currentUser.name || currentUser.id;
+    btnLogin.style.display = 'none';
+    btnReg.style.display   = 'none';
+  } else {
+    badge.style.display = 'none';
+    btnLogin.style.display = '';
+    btnReg.style.display   = '';
+  }
+}
+
+/* ============================================================
+   MY ORDERS
+============================================================ */
+async function showOrders() {
+  if (!currentUser) return;
+  document.getElementById('ordersModal').classList.add('open');
+
+  const list = document.getElementById('ordersList');
+  list.innerHTML = '<div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>';
+
+  try {
+    const res = await fetch(`${API}/orders?user_id=${currentUser.id}`, {
+      headers: { 'Authorization': `Bearer ${currentUser.token}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    const json = await res.json();
+    const orders = json.data || [];
+    renderOrders(orders);
+  } catch (_) {
+    renderOrders([]);
+  }
+}
+
+function renderOrders(orders) {
+  const list = document.getElementById('ordersList');
+  if (!orders.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🎫</div><div class="empty-text">Belum ada pesanan</div></div>';
+    return;
+  }
+  list.innerHTML = orders.map(o => `
+    <div class="order-card">
+      <div class="order-header">
+        <div class="order-title">${o.event_name || 'Konser'}</div>
+        <div class="status-badge status-${o.status}">${o.status}</div>
+      </div>
+      <div class="order-meta">
+        Kategori: ${o.seat_category_name || '-'}<br>
+        Order ID: #${o.id}<br>
+        ${o.lock_expires_at ? 'Kunci s/d: ' + formatDate(o.lock_expires_at) : ''}
+      </div>
+      <div class="order-footer">
+        <div class="order-price">Rp ${(o.price||0).toLocaleString('id')}</div>
+        ${o.status === 'locked' ?
+          `<button class="btn-primary" onclick="quickPay(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="padding:8px 16px;font-size:13px">Bayar</button>`
+          : ''}
+      </div>
+    </div>`).join('');
+}
+
+function quickPay(order) {
+  closeModal('ordersModal');
+  currentOrder = order;
+  openPaymentModal(order);
+}
+
+/* ============================================================
+   MODALS HELPERS
+============================================================ */
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (id === 'paymentModal') clearInterval(countdownTimer);
+}
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+/* ============================================================
+   TOAST
+============================================================ */
+function toast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  container.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(120%)'; t.style.transition = '.3s'; setTimeout(() => t.remove(), 300); }, 4000);
+}
+
+/* ============================================================
+   UTILITIES
+============================================================ */
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+}
+
+function scrollToGrid() {
+  document.getElementById('eventsGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* keyboard shortcut: ESC closes top modal */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const openModals = [...document.querySelectorAll('.modal-overlay.open')];
+    if (openModals.length) closeModal(openModals[openModals.length - 1].id);
+  }
+});
+</script>
+</body>
+</html>
