@@ -916,6 +916,113 @@
     .footer-links a { color: var(--text3); font-size: 13px; text-decoration: none; }
     .footer-links a:hover { color: var(--primary); }
 
+    /* ── New Sections ─────────────────────────────────── */
+    .home-section {
+      max-width: 1200px; margin: 0 auto; padding: 60px 24px;
+    }
+    .home-section-dark {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .home-section-dark .home-section { padding: 60px 24px; }
+
+    /* Cara Kerja */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+      position: relative;
+      transition: transform .2s, border-color .2s;
+    }
+    .step-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+    .step-num {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900;
+      margin: 0 auto 16px;
+    }
+    .step-icon { font-size: 36px; margin-bottom: 12px; }
+    .step-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .step-desc { color: var(--text2); font-size: 13px; line-height: 1.6; }
+    .step-arrow {
+      display: none; /* show on desktop between cards */
+    }
+
+    /* Kenapa WarTiket */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+      transition: transform .2s, border-color .2s;
+    }
+    .feature-card:hover { transform: translateY(-3px); border-color: rgba(108,99,255,.4); }
+    .feature-icon { font-size: 32px; margin-bottom: 12px; }
+    .feature-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feature-desc { color: var(--text2); font-size: 13px; line-height: 1.6; }
+
+    /* Upcoming banner */
+    .upcoming-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 32px;
+    }
+    .upcoming-card {
+      display: flex;
+      gap: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .upcoming-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .upcoming-thumb {
+      width: 80px; height: 80px;
+      border-radius: 12px;
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+    }
+    .upcoming-info { flex: 1; }
+    .upcoming-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+    .upcoming-meta { color: var(--text2); font-size: 12px; line-height: 1.6; }
+    .upcoming-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+    .upcoming-badge.on_sale { background: rgba(0,214,143,.15); color: #00d68f; }
+    .upcoming-badge.upcoming { background: rgba(255,170,0,.15); color: #ffaa00; }
+
+    @media (max-width: 768px) {
+      .steps-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .upcoming-grid { grid-template-columns: 1fr; }
+    }
+
     /* Loading spinner */
     .spinner {
       width: 20px; height: 20px;
@@ -1181,6 +1288,76 @@
         <div class="skeleton sk-line sk-w60"></div>
         <div class="skeleton sk-line sk-w40"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CARA KERJA ─────────────────────────────────────── -->
+<div class="home-section-dark">
+  <div class="home-section">
+    <div class="section-header">
+      <h2 class="section-title">⚡ <span>Cara Beli</span> Tiket</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-icon">🔐</div>
+        <div class="step-num">1</div>
+        <div class="step-title">Login</div>
+        <div class="step-desc">Masuk dengan User ID kamu. Tidak perlu daftar terlebih dahulu.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">🎵</div>
+        <div class="step-num">2</div>
+        <div class="step-title">Pilih Konser &amp; Kursi</div>
+        <div class="step-desc">Browse konser favoritmu, pilih kategori kursi sesuai budget, klik WAR TIKET!</div>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">💳</div>
+        <div class="step-num">3</div>
+        <div class="step-title">Bayar &amp; Dapatkan E-Tiket</div>
+        <div class="step-desc">Selesaikan pembayaran dalam 15 menit. E-Tiket dengan QR Code langsung diterbitkan.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── KENAPA WARTIKET ────────────────────────────────── -->
+<div class="home-section">
+  <div class="section-header">
+    <h2 class="section-title">🛡️ Kenapa <span>WarTiket</span>?</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">Anti Oversell 4 Lapis</div>
+      <div class="feature-desc">Redis lock + PostgreSQL + rate-limit + constraint unik memastikan satu kursi hanya terjual sekali.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Cepat &amp; Real-Time</div>
+      <div class="feature-desc">p95 latency hanya 153ms. Stok kursi diperbarui secara real-time tanpa perlu refresh.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">Anti-Bot &amp; Adil</div>
+      <div class="feature-desc">Rate limiter blokir bot otomatis. Semua user punya kesempatan yang sama saat war tiket.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-title">E-Tiket QR Code</div>
+      <div class="feature-desc">Tiket digital dengan QR Code unik langsung di akun kamu. Tunjukkan di pintu masuk venue.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SEMUA KONSER ───────────────────────────────────── -->
+<div class="home-section-dark">
+  <div class="home-section">
+    <div class="section-header">
+      <h2 class="section-title">🎤 <span>Semua Konser</span> 2026</h2>
+    </div>
+    <div class="upcoming-grid" id="upcomingGrid">
+      <!-- diisi oleh JS renderUpcoming() -->
     </div>
   </div>
 </div>
@@ -1689,6 +1866,7 @@ function updateStats() {
     sum + (ev.categories||[]).reduce((s, c) => s + (c.available_seats||0), 0), 0);
   animateCount('statEvents', totalEvents);
   animateCount('statSeats', totalSeats);
+  renderUpcoming();
 }
 
 function animateCount(id, target) {
@@ -1701,6 +1879,30 @@ function animateCount(id, target) {
     el.textContent = current >= 1000 ? (current/1000).toFixed(1) + 'K' : current;
     if (current >= target) clearInterval(t);
   }, 40);
+}
+
+function renderUpcoming() {
+  const grid = document.getElementById('upcomingGrid');
+  if (!grid) return;
+  const evs = allEvents.filter(e => ['on_sale','upcoming'].includes(e.status));
+  if (!evs.length) { grid.innerHTML = ''; return; }
+  grid.innerHTML = evs.map(ev => {
+    const minPrice = Math.min(...(ev.categories||[]).map(c => c.price||0));
+    const totalSeats = (ev.categories||[]).reduce((s,c) => s+(c.available_seats||0), 0);
+    return `<div class="upcoming-card" onclick="openEventDetail(allEvents.find(e=>e.id===${ev.id}))">
+      <div class="upcoming-thumb" style="${getBannerStyle(ev)}"></div>
+      <div class="upcoming-info">
+        <div class="upcoming-name">${ev.name}</div>
+        <div class="upcoming-meta">
+          📍 ${(ev.venue||'').substring(0,30)}<br>
+          📅 ${formatDate(ev.event_date)}<br>
+          🎟 ${totalSeats.toLocaleString('id')} kursi tersedia
+        </div>
+        <div class="upcoming-badge ${ev.status}">${ev.status === 'on_sale' ? '● On Sale' : '◎ Segera'}</div>
+        ${minPrice ? `<div style="color:var(--primary);font-weight:700;font-size:13px;margin-top:4px">Mulai Rp ${minPrice.toLocaleString('id')}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 /* ============================================================

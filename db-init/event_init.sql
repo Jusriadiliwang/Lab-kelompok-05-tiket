@@ -61,14 +61,50 @@ INSERT INTO events (name, venue, event_date, description, banner_url, status) VA
      'Stadion Utama GBK, Jakarta',
      '2026-08-10 19:30:00',
      'Tur akhir karir Ed Sheeran — satu malam yang tak terlupakan.',
-     'https://cdn.example.com/banners/edsheeran-math.jpg',
+     'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800',
      'completed'),
     ('Java Jazz Festival 2026',
      'Jakarta Convention Center',
      '2026-07-04 14:00:00',
      'Festival jazz bergengsi — 3 hari, 5 panggung, 100+ penampil.',
-     'https://cdn.example.com/banners/java-jazz-2026.jpg',
-     'cancelled')
+     'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800',
+     'cancelled'),
+    ('Taylor Swift The Eras Tour',
+     'Gelora Bung Karno, Jakarta',
+     '2026-10-20 19:00:00',
+     'Konser spektakuler Taylor Swift hadir di Jakarta — semua era, satu panggung luar biasa.',
+     'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&auto=format',
+     'on_sale'),
+    ('Noah World Tour 2026',
+     'Indonesia Arena, Jakarta',
+     '2026-09-27 19:30:00',
+     'Noah hadir dengan setlist terbaik dari seluruh perjalanan musiknya.',
+     'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&auto=format',
+     'on_sale'),
+    ('Sheila On 7 Reunion',
+     'Istora Senayan, Jakarta',
+     '2026-11-08 19:00:00',
+     'Reuni Sheila On 7 — 25 tahun perjalanan musik yang tidak terlupakan.',
+     'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&auto=format',
+     'upcoming'),
+    ('Metallica 72 Seasons Tour',
+     'Stadion Patriot, Bekasi',
+     '2026-12-05 18:00:00',
+     'Metallica menggebrak Jakarta dengan tur dunia 72 Seasons — metal paling brutal tahun ini.',
+     'https://images.unsplash.com/photo-1574172379033-d3fcf40f0aad?w=800&auto=format',
+     'on_sale'),
+    ('Tulus Live Concert',
+     'The Kasablanka Hall, Jakarta',
+     '2026-10-11 19:30:00',
+     'Malam yang intim bersama Tulus — suara dan melodi yang menghangatkan jiwa.',
+     'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=800&auto=format',
+     'on_sale'),
+    ('We The Fest 2026',
+     'Jiexpo Kemayoran, Jakarta',
+     '2026-08-30 14:00:00',
+     'Festival musik paling ditunggu — 3 hari, 50+ artis, satu pengalaman tak terlupakan.',
+     'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format',
+     'on_sale')
 ON CONFLICT DO NOTHING;
 
 -- Seat categories — available_seats sudah mencerminkan state setelah seed orders:
@@ -92,5 +128,28 @@ INSERT INTO seat_categories (event_id, name, total_seats, available_seats, price
     (4, 'Festival', 8000,  7998,  850000.00),
     (4, 'VVIP',      500,   500, 5000000.00),
     (5, 'VIP',      1000,  1000, 1500000.00),
-    (5, 'Festival', 5000,  5000,  600000.00)
+    (5, 'Festival', 5000,  5000,  600000.00),
+    -- Taylor Swift (id=6)
+    (6, 'Cat 1',    200,   200, 5000000.00),
+    (6, 'Cat 2',    500,   500, 3000000.00),
+    (6, 'Cat 3',   2000,  2000, 1500000.00),
+    (6, 'Festival',5000,  5000,  750000.00),
+    -- Noah (id=7)
+    (7, 'VVIP',     150,   150, 1500000.00),
+    (7, 'VIP',      400,   400,  800000.00),
+    (7, 'Festival',3000,  3000,  350000.00),
+    -- Sheila On 7 (id=8)
+    (8, 'Premium',  300,   300,  750000.00),
+    (8, 'Regular', 1500,  1500,  350000.00),
+    -- Metallica (id=9)
+    (9, 'Pit',      500,   500, 2000000.00),
+    (9, 'Tribun A',1000,  1000, 1000000.00),
+    (9, 'Tribun B',3000,  3000,  500000.00),
+    -- Tulus (id=10)
+    (10,'VIP Table', 100,   100, 1200000.00),
+    (10,'Regular',   800,   800,  450000.00),
+    -- We The Fest (id=11)
+    (11,'3-Day Pass',500,   500, 2500000.00),
+    (11,'Day Pass', 2000,  2000,  900000.00),
+    (11,'Festival', 8000,  8000,  450000.00)
 ON CONFLICT DO NOTHING;
