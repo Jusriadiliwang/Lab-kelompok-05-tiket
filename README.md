@@ -16,16 +16,16 @@
 ```
 
 ┌─────────────────────────────────────────────────────────┐
-│                     CLIENT / FRONTEND                    │
-└────────┬────────────┬────────────┬───────────────────────┘
+│                     CLIENT / FRONTEND                   │
+└────────┬────────────┬────────────┬──────────────────────┘
          │            │            │
     :3001│       :3002│       :3003│          :3004
 ┌────────▼──┐ ┌───────▼──┐ ┌──────▼──┐ ┌────────────────┐
 │  event-   │ │ ticket-  │ │payment- │ │notification-   │
 │  service  │ │ service  │ │ service │ │   service      │
 │           │ │          │ │         │ │                │
-│ PostgreSQL│ │PostgreSQL│ │PostgreSQL│ │  PostgreSQL    │
-│ event_db  │ │ticket_db │ │payment_db│ │notification_db │
+│ PostgreSQL│ │PostgreSQL│ │PostgreSQL│ │  PostgreSQL   │
+│ event_db  │ │ticket_db │ │payment_db│ │notification_db│
 └─────┬─────┘ └────┬─────┘ └────┬────┘ └───────▲────────┘
       │             │            │               │
       │        ┌────▼────┐       │               │
