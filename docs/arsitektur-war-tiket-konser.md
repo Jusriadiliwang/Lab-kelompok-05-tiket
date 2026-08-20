@@ -28,7 +28,7 @@
 
 ```mermaid
 graph TD
-    Client["Browser / Mobile App"]
+    Client["Browser"]
     GW["API Gateway\n(rate-limit, auth, routing)"]
 
     subgraph Services
