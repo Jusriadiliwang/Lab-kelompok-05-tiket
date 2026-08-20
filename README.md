@@ -13,26 +13,52 @@
 
 ## Arsitektur
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     CLIENT / FRONTEND                    │
-└────────┬────────────┬────────────┬───────────────────────┘
-         │            │            │
-    :3001│       :3002│       :3003│          :3004
-┌────────▼──┐ ┌───────▼──┐ ┌──────▼──┐ ┌────────────────┐
-│  event-   │ │ ticket-  │ │payment- │ │notification-   │
-│  service  │ │ service  │ │ service │ │   service      │
-│           │ │          │ │         │ │                │
-│ PostgreSQL│ │PostgreSQL│ │PostgreSQL│ │  PostgreSQL    │
-│ event_db  │ │ticket_db │ │payment_db│ │notification_db │
-└─────┬─────┘ └────┬─────┘ └────┬────┘ └───────▲────────┘
-      │             │            │               │
-      │        ┌────▼────┐       │               │
-      │        │  Redis  │       │       ┌───────┴──────┐
-      │        │ (locks) │       │       │   RabbitMQ   │
-      │        └─────────┘       │       │ tiket_events │
-      └──────────────────────────┴──────►│   exchange   │
-                                         └──────────────┘
+```mermaid
+graph TD
+    Client["Browser"]
+    GW["API Gateway\n(rate-limit, auth, routing)"]
+
+    subgraph Services
+        ES["event-service\n:3001"]
+        TS["ticket-service\n:3002"]
+        PS["payment-service\n:3003"]
+        NS["notification-service\n:3004"]
+    end
+
+    subgraph Data Stores
+        PG_E[("PostgreSQL\nevent-db")]
+        PG_T[("PostgreSQL\nticket-db")]
+        PG_P[("PostgreSQL\npayment-db")]
+        PG_N[("PostgreSQL\nnotif-db")]
+        RD[("Redis\nlock store + cache")]
+    end
+
+    subgraph Messaging
+        KF["Kafka / Redis Streams\n(event broker)"]
+    end
+
+    Client -->|HTTPS| GW
+    GW -->|REST| ES
+    GW -->|REST| TS
+    GW -->|REST| PS
+
+    ES --- PG_E
+    TS --- PG_T
+    TS --- RD
+    PS --- PG_P
+    NS --- PG_N
+
+    TS -->|produce: ticket.locked| KF
+    TS -->|produce: ticket.confirmed| KF
+    TS -->|produce: ticket.expired| KF
+    PS -->|produce: payment.confirmed| KF
+    PS -->|produce: payment.failed| KF
+    KF -->|consume: ticket.locked| PS
+    KF -->|consume: payment.confirmed| TS
+    KF -->|consume: payment.failed| TS
+    KF -->|consume: ticket.confirmed| NS
+    KF -->|consume: ticket.expired| NS
+    KF -->|consume: payment.failed| NS
 ```
 
 ## Jalankan Sistem
