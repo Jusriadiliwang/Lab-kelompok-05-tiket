@@ -16,6 +16,7 @@
     "dev:ticket":       "npm run dev --prefix ticket-service",
     "dev:payment":      "npm run dev --prefix payment-service",
     "dev:notification": "npm run dev --prefix notification-service",
+    "dev:mobile":       "npm start --prefix mobile",
     "start:all":        "docker compose up --build",
     "stop:all":         "docker compose down"
   }

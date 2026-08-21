@@ -238,6 +238,7 @@ services:
       TICKET_SERVICE_URL: http://ticket-service:3002
       PAYMENT_SERVICE_URL: http://payment-service:3003
       NOTIFICATION_SERVICE_URL: http://notification-service:3004
+      ERP_SERVICE_URL: http://erp-service:3005
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: tiketkonser123

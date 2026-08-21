@@ -20,7 +20,9 @@ const PUBLIC_ROUTES = [
   { method: 'GET',  pattern: /^\/health$/ },
   { method: 'GET',  pattern: /^\/catalog/ },
   { method: 'GET',  pattern: /^\/events/ },
-  { method: 'POST', pattern: /^\/auth\/token$/ },  // dev JWT generator
+  { method: 'POST', pattern: /^\/auth\/token$/ },     // dev JWT generator
+  { method: 'POST', pattern: /^\/auth\/register$/ },  // user registration
+  { method: 'POST', pattern: /^\/auth\/login$/ },     // user login
 ];
 
 function isPublic(method, path) {

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WarTiket — Diagram Arsitektur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg:      #0a0a0f;
+      --bg2:     #12121a;
+      --bg3:     #1a1a28;
+      --card:    #16161f;
+      --border:  rgba(255,255,255,0.08);
+      --primary: #ff4d00;
+      --primary2:#ff7a00;
+      --accent:  #6c63ff;
+      --success: #00d68f;
+      --danger:  #ff3d71;
+      --warning: #ffaa00;
+      --text1:   #ffffff;
+      --text2:   rgba(255,255,255,0.7);
+      --text3:   rgba(255,255,255,0.4);
+      --radius:  16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text1);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 99px; }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a0a00 50%, #0a0a0f 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      text-decoration: none;
+      color: var(--text1);
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .nav-badge {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 80px 40px 60px;
+      background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,77,0,0.15) 0%, transparent 70%);
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,77,0,0.12);
+      border: 1px solid rgba(255,77,0,0.3);
+      color: var(--primary2);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      color: var(--text2);
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── TOC ── */
+    .toc-wrap {
+      max-width: 1200px;
+      margin: 0 auto 64px;
+      padding: 0 40px;
+    }
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .toc-title {
+      grid-column: 1 / -1;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 4px;
+    }
+    .toc a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--text2);
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .toc a:hover {
+      background: rgba(255,77,0,0.08);
+      border-color: rgba(255,77,0,0.2);
+      color: var(--text1);
+    }
+    .toc a .num {
+      width: 24px; height: 24px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+    }
+
+    /* ── SECTION ── */
+    .section { scroll-margin-top: 80px; }
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .section-num {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(255,77,0,0.3);
+    }
+    .section-title-wrap h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+    .section-title-wrap p {
+      color: var(--text2);
+      font-size: 0.9rem;
+      margin-top: 4px;
+      line-height: 1.6;
+    }
+
+    /* ── DIAGRAM CARD ── */
+    .diagram-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .diagram-card:hover {
+      border-color: rgba(255,77,0,0.3);
+      box-shadow: 0 0 40px rgba(255,77,0,0.07);
+    }
+    .diagram-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+    }
+    .diagram-card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .diagram-card-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .dot-graph   { background: var(--accent); }
+    .dot-seq     { background: var(--success); }
+    .dot-erd     { background: var(--warning); }
+    .diagram-type-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+    .badge-graph   { background: rgba(108,99,255,0.15); color: var(--accent); border: 1px solid rgba(108,99,255,0.3); }
+    .badge-seq     { background: rgba(0,214,143,0.12); color: var(--success); border: 1px solid rgba(0,214,143,0.3); }
+    .badge-erd     { background: rgba(255,170,0,0.12); color: var(--warning); border: 1px solid rgba(255,170,0,0.3); }
+    .diagram-body {
+      padding: 32px 24px;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-body .mermaid {
+      max-width: 100%;
+    }
+
+    /* ── GRID 2-COL ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      main, .toc-wrap { padding: 0 20px 80px; }
+      header { padding: 0 20px; }
+      .hero { padding: 60px 20px 40px; }
+    }
+
+    /* ── LAYER CARD ── */
+    .layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .layer-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    .layer-item:hover {
+      border-color: rgba(255,77,0,0.3);
+      transform: translateX(4px);
+    }
+    .layer-num {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .ln1 { background: rgba(255,77,0,0.2); color: var(--primary); }
+    .ln2 { background: rgba(108,99,255,0.2); color: var(--accent); }
+    .ln3 { background: rgba(0,214,143,0.2); color: var(--success); }
+    .ln4 { background: rgba(255,170,0,0.2); color: var(--warning); }
+    .layer-text strong { font-size: 0.9rem; display: block; margin-bottom: 2px; }
+    .layer-text span { font-size: 0.8rem; color: var(--text3); }
+
+    /* ── TOPIC TABLE ── */
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .topic-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .topic-card h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--primary2);
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .topic-card pre {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: var(--text2);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .topic-card .key { color: var(--accent); }
+    .topic-card .str { color: var(--success); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text3);
+      font-size: 0.8rem;
+    }
+    footer span { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">🎫</div>
+      WarTiket
+    </a>
+    <span class="nav-badge">Diagram Arsitektur</span>
+  </div>
+</header>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-tag">📐 Technical Documentation</div>
+  <h1>Diagram Arsitektur<br/>War Tiket Konser</h1>
+  <p>Visualisasi lengkap arsitektur microservices — mulai dari system overview, alur happy path, race condition, ERD tiap service, hingga lapisan anti-oversell.</p>
+</div>
+
+<!-- ── TOC ── -->
+<div class="toc-wrap">
+  <div class="toc">
+    <div class="toc-title">Daftar Diagram</div>
+    <a href="#diagram-1"><span class="num">1</span> Architecture Overview</a>
+    <a href="#diagram-2"><span class="num">2</span> Happy Path Sequence</a>
+    <a href="#diagram-3"><span class="num">3</span> Race Condition Sequence</a>
+    <a href="#diagram-4"><span class="num">4</span> ERD — event-service</a>
+    <a href="#diagram-5"><span class="num">5</span> ERD — ticket-service</a>
+    <a href="#diagram-6"><span class="num">6</span> ERD — payment-service</a>
+    <a href="#diagram-7"><span class="num">7</span> ERD — notification-service</a>
+    <a href="#diagram-8"><span class="num">8</span> Kafka Event Schema</a>
+    <a href="#diagram-9"><span class="num">9</span> Anti-Oversell Layers</a>
+  </div>
+</div>
+
+<main>
+
+  <!-- ── 1. ARCHITECTURE OVERVIEW ── -->
+  <section class="section" id="diagram-1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title-wrap">
+        <h2>Architecture Overview</h2>
+        <p>Topologi keseluruhan sistem — Client, API Gateway, 4 microservices, data stores (PostgreSQL &amp; Redis), dan message broker (Kafka / Redis Streams).</p>
+      </div>
+    </div>
+    <div class="diagram-card">
+      <div class="diagram-card-header">
+        <div class="diagram-card-title">
+          <span class="dot dot-graph"></span>
+          System Architecture — Graph TD
+        </div>
+        <span class="diagram-type-badge badge-graph">graph</span>
+      </div>
+      <div class="diagram-body">
+        <div class="mermaid">
+graph TD
+    Client["🌐 Browser / Mobile App"]
+    GW["🛡️ API Gateway\n(rate-limit, auth, routing)"]
+
+    subgraph Services["⚙️ Services"]
+        ES["event-service\n:3001"]
+        TS["ticket-service\n:3002"]
+        PS["payment-service\n:3003"]
+        NS["notification-service\n:3004"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        PG_E[("PostgreSQL\nevent-db")]
+        PG_T[("PostgreSQL\nticket-db")]
+        PG_P[("PostgreSQL\npayment-db")]
+        PG_N[("PostgreSQL\nnotif-db")]
+        RD[("Redis\nlock store + cache")]
+    end
+
+    subgraph Messaging["📨 Messaging"]
+        KF["Kafka / Redis Streams\n(event broker)"]
+    end
+
+    Client -->|HTTPS| GW
+    GW -->|REST| ES
+    GW -->|REST| TS
+    GW -->|REST| PS
+
+    ES --- PG_E
+    TS --- PG_T
+    TS --- RD
+    PS --- PG_P
+    NS --- PG_N
+
+    TS -->|produce: ticket.locked| KF
+    TS -->|produce: ticket.confirmed| KF
+    TS -->|produce: ticket.expired| KF
+    PS -->|produce: payment.confirmed| KF
+    PS -->|produce: payment.failed| KF
+    KF -->|consume: ticket.locked| PS
+    KF -->|consume: payment.confirmed| TS
+    KF -->|consume: payment.failed| TS
+    KF -->|consume: ticket.confirmed| NS
+    KF -->|consume: ticket.expired| NS
+    KF -->|consume: payment.failed| NS
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. HAPPY PATH SEQUENCE ── -->
+  <section class="section" id="diagram-2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title-wrap">
+        <h2>Sequence Diagram — Happy Path</h2>
+        <p>Alur lengkap dari User melakukan lock kursi → pembayaran → konfirmasi → pengiriman e-ticket via Kafka choreography.</p>
+      </div>
+    </div>
+    <div class="diagram-card">
+      <div class="diagram-card-header">
+        <div class="diagram-card-title">
+          <span class="dot dot-seq"></span>
+          Happy Path — Lock, Pay, Confirm, Notify
+        </div>
+        <span class="diagram-type-badge badge-seq">sequence</span>
+      </div>
+      <div class="diagram-body">
+        <div class="mermaid">
+sequenceDiagram
+    actor User
+    participant GW as API Gateway
+    participant TS as ticket-service
+    participant Redis
+    participant KF as Kafka
+    participant PS as payment-service
+    participant NS as notification-service
+
+    User->>GW: POST /tickets/lock {eventId, seatId}
+    GW->>TS: forward request
+
+    TS->>Redis: SET lock:seat:{seatId} userId NX EX 600
+    Redis-->>TS: OK (lock acquired)
+
+    TS->>TS: INSERT reservations (status=PENDING, expires_at=+10min)
+    TS-->>GW: 201 { reservationId, expiresAt }
+    GW-->>User: 201 { reservationId, expiresAt }
+
+    User->>GW: POST /payments { reservationId, paymentMethod }
+    GW->>PS: forward request
+    PS->>PS: INSERT orders (status=PENDING)
+    PS->>PS: charge payment gateway
+    PS-->>GW: 202 Accepted { orderId }
+    GW-->>User: 202 Accepted { orderId }
+
+    PS->>KF: publish payment.confirmed { reservationId, orderId }
+
+    KF->>TS: consume payment.confirmed
+    TS->>TS: UPDATE reservations status=CONFIRMED
+    TS->>TS: INSERT seat_sold record (UNIQUE constraint)
+    Note over TS,Redis: Lock diganti flag SOLD di Redis agar kursi tidak bisa di-lock ulang
+    TS->>Redis: SET lock:seat:{seatId} SOLD (overwrite, tanpa TTL)
+    TS->>KF: produce ticket.confirmed { userId, reservationId, seatId }
+
+    KF->>NS: consume ticket.confirmed
+    NS->>NS: generate e-ticket PDF
+    NS->>User: send email / push notif (e-ticket)
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. RACE CONDITION ── -->
+  <section class="section" id="diagram-3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title-wrap">
+        <h2>Sequence Diagram — Race Condition</h2>
+        <p>Simulasi 1000 user berebut 1 kursi secara bersamaan. Redis atomic <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:0.85em">SET NX EX</code> menjamin hanya satu yang menang.</p>
+      </div>
+    </div>
+    <div class="diagram-card">
+      <div class="diagram-card-header">
+        <div class="diagram-card-title">
+          <span class="dot dot-seq"></span>
+          Race Condition — 1000 User, 1 Kursi
+        </div>
+        <span class="diagram-type-badge badge-seq">sequence</span>
+      </div>
+      <div class="diagram-body">
+        <div class="mermaid">
+sequenceDiagram
+    actor U1 as User-1 (menang)
+    actor U2 as User-2 (kalah)
+    participant TS as ticket-service
+    participant Redis
+
+    par Concurrent request
+        U1->>TS: POST /tickets/lock { seatId: A1 }
+        U2->>TS: POST /tickets/lock { seatId: A1 }
+    end
+
+    TS->>Redis: SET lock:seat:A1 user1 NX EX 600
+    Redis-->>TS: OK → U1 menang
+
+    TS->>Redis: SET lock:seat:A1 user2 NX EX 600
+    Redis-->>TS: nil → U2 KALAH (NX = only if Not eXist)
+
+    TS-->>U1: 201 { reservationId, expiresAt }
+    TS-->>U2: 409 Conflict { message: "Seat already reserved" }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4-7. ERD ── -->
+  <section class="section" id="diagram-4">
+    <div class="section-header">
+      <div class="section-num">4–7</div>
+      <div class="section-title-wrap">
+        <h2>ERD — Data Model Per Service</h2>
+        <p>Setiap service memiliki skema database sendiri (Database per Service pattern). Tidak ada shared table antar service.</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- event-service ERD -->
+      <div class="diagram-card" id="diagram-4-inner">
+        <div class="diagram-card-header">
+          <div class="diagram-card-title">
+            <span class="dot dot-erd"></span>
+            event-service
+          </div>
+          <span class="diagram-type-badge badge-erd">erd</span>
+        </div>
+        <div class="diagram-body">
+          <div class="mermaid">
+erDiagram
+    EVENT {
+        uuid id PK
+        string name
+        datetime event_date
+        string venue
+        string status "DRAFT|PUBLISHED|CANCELLED"
+    }
+    SEAT_CATEGORY {
+        uuid id PK
+        uuid event_id FK
+        string name "VIP|REGULER|FESTIVAL"
+        int total_seats
+        decimal price
+    }
+    SEAT {
+        uuid id PK
+        uuid category_id FK
+        string seat_code "A1, B12, ..."
+    }
+    EVENT ||--o{ SEAT_CATEGORY : has
+    SEAT_CATEGORY ||--o{ SEAT : contains
+          </div>
+        </div>
+      </div>
+
+      <!-- ticket-service ERD -->
+      <div class="diagram-card" id="diagram-5">
+        <div class="diagram-card-header">
+          <div class="diagram-card-title">
+            <span class="dot dot-erd"></span>
+            ticket-service
+          </div>
+          <span class="diagram-type-badge badge-erd">erd</span>
+        </div>
+        <div class="diagram-body">
+          <div class="mermaid">
+erDiagram
+    RESERVATION {
+        uuid id PK
+        uuid user_id
+        uuid seat_id
+        uuid event_id
+        string status "PENDING|CONFIRMED|EXPIRED|CANCELLED"
+        datetime expires_at
+        datetime created_at
+    }
+    SEAT_LOCK {
+        uuid seat_id PK
+        uuid reservation_id FK
+        uuid user_id
+        datetime locked_until
+        string lock_status "LOCKED|SOLD"
+    }
+    RESERVATION ||--|| SEAT_LOCK : "terkait via seat_id"
+          </div>
+        </div>
+      </div>
+
+      <!-- payment-service ERD -->
+      <div class="diagram-card" id="diagram-6">
+        <div class="diagram-card-header">
+          <div class="diagram-card-title">
+            <span class="dot dot-erd"></span>
+            payment-service
+          </div>
+          <span class="diagram-type-badge badge-erd">erd</span>
+        </div>
+        <div class="diagram-body">
+          <div class="mermaid">
+erDiagram
+    ORDER {
+        uuid id PK
+        uuid reservation_id
+        uuid user_id
+        decimal amount
+        string status "PENDING|PAID|FAILED|REFUNDED"
+        string payment_method
+        datetime paid_at
+        datetime expires_at
+    }
+    PAYMENT_LOG {
+        uuid id PK
+        uuid order_id FK
+        string event_type "INITIATED|CALLBACK|TIMEOUT"
+        jsonb payload
+        datetime created_at
+    }
+    ORDER ||--o{ PAYMENT_LOG : logs
+          </div>
+        </div>
+      </div>
+
+      <!-- notification-service ERD -->
+      <div class="diagram-card" id="diagram-7">
+        <div class="diagram-card-header">
+          <div class="diagram-card-title">
+            <span class="dot dot-erd"></span>
+            notification-service
+          </div>
+          <span class="diagram-type-badge badge-erd">erd</span>
+        </div>
+        <div class="diagram-body">
+          <div class="mermaid">
+erDiagram
+    NOTIFICATION {
+        uuid id PK
+        uuid user_id
+        string type "ETICKET|REMINDER|FAILED_PAYMENT"
+        string channel "EMAIL|PUSH"
+        string status "QUEUED|SENT|FAILED"
+        jsonb payload
+        datetime sent_at
+    }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 8. KAFKA TOPICS ── -->
+  <section class="section" id="diagram-8">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div class="section-title-wrap">
+        <h2>Kafka Event Schema</h2>
+        <p>Skema payload untuk setiap Kafka topic yang digunakan dalam komunikasi async antar service.</p>
+      </div>
+    </div>
+    <div class="topic-grid">
+      <div class="topic-card">
+        <h4>📤 ticket.locked</h4>
+        <pre><span class="str">{
+  <span class="key">"reservationId"</span>: "uuid",
+  <span class="key">"userId"</span>: "uuid",
+  <span class="key">"seatId"</span>: "uuid",
+  <span class="key">"eventId"</span>: "uuid",
+  <span class="key">"expiresAt"</span>: "ISO8601"
+}</span></pre>
+      </div>
+      <div class="topic-card">
+        <h4>✅ payment.confirmed</h4>
+        <pre><span class="str">{
+  <span class="key">"orderId"</span>: "uuid",
+  <span class="key">"reservationId"</span>: "uuid",
+  <span class="key">"userId"</span>: "uuid",
+  <span class="key">"paidAt"</span>: "ISO8601"
+}</span></pre>
+      </div>
+      <div class="topic-card">
+        <h4>❌ payment.failed</h4>
+        <pre><span class="str">{
+  <span class="key">"orderId"</span>: "uuid",
+  <span class="key">"reservationId"</span>: "uuid",
+  <span class="key">"reason"</span>: "TIMEOUT|DECLINED"
+}</span></pre>
+      </div>
+      <div class="topic-card">
+        <h4>🎫 ticket.confirmed</h4>
+        <pre><span class="str">{
+  <span class="key">"reservationId"</span>: "uuid",
+  <span class="key">"userId"</span>: "uuid",
+  <span class="key">"seatCode"</span>: "A1",
+  <span class="key">"eventName"</span>: "string",
+  <span class="key">"eventDate"</span>: "ISO8601",
+  <span class="key">"eticketUrl"</span>: "string"
+}</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 9. ANTI-OVERSELL LAYERS ── -->
+  <section class="section" id="diagram-9">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div class="section-title-wrap">
+        <h2>Lapisan Anti-Oversell</h2>
+        <p>Empat lapisan perlindungan berlapis yang memastikan satu kursi hanya bisa terjual satu kali, bahkan saat ribuan request bersamaan atau terjadi bug di satu lapisan.</p>
+      </div>
+    </div>
+    <div class="layer-stack">
+      <div class="layer-item">
+        <div class="layer-num ln1">L1</div>
+        <div class="layer-text">
+          <strong>Rate Limit — API Gateway / Redis</strong>
+          <span>Sliding window counter per user (10 req/s pada /tickets/lock). Melindungi backend dari abuse &amp; bot.</span>
+        </div>
+      </div>
+      <div class="layer-item">
+        <div class="layer-num ln2">L2</div>
+        <div class="layer-text">
+          <strong>SET NX EX — Redis Distributed Lock</strong>
+          <span>Operasi atomic O(1). Hanya satu request yang bisa sukses walau ribuan request bersamaan. TTL otomatis melepas kursi bila tidak dibayar.</span>
+        </div>
+      </div>
+      <div class="layer-item">
+        <div class="layer-num ln3">L3</div>
+        <div class="layer-text">
+          <strong>INSERT reservation — PostgreSQL Persistence</strong>
+          <span>Data reservasi dicatat permanen ke database. Hanya berjalan setelah Redis lock berhasil diperoleh.</span>
+        </div>
+      </div>
+      <div class="layer-item">
+        <div class="layer-num ln4">L4</div>
+        <div class="layer-text">
+          <strong>UNIQUE seat_sold constraint — PostgreSQL Last-Resort</strong>
+          <span>Constraint UNIQUE pada kolom seat_id di tabel seat_sold. Jaminan terakhir — tidak mungkin ada dua record untuk kursi yang sama.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Dibuat oleh <span>Lab Kelompok 05</span> &nbsp;·&nbsp; War Tiket Konser — Microservices Architecture
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#16161f',
+      primaryColor: '#ff4d00',
+      primaryTextColor: '#ffffff',
+      primaryBorderColor: 'rgba(255,255,255,0.15)',
+      lineColor: 'rgba(255,255,255,0.3)',
+      secondaryColor: '#1a1a28',
+      tertiaryColor: '#12121a',
+      edgeLabelBackground: '#16161f',
+      clusterBkg: '#1a1a28',
+      clusterBorder: 'rgba(255,255,255,0.1)',
+      titleColor: '#ffffff',
+      attributeBackgroundColorEven: '#16161f',
+      attributeBackgroundColorOdd: '#1a1a28',
+      nodeBorder: 'rgba(255,255,255,0.15)',
+      mainBkg: '#1a1a28',
+      fontFamily: 'Inter, sans-serif',
+    },
+    flowchart: {
+      curve: 'basis',
+      htmlLabels: true,
+      padding: 20,
+    },
+    sequence: {
+      diagramMarginX: 20,
+      diagramMarginY: 20,
+      actorMargin: 60,
+      width: 160,
+      height: 50,
+      boxMargin: 10,
+      boxTextMargin: 5,
+      noteMargin: 10,
+      messageMargin: 35,
+    },
+    er: {
+      diagramPadding: 20,
+      layoutDirection: 'TB',
+      minEntityWidth: 100,
+      minEntityHeight: 75,
+      entityPadding: 15,
+    },
+  });
+</script>
+</body>
+</html>
