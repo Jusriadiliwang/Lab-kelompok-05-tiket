@@ -12,6 +12,116 @@
 | Atribut | Detail |
 |---|---|
 | **Peran Utama** | QA Engineer, Load Tester & Technical Writer |
+| **Tanggung Jawab** | Pengujian performa, verifikasi end-to-end, dokumentasi teknis, load test script |
+| **Commit sebagai Author** | 2 commit utama (load test & hasil) |
+| **Stack** | PowerShell scripting, k6 (script), PostgreSQL query, Markdown |
+
+---
+
+## 🏗️ Kontribusi Berdasarkan Commit Nyata
+
+| Commit | Author | Deskripsi |
+|---|---|---|
+| `94d6c38` | **Marhepi Rahmadani** | `docs: add load-test script, hasil-test, dan panduan-api` — script k6 + panduan API |
+| `b053aeb` | **Marhepi Rahmadani** | `docs(load-test): update hasil-test.md dengan data pengukuran real` — data nyata dari sistem berjalan |
+| `d8b2f1d` | *(Miftahul — push ulang)* | Sama dengan 94d6c38, push melalui branch lain |
+
+---
+
+## 🧪 Load Test — Data Real (20 Agustus 2026)
+
+Pengujian dilakukan langsung pada sistem yang berjalan di Docker.
+
+### Test A — GET /catalog Tanpa Gateway (200 req, 50 concurrent)
+
+| Metrik | Nilai |
+|---|---|
+| p50 latency | 135ms |
+| **p95 latency** | **191ms** |
+| p99 latency | 224ms |
+| Error rate | 0% |
+
+### Test B — GET /catalog Via API Gateway + Redis Cache (200 req, 50 concurrent)
+
+| Metrik | Nilai |
+|---|---|
+| p50 latency | 131ms |
+| **p95 latency** | **167ms** ↓13% |
+| p99 latency | 200ms |
+| Error rate (non-429) | **0%** |
+| Diblokir rate-limit (429) | **101 dari 200** ✅ |
+
+### Test C — POST /orders: 50 Concurrent User
+
+| Metrik | Nilai |
+|---|---|
+| p95 latency | 1138ms |
+| Avg latency | 766.3ms |
+| Duplikat seat (oversell) | **0** ✅ |
+| Error (5xx) | **0** ✅ |
+
+### Test D — Rate Limit Verification (110 rapid request)
+
+| Metrik | Nilai |
+|---|---|
+| HTTP 200 (diterima) | 100 |
+| HTTP 429 (diblokir tepat) | **10** ✅ |
+| Error rate | **0%** ✅ |
+
+---
+
+## 📊 Data Real dari PostgreSQL (Query Langsung)
+
+```sql
+-- ticket_db
+-- total=74 | confirmed=13 | locked=50 | expired=9 | cancelled=2
+
+-- payment_db
+-- total=15 | success=12 | revenue=Rp 16.700.000
+
+-- event_db
+-- Noah World Tour Festival: 50 kursi terjual dari 3000
+```
+
+---
+
+## 📄 File yang Dibuat
+
+| File | Isi |
+|---|---|
+| `load-test/script.js` | Script k6 — 4 stage (warmup, ramp-up, peak, ramp-down), custom metrics, threshold |
+| `load-test/hasil-test.md` | Analisis lengkap dengan data pengukuran real |
+| `docs/panduan-api.md` | Dokumentasi lengkap semua 15 endpoint API |
+
+---
+
+## 🔍 QA — Verifikasi End-to-End
+
+Flow yang diverifikasi langsung di PostgreSQL:
+
+```
+Login → Browse Event → Pilih Kursi → Lock (Redis NX EX) →
+Bayar (RabbitMQ Saga) → Konfirmasi → QR Code E-Ticket ✅
+```
+
+Bukti: Order #23 `user_test`, VIP, Rp 750.000, status=`confirmed`, tersimpan di ticket_db.
+
+---
+
+*Dokumen ini merupakan bagian dari laporan praktikum Microservices Kelompok 5 — Universitas Muhammadiyah Makassar.*
+
+**NIM:** 105841109523  
+**Kelompok:** 5 | Praktikum Microservices  
+**Universitas:** Muhammadiyah Makassar  
+**Repository:** https://github.com/Jusriadiliwang/Lab-kelompok-05-tiket
+
+---
+
+## 👤 Profil Peran
+
+| Atribut | Detail |
+|---|---|
+| **Peran Utama** | QA Engineer, Load Tester & Technical Writer |
 | **Tanggung Jawab** | Pengujian performa, verifikasi end-to-end, dokumentasi teknis, deployment docs |
 | **Kontribusi** | 7 commit sebagai co-author |
 | **Stack** | Artillery / k6, Node.js, GitHub Pages, Markdown |

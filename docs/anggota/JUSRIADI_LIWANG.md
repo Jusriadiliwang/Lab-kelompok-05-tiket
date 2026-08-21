@@ -3,6 +3,102 @@
 **NIM:** 105841117023  
 **Kelompok:** 5 | Praktikum Microservices  
 **Universitas:** Muhammadiyah Makassar  
+**GitHub:** [@Jusriadiliwang](https://github.com/Jusriadiliwang)  
+**Repository:** https://github.com/Jusriadiliwang/Lab-kelompok-05-tiket
+
+---
+
+## 👤 Profil Peran
+
+| Atribut | Detail |
+|---|---|
+| **Peran Utama** | Data & Persistence Engineer, Frontend Developer |
+| **Tanggung Jawab** | Database design, seed data, skema PostgreSQL, frontend SPA, deployment |
+| **Total Commit** | 7+ commit sebagai author utama |
+| **Stack** | PostgreSQL, SQL, HTML/CSS/JavaScript, Nginx, Docker, GitHub Pages |
+
+---
+
+## 🏗️ Kontribusi Berdasarkan Commit Nyata
+
+### Fondasi Sistem & Database
+
+| Commit | Deskripsi |
+|---|---|
+| `c05afeb` | `feat: initial microservices - War Tiket Konser Kelompok 5` — scaffold 4 microservice awal |
+| `956924d` | `fix: bug fixes, schema improvements, seed data, env examples` |
+| `dd7f84d` | `Update README.md` |
+| `c5674c4` | `fix: sinkronkan openapi.yaml dengan schema DB terbaru` |
+| `5ea5dc4` | `add dataset` — data SQL untuk demo & testing |
+| `52995d5` | `docs: tambah AI-LOG.md` |
+
+### Frontend Web
+
+| Commit | Deskripsi |
+|---|---|
+| `589fb41` | `feat(frontend): add web UI` — halaman utama, hero carousel, event grid |
+| `c2bd3ed` | `feat(frontend): add hidden admin panel` — event/image management |
+| `7bd4559` | `fix(frontend): persist images & banners in localStorage` |
+| `24e8dfe` | `deploy: add docs/ folder for GitHub Pages` |
+
+---
+
+## 🗄️ Skema Database (4 Service)
+
+### event_init.sql
+```sql
+CREATE TABLE events (id SERIAL, name, venue, event_date, status CHECK(...));
+CREATE TABLE seat_categories (id SERIAL, event_id FK, name, total_seats, available_seats, price);
+-- Seed: 9 event konser nyata dengan banner Unsplash
+```
+
+### ticket_init.sql
+```sql
+CREATE TABLE orders (id SERIAL, user_id, event_id, seat_category_id, status, lock_expires_at);
+CREATE TABLE tickets (id SERIAL, order_id FK, qr_code UNIQUE, seat_number UNIQUE);
+-- UNIQUE constraint: satu tiket per order (anti-oversell layer 4)
+```
+
+### payment_init.sql
+```sql
+CREATE TABLE payments (id SERIAL, order_id, user_id, amount, method, status);
+-- CHECK constraint: method IN ('bank_transfer','credit_card','gopay','ovo','dana')
+-- PARTIAL UNIQUE INDEX: idx_payments_order_active WHERE status IN ('pending','success')
+```
+
+### notification_init.sql
+```sql
+CREATE TABLE notifications (id SERIAL, user_id, type, channel, status, payload JSONB);
+```
+
+---
+
+## 🌐 Frontend SPA (91KB+)
+
+- Hero carousel dengan 3 featured event dari database  
+- Event grid + filter kategori + search real-time  
+- Modal detail + pilih kursi + countdown timer  
+- Login/logout user  
+- Halaman "Pesanan Saya" + QR code e-ticket  
+- Admin Panel tersembunyi (klik logo 5x)  
+- Deploy ke **GitHub Pages**: https://jusriadiliwang.github.io/Lab-kelompok-05-tiket/
+
+---
+
+## 📊 Statistik Commit
+
+| Metrik | Nilai |
+|---|---|
+| Total commit (author) | **7+ commit** |
+| File utama | `frontend/index.html`, `db-init/*.sql`, `docker-compose.yml` awal, `openapi.yaml` v1 |
+
+---
+
+*Dokumen ini merupakan bagian dari laporan praktikum Microservices Kelompok 5 — Universitas Muhammadiyah Makassar.*
+
+**NIM:** 105841117023  
+**Kelompok:** 5 | Praktikum Microservices  
+**Universitas:** Muhammadiyah Makassar  
 **Repository:** https://github.com/Jusriadiliwang/Lab-kelompok-05-tiket
 
 ---

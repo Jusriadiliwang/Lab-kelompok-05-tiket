@@ -12,6 +12,93 @@
 | Atribut | Detail |
 |---|---|
 | **Peran Utama** | System Architect |
+| **Tanggung Jawab** | Desain arsitektur, ADR, ERP design, dokumentasi sistem, README, laporan |
+| **Commit sebagai Author** | 4 commit README + 1 commit arsitektur utama + 1 commit load test |
+| **Stack** | System Design, Mermaid, Markdown, GitHub |
+
+---
+
+## 🏗️ Kontribusi Berdasarkan Commit Nyata
+
+| Commit | Deskripsi |
+|---|---|
+| `08a93ce` | `feat: add health checks and architecture documentation for microservices` — **arsitektur utama** (arsitektur-war-tiket-konser.md, struktur-erp-tasks.md) |
+| `d8b2f1d` | `docs: add load-test script, hasil-test, dan panduan-api` |
+| `b4fb3bb` | `Update README.md` |
+| `6337cd5` | `Update README.md` |
+| `52a7067` | `Update README.md` |
+
+> Commit `08a93ce` awalnya atas nama Ashabul Kahfi, kemudian **diubah author menjadi Miftahul Jannah** karena dokumen arsitektur ini adalah tanggung jawab Arsitek Sistem.
+
+---
+
+## 🏛️ Arsitektur yang Dirancang
+
+### 6 Service + Batas Tanggung Jawab
+
+| Service | Port | Tanggung Jawab |
+|---|---|---|
+| `api-gateway` | 3000 | Auth, Rate-limit, Routing |
+| `event-service` | 3001 | Konser, kursi, harga |
+| `ticket-service` | 3002 | Lock kursi, konfirmasi, expire |
+| `payment-service` | 3003 | Pembayaran, refund |
+| `notification-service` | 3004 | E-ticket, notif expire |
+| `erp-service` | 3005 | Back-office M1–M6, RBAC, Audit |
+
+### 5 Architecture Decision Records (ADR)
+
+| ADR | Keputusan | Status |
+|---|---|---|
+| ADR-001 | Redis `SET NX EX` sebagai Distributed Lock | Accepted |
+| ADR-002 | Database per Service (No Shared DB) | Accepted |
+| ADR-003 | RabbitMQ untuk Async Communication | Accepted |
+| ADR-004 | Saga Pattern (Choreography) | Accepted |
+| ADR-005 | Rate Limiting di API Gateway | Accepted |
+
+### Strategi Anti-Oversell 4 Lapis
+
+```
+L1: Rate Limit (API Gateway)          → fairness, anti-bot
+L2: Redis SET NX EX (ticket-service)  → distributed lock, atomic
+L3: PostgreSQL INSERT orders           → persistence
+L4: UNIQUE seat_sold constraint        → last-resort guard
+```
+
+---
+
+## 📄 File yang Dibuat
+
+| File | Isi |
+|---|---|
+| `docs/arsitektur-war-tiket-konser.md` | Diagram arsitektur, Sequence Diagram, ERD, 5 ADR, Edge Cases |
+| `docs/struktur-erp-tasks.md` | ERP M1–M6 design, ERD ERP, Sprint Plan 8 minggu |
+| `README.md` | Deskripsi sistem, arsitektur diagram, cara jalankan |
+
+---
+
+## 📊 Statistik Commit
+
+| Metrik | Nilai |
+|---|---|
+| Commit sebagai author | **4+ commit** |
+| File kunci | `docs/arsitektur-war-tiket-konser.md`, `docs/struktur-erp-tasks.md`, `README.md` |
+
+---
+
+*Dokumen ini merupakan bagian dari laporan praktikum Microservices Kelompok 5 — Universitas Muhammadiyah Makassar.*
+
+**NIM:** 105841116023  
+**Kelompok:** 5 | Praktikum Microservices  
+**Universitas:** Muhammadiyah Makassar  
+**Repository:** https://github.com/Jusriadiliwang/Lab-kelompok-05-tiket
+
+---
+
+## 👤 Profil Peran
+
+| Atribut | Detail |
+|---|---|
+| **Peran Utama** | System Architect |
 | **Tanggung Jawab** | Desain arsitektur, Architecture Decision Records (ADR), strategi anti-oversell, ERP design |
 | **Kontribusi** | 4 commit sebagai co-author pada fitur arsitektur kritis |
 | **Stack** | System Design, Mermaid, PostgreSQL ERD, RabbitMQ, Redis, Saga Pattern |
