@@ -1,0 +1,279 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<title>War Tiket - Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#5e5e63",
+                        "on-surface-variant": "#46464a",
+                        "on-background": "#1a1c1d",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1a1b1f",
+                        "outline": "#77767b",
+                        "pure-black": "#000000",
+                        "on-primary-fixed-variant": "#474649",
+                        "on-primary-container": "#868587",
+                        "tertiary": "#040302",
+                        "on-error": "#ffffff",
+                        "system-gray-dark": "#424245",
+                        "primary-fixed": "#e4e2e4",
+                        "tertiary-fixed-dim": "#cec4c2",
+                        "on-tertiary-fixed": "#1f1a19",
+                        "on-secondary-fixed-variant": "#46464b",
+                        "primary": "#030304",
+                        "primary-fixed-dim": "#c8c6c8",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#e3e2e7",
+                        "on-primary-fixed": "#1b1b1d",
+                        "surface-container-low": "#f3f3f5",
+                        "on-tertiary-container": "#8c8382",
+                        "tertiary-container": "#211c1b",
+                        "on-surface": "#1a1c1d",
+                        "background": "#f9f9fb",
+                        "surface-container-high": "#e8e8ea",
+                        "tertiary-fixed": "#ebe0de",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d9dadc",
+                        "surface": "#f9f9fb",
+                        "secondary-fixed-dim": "#c7c6cb",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2f3132",
+                        "surface-container": "#eeeef0",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#c8c6c8",
+                        "on-secondary-container": "#626267",
+                        "surface-tint": "#5f5e60",
+                        "inverse-on-surface": "#f0f0f2",
+                        "system-gray-light": "#E8E8ED",
+                        "surface-bright": "#f9f9fb",
+                        "secondary-container": "#e0dfe4",
+                        "surface-container-highest": "#e2e2e4",
+                        "on-tertiary-fixed-variant": "#4c4544",
+                        "pure-white": "#FFFFFF",
+                        "surface-variant": "#e2e2e4",
+                        "primary-container": "#1d1d1f",
+                        "outline-variant": "#c7c6ca",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "gutter-mobile": "16px",
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "safe": "env(safe-area-inset-bottom)"
+                    },
+                    "fontFamily": {
+                        "display-ticket-war": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "countdown": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-ticket-war": ["48px", {"lineHeight": "48px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "body-lg": ["17px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["15px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "countdown": ["20px", {"lineHeight": "24px", "fontWeight": "700"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Smooth fade for elements coming into view */
+        .fade-in { opacity: 0; animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body class="bg-surface-lowest text-on-surface antialiased font-body-lg text-body-lg pb-[80px] md:pb-0 pt-14 selection:bg-pure-black selection:text-pure-white">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-pure-white/80 backdrop-blur-md bg-surface-container-highest/20 transition-all duration-300" id="top-nav">
+<div class="flex justify-between items-center px-margin-mobile h-14 w-full max-w-screen-xl mx-auto">
+<button aria-label="Menu" class="active:scale-95 duration-100 hover:opacity-70 transition-opacity flex items-center justify-center p-2 -ml-2 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-pure-black tracking-tight">War Tiket</h1>
+<button aria-label="Search" class="active:scale-95 duration-100 hover:opacity-70 transition-opacity flex items-center justify-center p-2 -mr-2 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">search</span>
+</button>
+</div>
+</header>
+<main class="max-w-screen-xl mx-auto w-full">
+<!-- Search Bar Area -->
+<section class="px-margin-mobile pt-stack-md pb-stack-lg fade-in">
+<div class="relative w-full group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 0;">search</span>
+</div>
+<input class="w-full bg-surface-container-low border border-system-gray-light text-on-surface text-body-lg rounded-full py-3 pl-12 pr-4 focus:outline-none focus:border-pure-black focus:ring-1 focus:ring-pure-black transition-colors duration-200 shadow-sm placeholder:text-secondary" placeholder="Search artists, venues, or events" type="text">
+</div>
+</section>
+<!-- Featured Concert Hero -->
+<section class="px-margin-mobile pb-stack-lg fade-in delay-1">
+<div class="flex items-center justify-between mb-stack-sm">
+<h2 class="font-headline-md text-headline-md font-bold text-pure-black">Featured</h2>
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">Ending Soon</span>
+</div>
+<div class="relative w-full rounded-xl overflow-hidden aspect-[4/5] md:aspect-[21/9] bg-surface-container-high group cursor-pointer active:scale-[0.98] transition-transform duration-200">
+<img class="absolute inset-0 w-full h-full object-cover grayscale contrast-125 brightness-75 group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="A striking, high-contrast monochrome photograph of a legendary rock singer performing on a massive stadium stage. The image captures raw emotion and dynamic movement, with harsh spotlights creating deep shadows against a pure black background. The minimal, gritty aesthetic perfectly aligns with a premium, intense 'ticket war' app design, emphasizing the artist's silhouette and a massive crowd in the deep background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNwgVzfjUcAMi-6e7NFjoQs__uuSzew8QUIR-VbBHAJettYFLTaed6lgcqpCsZl6rZvweLyz474h6Ci3TwlsppUJ8izltng0lDGgjfal4RrOLSAhZNo1153Wri76nlVMHjp_ob34aY63oiDbGPUAZMiG7Ou7XgWnHr6j10twtCXN62HvwTRUNUwVPAk0zt3NGpNkKBWT9ydQRz516WcVVEwUNxYacnxbwAMBM8lLf2WxZIhVgw6WaG">
+<!-- Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-pure-black via-pure-black/60 to-transparent"></div>
+<!-- Content -->
+<div class="absolute bottom-0 left-0 w-full p-stack-md flex flex-col gap-stack-sm">
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-pure-white text-pure-black font-label-caps text-label-caps px-2 py-1 rounded uppercase tracking-wider font-bold">Published</span>
+<span class="text-pure-white/80 font-body-sm text-body-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">location_on</span>
+                            Stadium Arena
+                        </span>
+</div>
+<h3 class="font-display-ticket-war text-display-ticket-war text-pure-white break-words leading-tight">THE BLACK<br>PARADE</h3>
+<div class="flex items-end justify-between mt-stack-sm">
+<div class="flex flex-col">
+<span class="text-pure-white/70 font-label-caps text-label-caps uppercase">Queue Opens In</span>
+<div class="bg-system-gray-dark text-pure-white font-countdown text-countdown px-3 py-1.5 rounded-full inline-flex items-center gap-2 mt-1 w-max border border-system-gray-light/20">
+                                00:14:59
+                            </div>
+</div>
+<button class="bg-pure-white text-pure-black font-body-lg text-body-lg font-bold px-6 py-3 rounded-full hover:bg-surface-container-low transition-colors duration-200 active:scale-95 shadow-lg flex items-center gap-2" data-action="queue-waitlist">
+                            Join Waitlist
+                            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Upcoming Events List -->
+<section class="px-margin-mobile pb-stack-lg fade-in delay-2">
+<div class="flex items-center justify-between mb-stack-md">
+<h2 class="font-headline-md text-headline-md font-bold text-pure-black">Upcoming Events</h2>
+<button class="font-body-sm text-body-sm text-secondary hover:text-pure-black transition-colors">See All</button>
+</div>
+<div class="flex flex-col gap-unit">
+<!-- List Item 1 -->
+<div class="flex items-center p-stack-sm bg-pure-white rounded-lg border border-system-gray-light hover:border-pure-black transition-colors duration-200 cursor-pointer active:scale-[0.99]">
+<div class="w-16 h-16 rounded bg-surface-container-high flex-shrink-0 overflow-hidden mr-stack-md">
+<img class="w-full h-full object-cover grayscale" data-alt="A minimal, high-contrast black and white close-up portrait of a contemporary pop artist looking intensely at the camera. The lighting is dramatic, casting distinct shadows on one side of the face, set against a completely stark white background. The image feels premium, moody, and perfectly suited for a sleek, modern event listing thumbnail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWBn78CjLaTs-8cl0TSjSxtX1OLGSvrqTfN4IhRhVzTXyQetLZRuzSjIg-dCtqaH_G021fuiyKL3hclwjbYD-rjRyvkZgqixV-NzLkwS31e-av5IcgMksjS1TpkSy4Up1bb8V9vcYBJngP_MQlHtxigauJ6bNcwKn0TdUVZWEbLsAc6b76NOiYDToNKDzGc-wHj1ZvmKAZ7tK8RA98tgBhL-PmgxHOsJEVaIAMFaN-5eE306KxbFDz">
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-body-lg text-body-lg font-bold text-pure-black truncate">Neon Nights Tour</h4>
+<p class="font-body-sm text-body-sm text-secondary truncate mt-0.5">Fri, Oct 24 • Grand Theater</p>
+</div>
+<div class="flex flex-col items-end justify-center ml-stack-sm pl-2">
+<span class="font-label-caps text-label-caps text-pure-black border border-pure-black px-2 py-1 rounded uppercase tracking-wider mb-1">Published</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="flex items-center p-stack-sm bg-pure-white rounded-lg border border-system-gray-light hover:border-pure-black transition-colors duration-200 cursor-pointer active:scale-[0.99]">
+<div class="w-16 h-16 rounded bg-surface-container-high flex-shrink-0 overflow-hidden mr-stack-md">
+<img class="w-full h-full object-cover grayscale" data-alt="An abstract, stark black and white architectural photograph of a massive, modern concert hall exterior. Sharp angles, deep shadows, and pure white highlights create a striking geometric composition. The image conveys a sense of monumental scale and premium exclusivity, fitting for a high-end classical or electronic music event listing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdKHpX__UpWvoGvfQP_Se6Oa_qrp-hzOUTneZGVJz7kWIC_UR9jSXbT0om-q5GVHlvoJ6TbaH1YB2_qZxRZJv0-ydt9zvVNRqaSOZvd7bI-p-Cdj6bCShPlNcXm0IVrTTLEhsfvvtjUZ3fX8gv7gRQt_5Bhf0GhmJoyfugtaG34HyrrE84jV780uA0H1lbsWYzlumfJOGvQDZAsF1vPRhPWzMzMRHV2a4jZEFn8Qh9HZ-VV1OSSe5S">
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-body-lg text-body-lg font-bold text-pure-black truncate">Symphony of Shadows</h4>
+<p class="font-body-sm text-body-sm text-secondary truncate mt-0.5">Sat, Nov 02 • Opera House</p>
+</div>
+<div class="flex flex-col items-end justify-center ml-stack-sm pl-2">
+<span class="font-label-caps text-label-caps text-secondary border border-system-gray-light px-2 py-1 rounded uppercase tracking-wider mb-1">Draft</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+</div>
+</div>
+<!-- List Item 3 -->
+<div class="flex items-center p-stack-sm bg-pure-white rounded-lg border border-system-gray-light hover:border-pure-black transition-colors duration-200 cursor-pointer active:scale-[0.99] opacity-70">
+<div class="w-16 h-16 rounded bg-surface-container-high flex-shrink-0 overflow-hidden mr-stack-md relative">
+<img class="w-full h-full object-cover grayscale" data-alt="A gritty, high-contrast monochrome image of a DJ mixing desk and turntables viewed from a low angle. The texture of the metal and vinyl is emphasized by stark lighting against a pitch-black background. The mood is underground, intense, and perfectly aligns with a sold-out electronic music event in a minimalist app design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf4_ptLbeHDBW3P1vaqKumQ16wnlU_kbtzrKCDX3nh1u52wYd2u31ED5NkglFOKXBhVEfbZ4tY29LADRJe2UHSGmgMasE6SgV89_gHNjmMX00Q_UJ3VvjmRdAHGYM-fD6XbgWQdfMzd5ips6WaiPJtGrACp59cAYZKGvdYRg27HmlLrra1bH7d5CHcIbAicWuVC-6PSqOzKYfgXAlK9h0OpeFORgufaYJ9skRnw2nFeOfBYty1hgLc">
+<div class="absolute inset-0 bg-pure-white/40 backdrop-blur-[1px] flex items-center justify-center">
+<span class="material-symbols-outlined text-pure-black" style="font-variation-settings: 'FILL' 1;">block</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-body-lg text-body-lg font-bold text-pure-black truncate line-through decoration-1 text-secondary">Underground Sessions</h4>
+<p class="font-body-sm text-body-sm text-secondary truncate mt-0.5">Sun, Nov 15 • The Warehouse</p>
+</div>
+<div class="flex flex-col items-end justify-center ml-stack-sm pl-2">
+<span class="font-label-caps text-label-caps text-error bg-error-container/30 px-2 py-1 rounded uppercase tracking-wider mb-1 font-bold">Cancelled</span>
+</div>
+</div>
+</div>
+</section>
+<!-- spacer for bottom nav -->
+<div class="h-6 md:hidden"></div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 pb-safe bg-pure-white/80 backdrop-blur-md bg-surface-container-highest/30">
+<div class="flex justify-around items-center w-full px-margin-mobile py-2">
+<!-- Home (Active) -->
+<button class="active:scale-90 transition-transform duration-150 hover:text-primary flex flex-col items-center justify-center text-pure-black font-bold group w-16">
+<div class="p-1 rounded-full group-hover:bg-surface-container-low transition-colors mb-0.5">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+</div>
+<span class="font-label-caps text-label-caps text-[10px]">Home</span>
+</button>
+<!-- Events (Inactive) -->
+<button class="active:scale-90 transition-transform duration-150 hover:text-primary flex flex-col items-center justify-center text-on-surface-variant group w-16">
+<div class="p-1 rounded-full group-hover:bg-surface-container-low transition-colors mb-0.5">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">confirmation_number</span>
+</div>
+<span class="font-label-caps text-label-caps text-[10px] font-normal">Events</span>
+</button>
+<!-- My Tickets (Inactive) -->
+<button class="active:scale-90 transition-transform duration-150 hover:text-primary flex flex-col items-center justify-center text-on-surface-variant group w-16">
+<div class="p-1 rounded-full group-hover:bg-surface-container-low transition-colors mb-0.5">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_activity</span>
+</div>
+<span class="font-label-caps text-label-caps text-[10px] font-normal">My Tickets</span>
+</button>
+<!-- Profile (Inactive) -->
+<button class="active:scale-90 transition-transform duration-150 hover:text-primary flex flex-col items-center justify-center text-on-surface-variant group w-16">
+<div class="p-1 rounded-full group-hover:bg-surface-container-low transition-colors mb-0.5">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+</div>
+<span class="font-label-caps text-label-caps text-[10px] font-normal">Profile</span>
+</button>
+</div>
+</nav>
+<script>
+        // Simple scroll effect for TopAppBar shadow/border
+        const topNav = document.getElementById('top-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                topNav.classList.add('shadow-sm', 'border-b', 'border-system-gray-light/50');
+            } else {
+                topNav.classList.remove('shadow-sm', 'border-b', 'border-system-gray-light/50');
+            }
+        });
+    </script>
+
+
+</body></html>

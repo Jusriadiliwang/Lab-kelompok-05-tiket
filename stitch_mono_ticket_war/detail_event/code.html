@@ -1,0 +1,240 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Event Detail - War Tiket</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#5e5e63",
+                        "on-surface-variant": "#46464a",
+                        "on-background": "#1a1c1d",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1a1b1f",
+                        "outline": "#77767b",
+                        "pure-black": "#000000",
+                        "on-primary-fixed-variant": "#474649",
+                        "on-primary-container": "#868587",
+                        "tertiary": "#040302",
+                        "on-error": "#ffffff",
+                        "system-gray-dark": "#424245",
+                        "primary-fixed": "#e4e2e4",
+                        "tertiary-fixed-dim": "#cec4c2",
+                        "on-tertiary-fixed": "#1f1a19",
+                        "on-secondary-fixed-variant": "#46464b",
+                        "primary": "#030304",
+                        "primary-fixed-dim": "#c8c6c8",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#e3e2e7",
+                        "on-primary-fixed": "#1b1b1d",
+                        "surface-container-low": "#f3f3f5",
+                        "on-tertiary-container": "#8c8382",
+                        "tertiary-container": "#211c1b",
+                        "on-surface": "#1a1c1d",
+                        "background": "#f9f9fb",
+                        "surface-container-high": "#e8e8ea",
+                        "tertiary-fixed": "#ebe0de",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d9dadc",
+                        "surface": "#f9f9fb",
+                        "secondary-fixed-dim": "#c7c6cb",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2f3132",
+                        "surface-container": "#eeeef0",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#c8c6c8",
+                        "on-secondary-container": "#626267",
+                        "surface-tint": "#5f5e60",
+                        "inverse-on-surface": "#f0f0f2",
+                        "system-gray-light": "#E8E8ED",
+                        "surface-bright": "#f9f9fb",
+                        "secondary-container": "#e0dfe4",
+                        "surface-container-highest": "#e2e2e4",
+                        "on-tertiary-fixed-variant": "#4c4544",
+                        "pure-white": "#FFFFFF",
+                        "surface-variant": "#e2e2e4",
+                        "primary-container": "#1d1d1f",
+                        "outline-variant": "#c7c6ca",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "gutter-mobile": "16px",
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "display-ticket-war": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "countdown": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-ticket-war": ["48px", { "lineHeight": "48px", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                        "body-lg": ["17px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg": ["34px", { "lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["15px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "countdown": ["20px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .glass-checkout {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid #E8E8ED;
+        }
+    </style>
+</head>
+<body class="bg-surface-lowest text-on-surface antialiased pb-32">
+<!-- Top AppBar (from JSON, modified for Detail view - suppressing nav shell as per rules) -->
+<header class="fixed top-0 w-full z-50 bg-pure-white/80 dark:bg-pure-black/80 backdrop-blur-md bg-surface-container-highest/20 dark:bg-surface-container-lowest/10">
+<div class="flex justify-between items-center px-margin-mobile h-14 w-full max-w-screen-xl mx-auto">
+<button class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:opacity-70 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back" data-weight="regular">arrow_back</span>
+</button>
+<div class="font-headline-md text-headline-md font-bold text-pure-black dark:text-pure-white truncate flex-1 text-center px-4">
+                War Tiket
+            </div>
+<button class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:opacity-70 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 rounded-full opacity-0 pointer-events-none">
+<span class="material-symbols-outlined" data-icon="search" data-weight="regular">search</span>
+</button>
+</div>
+</header>
+<main class="w-full max-w-screen-xl mx-auto pt-14">
+<!-- Hero Image -->
+<section class="relative w-full h-[50vh] md:h-[60vh]">
+<img class="w-full h-full object-cover grayscale brightness-75" data-alt="A striking, high-contrast monochrome photograph of a prominent music artist performing on stage. The artist is silhouetted against intense, brilliant white stage lights, creating a dramatic, premium look. The background is pure black, emphasizing the stark, quiet authority aesthetic of the design system. The lighting is harsh yet elegant, perfectly suited for a high-stakes concert ticket platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyx1hbuzmaPAhLiZg92lIxO3BZiCGjBlo1ykAkB5HqTvlYGINKnGA-TuvYxKyBO05pArDav3nHxLoGhxudNY2s43YCi63t13dze9CzWPGAQ7F2VZjOvtlu_WAg-8AGQpa9NTrg3zAm1ToOHcf6xGvSv1NqEH3h2PPZRvAzewZWKdOP5uwmRPbbHtAsCYlj1t0nG1XwLAyopDfrv3avW0Yv9DrmQer_nIowBp14Yhcx0j5rs_x0F_hG">
+<div class="absolute inset-0 bg-gradient-to-t from-pure-black via-pure-black/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-margin-mobile flex flex-col gap-stack-sm">
+<span class="font-label-caps text-label-caps text-pure-white/70 uppercase tracking-widest">Live in Concert</span>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-pure-white mb-2">THE ABEL SYMPHONY</h1>
+<div class="flex items-center gap-2 text-pure-white/90">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today" data-weight="regular">calendar_today</span>
+<span class="font-body-sm text-body-sm">Oct 24, 2024 • 8:00 PM</span>
+</div>
+<div class="flex items-center gap-2 text-pure-white/90">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on" data-weight="regular">location_on</span>
+<span class="font-body-sm text-body-sm">Global Stadium, NY</span>
+</div>
+</div>
+</section>
+<!-- Countdown Bar -->
+<section class="px-margin-mobile py-stack-md bg-surface-container-low border-b border-system-gray-light">
+<div class="flex items-center justify-between bg-system-gray-light rounded-full px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-pure-black" data-icon="timer" data-weight="regular">timer</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Reservation Lock Ends In</span>
+</div>
+<div class="font-countdown text-countdown text-pure-black tracking-widest" id="countdown-timer">00:10:00</div>
+</div>
+</section>
+<!-- Ticket Categories -->
+<section class="px-margin-mobile py-stack-lg flex flex-col gap-stack-md">
+<h2 class="font-headline-md text-headline-md text-pure-black mb-2">Select Tickets</h2>
+<!-- VIP Card (Available) -->
+<label class="group relative flex items-center justify-between p-5 bg-pure-white border border-system-gray-light rounded-lg cursor-pointer transition-colors hover:border-pure-black focus-within:border-pure-black has-[:checked]:bg-pure-black has-[:checked]:text-pure-white">
+<div class="flex flex-col gap-1">
+<span class="font-headline-md text-headline-md group-has-[:checked]:text-pure-white text-pure-black">VIP Access</span>
+<span class="font-body-sm text-body-sm group-has-[:checked]:text-pure-white/80 text-on-surface-variant">Front row standing, Early Entry</span>
+<span class="font-label-caps text-label-caps text-primary mt-2 group-has-[:checked]:text-pure-white/60">Available</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md group-has-[:checked]:text-pure-white text-pure-black">$450</span>
+<input class="sr-only" name="ticket_type" type="radio" value="vip">
+<div class="w-6 h-6 rounded-full border border-system-gray-dark flex items-center justify-center group-has-[:checked]:border-pure-white group-has-[:checked]:bg-pure-white">
+<span class="material-symbols-outlined text-[16px] text-pure-black opacity-0 group-has-[:checked]:opacity-100" data-icon="check" data-weight="fill">check</span>
+</div>
+</div>
+</label>
+<!-- Festival Card (Available) -->
+<label class="group relative flex items-center justify-between p-5 bg-pure-white border border-system-gray-light rounded-lg cursor-pointer transition-colors hover:border-pure-black focus-within:border-pure-black has-[:checked]:bg-pure-black has-[:checked]:text-pure-white"><div class="flex flex-col gap-1"><span class="font-headline-md text-headline-md group-has-[:checked]:text-pure-white text-pure-black">Reguler</span><span class="font-body-sm text-body-sm group-has-[:checked]:text-pure-white/80 text-on-surface-variant">Standard Seating, Mid Tier</span><span class="font-label-caps text-label-caps text-primary mt-2 group-has-[:checked]:text-pure-white/60">Available</span></div><div class="flex items-center gap-4"><span class="font-headline-md text-headline-md group-has-[:checked]:text-pure-white text-pure-black">$250</span><input class="sr-only" name="ticket_type" type="radio" value="reguler"><div class="w-6 h-6 rounded-full border border-system-gray-dark flex items-center justify-center group-has-[:checked]:border-pure-white group-has-[:checked]:bg-pure-white"><span class="material-symbols-outlined text-[16px] text-pure-black opacity-0 group-has-[:checked]:opacity-100" data-icon="check" data-weight="fill">check</span></div></div></label>
+<!-- Cat 1 Card (Sold Out) -->
+<div class="relative flex items-center justify-between p-5 bg-surface-container-low border border-system-gray-light rounded-lg opacity-60 grayscale cursor-not-allowed"><div class="flex flex-col gap-1"><span class="font-headline-md text-headline-md text-on-surface-variant">Festival Standing</span><span class="font-body-sm text-body-sm text-on-surface-variant">General Admission, Floor Area</span><span class="font-label-caps text-label-caps text-secondary mt-2">Sold Out</span></div><div class="flex items-center gap-4"><span class="font-headline-md text-headline-md text-on-surface-variant">$150</span><div class="w-6 h-6 rounded-full border border-system-gray-light bg-system-gray-light flex items-center justify-center"><span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="close" data-weight="regular">close</span></div></div></div>
+</section>
+</main>
+<!-- Sticky Checkout Bar -->
+<div class="fixed bottom-0 left-0 w-full glass-checkout z-50 pb-safe">
+<div class="max-w-screen-xl mx-auto px-margin-mobile py-4 flex items-center justify-between gap-4">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Total</span>
+<span class="font-headline-md text-headline-md text-pure-black font-bold">--</span>
+</div>
+<button class="bg-pure-black text-pure-white font-body-lg text-body-lg font-bold py-4 px-8 rounded-lg flex-1 min-h-[56px] flex items-center justify-center hover:opacity-90 active:scale-[0.98] transition-all shadow-sm">
+                Buy Now
+            </button>
+</div>
+</div>
+<script>
+        // Simple mock countdown animation
+        function updateCountdown() {
+            const timerElement = document.getElementById('countdown-timer');
+            let [hours, minutes, seconds] = timerElement.innerText.split(':').map(Number);
+            
+            if (seconds > 0) {
+                seconds--;
+            } else {
+                if (minutes > 0) {
+                    minutes--;
+                    seconds = 59;
+                } else if (hours > 0) {
+                    hours--;
+                    minutes = 59;
+                    seconds = 59;
+                }
+            }
+
+            timerElement.innerText = 
+                String(hours).padStart(2, '0') + ':' + 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0');
+                
+            // Increase weight in last 60 seconds (mock logic, applying if under 1 min)
+            if (hours === 0 && minutes === 0 && seconds <= 60) {
+                 timerElement.classList.remove('font-countdown');
+                 timerElement.style.fontWeight = '800'; // Extra bold for urgency
+            }
+        }
+
+        setInterval(updateCountdown, 1000);
+
+        // Radio button total update mock
+        const radios = document.querySelectorAll('input[name="ticket_type"]');
+        const totalDisplay = document.querySelector('.glass-checkout .font-headline-md');
+
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if(e.target.value === 'vip') totalDisplay.innerText = '$450';
+                if(e.target.value === 'festival') totalDisplay.innerText = '$150';
+            });
+        });
+    </script>
+
+
+</body></html>

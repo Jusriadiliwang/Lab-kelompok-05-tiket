@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Ticket Queue</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#5e5e63",
+                        "on-surface-variant": "#46464a",
+                        "on-background": "#1a1c1d",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1a1b1f",
+                        "outline": "#77767b",
+                        "pure-black": "#000000",
+                        "on-primary-fixed-variant": "#474649",
+                        "on-primary-container": "#868587",
+                        "tertiary": "#040302",
+                        "on-error": "#ffffff",
+                        "system-gray-dark": "#424245",
+                        "primary-fixed": "#e4e2e4",
+                        "tertiary-fixed-dim": "#cec4c2",
+                        "on-tertiary-fixed": "#1f1a19",
+                        "on-secondary-fixed-variant": "#46464b",
+                        "primary": "#030304",
+                        "primary-fixed-dim": "#c8c6c8",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#e3e2e7",
+                        "on-primary-fixed": "#1b1b1d",
+                        "surface-container-low": "#f3f3f5",
+                        "on-tertiary-container": "#8c8382",
+                        "tertiary-container": "#211c1b",
+                        "on-surface": "#1a1c1d",
+                        "background": "#f9f9fb",
+                        "surface-container-high": "#e8e8ea",
+                        "tertiary-fixed": "#ebe0de",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d9dadc",
+                        "surface": "#f9f9fb",
+                        "secondary-fixed-dim": "#c7c6cb",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2f3132",
+                        "surface-container": "#eeeef0",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#c8c6c8",
+                        "on-secondary-container": "#626267",
+                        "surface-tint": "#5f5e60",
+                        "inverse-on-surface": "#f0f0f2",
+                        "system-gray-light": "#E8E8ED",
+                        "surface-bright": "#f9f9fb",
+                        "secondary-container": "#e0dfe4",
+                        "surface-container-highest": "#e2e2e4",
+                        "on-tertiary-fixed-variant": "#4c4544",
+                        "pure-white": "#FFFFFF",
+                        "surface-variant": "#e2e2e4",
+                        "primary-container": "#1d1d1f",
+                        "outline-variant": "#c7c6ca",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "gutter-mobile": "16px",
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "display-ticket-war": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "countdown": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-ticket-war": ["48px", {"lineHeight": "48px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "body-lg": ["17px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["15px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "countdown": ["20px", {"lineHeight": "24px", "fontWeight": "700"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(0, 0, 0, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+        }
+        .progress-bar-fill {
+            transition: width 1s linear;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col justify-center items-center p-margin-mobile relative overflow-hidden">
+<!-- Header (Suppressed Nav, just Logo/Brand anchor) -->
+<header class="fixed top-0 w-full z-50 flex justify-center items-center h-14 w-full max-w-screen-xl mx-auto bg-pure-white/80 backdrop-blur-md">
+<h1 class="font-headline-md text-headline-md font-bold text-pure-black">War Tiket</h1>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-md flex flex-col items-center justify-center space-y-stack-lg z-10 relative mt-14">
+<!-- Background Artistic Element -->
+<div aria-hidden="true" class="absolute -z-10 w-full h-full opacity-10 flex items-center justify-center pointer-events-none">
+<span class="material-symbols-outlined text-[300px] text-pure-black" style="font-variation-settings: 'FILL' 0;">hourglass_empty</span>
+</div>
+<!-- Progress/Status Area -->
+<div class="flex flex-col items-center justify-center w-full space-y-stack-md bg-pure-white p-margin-mobile rounded-xl shadow-[0px_10px_30px_rgba(0,0,0,0.08)] border border-system-gray-light pulse-ring">
+<div class="text-center space-y-stack-sm">
+<p class="font-headline-md text-headline-md text-pure-black">You are in line.</p>
+<p class="font-body-sm text-body-sm text-error font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+                    Please do not refresh the page.
+                </p>
+</div>
+<!-- Custom Progress Bar -->
+<div class="w-full h-3 bg-system-gray-light rounded-full overflow-hidden mt-stack-md relative">
+<!-- Using a simulated progress of ~60% for visual -->
+<div class="h-full bg-pure-black rounded-full progress-bar-fill w-3/5 relative">
+<!-- Shimmer effect on progress bar -->
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-pure-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+</div>
+</div>
+<style>
+                @keyframes shimmer {
+                    100% { transform: translateX(100%); }
+                }
+            </style>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-2 gap-gutter-mobile w-full">
+<!-- Position -->
+<div class="flex flex-col items-center justify-center p-stack-md bg-pure-white rounded-lg border border-system-gray-light shadow-sm">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider mb-unit">Current Position</span>
+<span class="font-display-ticket-war text-display-ticket-war text-pure-black md:hidden">3,402</span>
+<span class="font-display-ticket-war text-display-ticket-war text-pure-black hidden md:block" style="font-size: 36px; line-height: 40px;">3,402</span> <!-- Slight scale down for bento feel on larger -->
+</div>
+<!-- Wait Time -->
+<div class="flex flex-col items-center justify-center p-stack-md bg-pure-white rounded-lg border border-system-gray-light shadow-sm">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider mb-unit">Est. Wait Time</span>
+<div class="flex items-baseline space-x-1">
+<span class="font-display-ticket-war text-display-ticket-war text-pure-black md:hidden">12</span>
+<span class="font-display-ticket-war text-display-ticket-war text-pure-black hidden md:block" style="font-size: 36px; line-height: 40px;">12</span>
+<span class="font-body-sm text-body-sm text-secondary">min</span>
+</div>
+</div>
+</div>
+<!-- Contextual Info -->
+<div class="w-full flex items-center p-stack-sm bg-surface-container-low rounded-lg border border-system-gray-light mt-stack-md">
+<div class="w-12 h-12 bg-system-gray-light rounded mr-stack-sm overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A macro, abstract close-up shot of a modern concert stage lighting rig in a minimalist setting. The lights are off, waiting in the dark. Deep blacks and pristine whites dominate the high-contrast scene, emphasizing calm precision and premium exclusivity before the show begins. Highly detailed, photorealistic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuhHzuitK0JeCMR6rPdj1hrhx9mLyvccj2cWQFqX71UCt1T1SkhtR64AAu66zvozznTCRxOlr08kg9quOIvazX3UGaX4Fexh1ajV4bG1PkXigPIiJXxaQ1s0YdRbzyh28aJxE-_BDncTBS9Yc5njSkYoyHPHm_Y_Tn4vVqwvfkf4ISSRmrhws6Kq-AfdWRyA5X7_PRb4Z4FHCkTG35-aQdAKHQjkdVTbkGmig1xaOX5aJtRl1LLKiR"/>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-body-sm text-body-sm font-bold text-pure-black line-clamp-1">World Tour 2024 - General Admission</p>
+<p class="font-label-caps text-label-caps text-secondary">Saturday, Oct 12 • 8:00 PM</p>
+</div>
+</div>
+</main>
+<!-- Bottom Safespace / Footer info -->
+<div class="fixed bottom-0 w-full p-margin-mobile flex justify-center pb-safe text-center">
+<p class="font-label-caps text-label-caps text-secondary flex items-center gap-1 opacity-70">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+            Secure Queue Connection
+        </p>
+</div>
+</body></html>
