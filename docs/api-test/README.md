@@ -51,9 +51,7 @@ Mendapatkan token JWT untuk mengakses semua endpoint.
 
 📸 **Screenshot:**
 
----
-
-## 2. Lock Kursi — WAR TIKET!
+![Login](gambar/login.png) — WAR TIKET!
 
 Mengunci kursi menggunakan Redis `SET NX EX` — inti anti-oversell sistem (ADR-001).
 
@@ -94,6 +92,8 @@ Mengunci kursi menggunakan Redis `SET NX EX` — inti anti-oversell sistem (ADR-
 > 📌 Catat nilai `id` (contoh: `110`) — dipakai di step 3 & 4.
 
 📸 **Screenshot:**
+
+![Lock Kursi](gambar/orders.png)
 
 ---
 
@@ -137,6 +137,8 @@ Memproses pembayaran. Setelah sukses, sistem akan otomatis:
 
 📸 **Screenshot:**
 
+![Bayar Tiket](gambar/payments.png)
+
 ---
 
 ## 4. Konfirmasi Order
@@ -163,6 +165,8 @@ Memverifikasi status order berubah dari `locked` → `confirmed` setelah pembaya
 ```
 
 📸 **Screenshot:**
+
+![Konfirmasi Order](gambar/getorder.png)
 
 ---
 
@@ -196,6 +200,8 @@ Membuktikan sistem mencegah double-booking — Redis `SET NX EX` hanya mengizink
 > ℹ️ **409 bukan error** — ini adalah fitur anti-oversell yang bekerja dengan benar.
 
 📸 **Screenshot:**
+
+![Anti-Oversell 409](gambar/oversell.png)
 
 ---
 
