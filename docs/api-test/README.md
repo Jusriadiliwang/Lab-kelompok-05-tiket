@@ -1,150 +1,520 @@
-# Panduan Import & Test API — War Tiket Konser
-
+# Dokumentasi API — War Tiket Konser (Postman)
 **Kelompok 5 | Universitas Muhammadiyah Makassar**  
-**Base URL:** `http://localhost:3000`
+**Base URL:** `http://localhost:3000`  
+**Tool:** Postman
 
 ---
 
-## 📂 File Collection
-
-| File | Untuk | Cara Import |
-|---|---|---|
-| `WarTiket-PostmanCollection.json` | **Postman** | Import → Upload Files |
-| `WarTiket-ThunderClient.json` | **Thunder Client** (VS Code) | Thunder Client → Collections → Import |
-
----
-
-## 🚀 Langkah Pakai Postman
-
-### 1. Import Collection
-1. Buka Postman
-2. Klik **Import** (pojok kiri atas)
-3. Drag & drop file `WarTiket-PostmanCollection.json`
-4. Klik **Import**
-
-### 2. Login Dulu (Wajib)
-1. Buka folder **🔐 Auth**
-2. Klik request **"Login"**
-3. Klik **Send**
-4. Token JWT otomatis tersimpan ke variable `{{token}}`
-
-### 3. Test Endpoint Lain
-Semua endpoint sudah pakai `Bearer {{token}}` — langsung klik Send.
+## Daftar Isi
+1. [Health Check](#1-health-check)
+2. [Login](#2-login)
+3. [Catalog Event](#3-catalog-event)
+4. [Detail Event](#4-detail-event)
+5. [Ketersediaan Kursi](#5-ketersediaan-kursi)
+6. [Lock Kursi — WAR TIKET!](#6-lock-kursi--war-tiket)
+7. [Cek Status Order](#7-cek-status-order)
+8. [Bayar Tiket](#8-bayar-tiket)
+9. [Konfirmasi Order](#9-konfirmasi-order)
+10. [Notifikasi](#10-notifikasi)
+11. [Register User Baru](#11-register-user-baru)
+12. [Rate Limit (ADR-005)](#12-rate-limit-adr-005)
 
 ---
 
-## ⚡ Langkah Pakai Thunder Client (VS Code)
+## 1. Health Check
 
-### 1. Install Extension
-Cari "Thunder Client" di VS Code Extensions → Install
+**Tujuan:** Memastikan API Gateway dan semua service berjalan.
 
-### 2. Import Collection
-1. Klik icon Thunder Client di sidebar kiri
-2. Klik **Collections** → titik tiga (**...**) → **Import**
-3. Pilih file `WarTiket-ThunderClient.json`
+| | |
+|---|---|
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/health` |
+| **Auth** | Tidak diperlukan |
 
-### 3. Import Environment
-1. Klik **Env** → titik tiga → **Import**
-4. File sama: `WarTiket-ThunderClient.json` (berisi env juga)
-
-### 4. Login Dulu
-1. Buka collection → folder **🔐 Auth** → **Login**
-2. Klik **Send**
-3. Copy nilai `token` dari response
-4. Paste ke Environment variable `token`
-
----
-
-## 📋 Urutan Test yang Disarankan
-
+**Request di Postman:**
 ```
-1. Health Check              GET  /health          → Pastikan backend up
-2. Login                     POST /auth/login       → Dapat JWT token
-3. GET Catalog               GET  /catalog          → Lihat semua event (Redis cache)
-4. GET Event Detail          GET  /events/1         → Detail Konser Dewa 19
-5. GET Ketersediaan Kursi    GET  /events/1/seats   → Lihat kategori & sisa kursi
-6. Lock Kursi (WAR TIKET!)   POST /orders           → Lock kursi — inti sistem!
-7. GET Status Order          GET  /orders/{id}      → Cek status locked
-8. Bayar Tiket               POST /payments         → Bayar → trigger RabbitMQ Saga
-9. GET Status Pembayaran     GET  /payments/{id}    → Pastikan status=success
-10. GET Notifikasi           GET  /notifications/.. → Cek e-ticket terkirim
+GET http://localhost:3000/health
 ```
 
+**Response yang diharapkan (200 OK):**
+```json
+{
+  "status": "ok",
+  "service": "api-gateway",
+  "timestamp": "2026-08-22T...",
+  "upstreams": {
+    "event-service": "http://event-service:3001",
+    "ticket-service": "http://ticket-service:3002",
+    "payment-service": "http://payment-service:3003",
+    "notification-service": "http://notification-service:3004"
+  }
+}
+```
+
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
 ---
 
-## 🔐 Token JWT
+## 2. Login
 
-Token didapat dari response Login:
+**Tujuan:** Mendapatkan token JWT untuk mengakses semua endpoint terproteksi.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/auth/login` |
+| **Auth** | Tidak diperlukan |
+| **Content-Type** | `application/json` |
+
+**Body (raw JSON):**
+```json
+{
+  "userId": "user_001"
+}
+```
+
+> 💡 User yang tersedia di seed data: `user_001` s/d `user_010`, `user_test`
+
+**Response yang diharapkan (200 OK):**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "userId": "user_001",
   "name": "user_001",
-  "role": "user"
+  "role": "user",
+  "message": "Selamat datang kembali, user_001!"
 }
 ```
 
-Masukkan di header setiap request:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
+> ⚠️ **Salin nilai `token`** dan gunakan sebagai `Authorization: Bearer <token>` di semua request berikutnya.
+
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
 
 ---
 
-## 📝 User ID yang Tersedia (Seed Data)
+## 3. Catalog Event
 
-| User ID | Kondisi |
+**Tujuan:** Mengambil semua event yang sedang dijual. Di-cache Redis 5 detik (ADR-001).
+
+| | |
 |---|---|
-| `user_001` | Order confirmed, payment success |
-| `user_002` | Order confirmed, payment success |
-| `user_003` | Order expired (tidak bayar) |
-| `user_010` | Order masih locked (belum bayar) |
-| `user_test` | Bebas untuk testing |
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/catalog` |
+| **Auth** | `Bearer <token>` |
+
+**Headers di Postman:**
+| Key | Value |
+|---|---|
+| Authorization | `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` |
+
+**Response yang diharapkan (200 OK):**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Konser Dewa 19 Reuni",
+      "venue": "Gelora Bung Karno, Jakarta",
+      "event_date": "2026-09-20T19:00:00.000Z",
+      "status": "on_sale",
+      "categories": [
+        { "id": 3, "name": "Festival", "available_seats": 4998, "price": "350000.00" },
+        { "id": 2, "name": "VIP",      "available_seats": 498,  "price": "750000.00" },
+        { "id": 1, "name": "VVIP",     "available_seats": 199,  "price": "2500000.00" }
+      ]
+    }
+  ]
+}
+```
+
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
 
 ---
 
-## 🎯 Skenario Test Menarik
+## 4. Detail Event
 
-### Skenario 1: Happy Path (Lock → Bayar → Konfirmasi)
-```
-POST /auth/login       {"userId": "user_test"}
-POST /orders           {"event_id": 2, "seat_category_id": 6, "user_id": "user_test"}
-POST /payments         {"order_id": {id_dari_step_2}, "user_id": "user_test", "method": "gopay"}
-GET  /orders/{id}      → status harus berubah ke "confirmed"
+**Tujuan:** Melihat informasi lengkap satu event.
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/events/1` |
+| **Auth** | `Bearer <token>` |
+
+**Response yang diharapkan (200 OK):**
+```json
+{
+  "id": 1,
+  "name": "Konser Dewa 19 Reuni",
+  "venue": "Gelora Bung Karno, Jakarta",
+  "event_date": "2026-09-20T19:00:00.000Z",
+  "description": "Reuni legenda rock Indonesia...",
+  "status": "on_sale"
+}
 ```
 
-### Skenario 2: Anti-Oversell (2 User, 1 Kursi)
-```
-# Buka 2 tab Postman/Thunder Client
-# User A:
-POST /orders {"event_id": 1, "seat_category_id": 1, "user_id": "user_a"}
-→ 201 (MENANG)
-
-# User B (kirim bersamaan):
-POST /orders {"event_id": 1, "seat_category_id": 1, "user_id": "user_b"}
-→ 409 Conflict (KALAH — Redis NX EX bekerja!)
-```
-
-### Skenario 3: Rate Limit (ADR-005)
-```
-# Kirim GET /catalog berkali-kali cepat
-# Setelah 100 request dalam 60 detik:
-→ 429 Too Many Requests
-→ {"error": "too_many_requests", "retryAfter": 60}
-```
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
 
 ---
 
-## 🌐 Endpoint Lain (Manual Test)
+## 5. Ketersediaan Kursi
 
-| Method | URL | Keterangan |
-|---|---|---|
-| GET | http://localhost:3000/health | Gateway health |
-| GET | http://localhost:8080 | Frontend web |
-| GET | http://localhost:15672 | RabbitMQ Management UI |
-| GET | http://localhost:3001/health | event-service langsung |
-| GET | http://localhost:3002/health | ticket-service langsung |
-| GET | http://localhost:3003/health | payment-service langsung |
+**Tujuan:** Melihat jumlah kursi tersedia per kategori untuk suatu event.
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/events/1/seats` |
+| **Auth** | `Bearer <token>` |
+
+**Response yang diharapkan (200 OK):**
+```json
+{
+  "event_id": 1,
+  "event_name": "Konser Dewa 19 Reuni",
+  "categories": [
+    {
+      "id": 3,
+      "name": "Festival",
+      "total_seats": 5000,
+      "available_seats": 4998,
+      "price": "350000.00"
+    },
+    {
+      "id": 2,
+      "name": "VIP",
+      "total_seats": 500,
+      "available_seats": 498,
+      "price": "750000.00"
+    }
+  ]
+}
+```
+
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+---
+
+## 6. Lock Kursi — WAR TIKET!
+
+**Tujuan:** Mengunci kursi selama 15 menit menggunakan Redis `SET NX EX` (ADR-001 — anti-oversell layer 2).
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/orders` |
+| **Auth** | `Bearer <token>` |
+| **Content-Type** | `application/json` |
+
+**Headers di Postman:**
+| Key | Value |
+|---|---|
+| Authorization | `Bearer <token>` |
+| Content-Type | `application/json` |
+| X-Correlation-ID | `postman-test-001` |
+
+**Body (raw JSON):**
+```json
+{
+  "event_id": 1,
+  "seat_category_id": 3,
+  "user_id": "user_test"
+}
+```
+
+**Response berhasil (201 Created):**
+```json
+{
+  "id": 110,
+  "user_id": "user_test",
+  "event_id": 1,
+  "seat_category_id": 3,
+  "event_name": "Konser Dewa 19 Reuni",
+  "seat_category_name": "Festival",
+  "price": "350000.00",
+  "status": "locked",
+  "lock_expires_at": "2026-08-22T06:03:52.279Z",
+  "message": "Kursi dikunci selama 15 menit. Segera bayar sebelum kedaluwarsa."
+}
+```
+
+> 📌 Catat nilai `id` dari response (contoh: `110`) — akan dipakai sebagai `order_id` di Step 8.
+
+**Response jika kursi sudah dikunci user lain (409 Conflict):**
+```json
+{
+  "error": "duplicate_order",
+  "message": "Kamu sudah memiliki pesanan aktif untuk konser ini"
+}
+```
+
+> ℹ️ **409 bukan error sesungguhnya** — ini adalah mekanisme anti-oversell yang bekerja dengan benar.
+
+📸 **Screenshot Postman (201 berhasil):**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+📸 **Screenshot Postman (409 anti-oversell):**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+---
+
+## 7. Cek Status Order
+
+**Tujuan:** Melihat status order setelah dikunci.
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/orders/110` |
+| **Auth** | `Bearer <token>` |
+
+> Ganti `110` dengan `id` yang didapat dari Step 6.
+
+**Response (200 OK):**
+```json
+{
+  "id": 110,
+  "status": "locked",
+  "event_name": "Konser Dewa 19 Reuni",
+  "seat_category_name": "Festival",
+  "price": "350000.00",
+  "lock_expires_at": "2026-08-22T06:03:52.279Z"
+}
+```
+
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+---
+
+## 8. Bayar Tiket
+
+**Tujuan:** Memproses pembayaran. Setelah sukses, sistem akan:
+1. Publish `payment.confirmed` ke RabbitMQ (Saga Choreography — ADR-004)
+2. `ticket-service` consume event → update order status menjadi `confirmed`
+3. `notification-service` consume event → kirim e-ticket
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/payments` |
+| **Auth** | `Bearer <token>` |
+| **Content-Type** | `application/json` |
+
+**Body (raw JSON):**
+```json
+{
+  "order_id": 110,
+  "user_id": "user_test",
+  "method": "gopay"
+}
+```
+
+> Metode tersedia: `bank_transfer` · `credit_card` · `gopay` · `ovo` · `dana`
+
+**Response berhasil (201 Created):**
+```json
+{
+  "id": 51,
+  "order_id": 110,
+  "user_id": "user_test",
+  "amount": "350000.00",
+  "method": "gopay",
+  "status": "success",
+  "paid_at": "2026-08-22T05:49:09.019Z",
+  "message": "Pembayaran berhasil! E-tiket akan segera dikirim."
+}
+```
+
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+---
+
+## 9. Konfirmasi Order
+
+**Tujuan:** Memverifikasi bahwa status order berubah menjadi `confirmed` setelah pembayaran (bukti Saga berjalan).
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/orders/110` |
+| **Auth** | `Bearer <token>` |
+
+**Response (200 OK) — status sudah berubah:**
+```json
+{
+  "id": 110,
+  "status": "confirmed",
+  "event_name": "Konser Dewa 19 Reuni",
+  "seat_category_name": "Festival",
+  "price": "350000.00"
+}
+```
+
+> ✅ Status berubah dari `locked` → `confirmed` — bukti bahwa RabbitMQ Saga berhasil dieksekusi.
+
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+---
+
+## 10. Notifikasi
+
+**Tujuan:** Melihat notifikasi user termasuk e-ticket yang dikirim setelah pembayaran.
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/notifications/user_001` |
+| **Auth** | `Bearer <token>` |
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "user_id": "user_001",
+    "type": "ETICKET",
+    "channel": "EMAIL",
+    "status": "SENT",
+    "payload": {
+      "event_name": "Konser Dewa 19 Reuni",
+      "seat_category": "Festival"
+    },
+    "sent_at": "2026-08-22T05:49:12.000Z"
+  }
+]
+```
+
+📸 **Screenshot Postman:**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+---
+
+## 11. Register User Baru
+
+**Tujuan:** Membuat akun user baru. Berbeda dengan Login — Register membutuhkan `name`.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/auth/register` |
+| **Auth** | Tidak diperlukan |
+| **Content-Type** | `application/json` |
+
+**Body (raw JSON) — field `name` WAJIB:**
+```json
+{
+  "userId": "mahasiswa_demo",
+  "name": "Mahasiswa Demo Unismuh",
+  "email": "demo@student.unismuh.ac.id"
+}
+```
+
+> ⚠️ **Perbedaan Register vs Login:**
+> - `/auth/register` → butuh `userId` + `name` → membuat akun baru
+> - `/auth/login` → butuh `userId` saja → masuk dengan akun yang sudah ada
+
+**Response berhasil (201 Created):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "userId": "mahasiswa_demo",
+  "name": "Mahasiswa Demo Unismuh",
+  "role": "user",
+  "message": "Selamat datang, Mahasiswa Demo Unismuh! Akun berhasil dibuat."
+}
+```
+
+**Response jika `name` kosong (400 Bad Request):**
+```json
+{
+  "error": "validation_error",
+  "message": "Nama wajib diisi dan minimal 2 karakter"
+}
+```
+
+**Response jika `userId` sudah dipakai (409 Conflict):**
+```json
+{
+  "error": "user_exists",
+  "message": "User ID 'mahasiswa_demo' sudah terdaftar."
+}
+```
+
+📸 **Screenshot Postman (201 berhasil):**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+📸 **Screenshot Postman (400 validasi error):**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+---
+
+## 12. Rate Limit (ADR-005)
+
+**Tujuan:** Membuktikan bahwa rate limiting berjalan (ADR-005 — sliding window counter di Redis).
+
+**Cara test:**
+1. Kirim request `GET /catalog` berkali-kali sangat cepat
+2. Atau gunakan **Collection Runner** dengan 110 iterasi
+3. Setelah 100 request dalam 60 detik → mendapat **429**
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/catalog` |
+| **Auth** | `Bearer <token>` |
+
+**Response normal (200 OK):**
+```json
+{ "data": [...] }
+```
+
+**Response setelah 100 request (429 Too Many Requests):**
+```json
+{
+  "error": "too_many_requests",
+  "message": "Rate limit terlampaui. Maksimal 100 request per 60 detik.",
+  "retryAfter": 60,
+  "correlationId": "postman-..."
+}
+```
+
+**Response Headers yang muncul:**
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 0
+X-RateLimit-Window: 60s
+```
+
+📸 **Screenshot Postman (200 normal):**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+📸 **Screenshot Postman (429 rate limit):**
+> *(Sisipkan screenshot hasil Postman di sini)*
+
+---
+
+## Ringkasan Alur Test
+
+```
+1. GET  /health                     → Pastikan backend hidup
+2. POST /auth/login                 → Dapat JWT token
+3. GET  /catalog                    → Lihat semua event
+4. GET  /events/1                   → Detail event
+5. GET  /events/1/seats             → Cek ketersediaan kursi
+6. POST /orders                     → LOCK KURSI (catat order_id)
+7. GET  /orders/{order_id}          → Lihat status: locked
+8. POST /payments                   → BAYAR
+9. GET  /orders/{order_id}          → Status berubah: confirmed ✅
+10. GET /notifications/{user_id}    → Cek e-ticket
+```
 
 ---
 
