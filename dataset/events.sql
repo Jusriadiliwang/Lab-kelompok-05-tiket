@@ -1,40 +1,62 @@
--- ============================================================
--- DATASET: event_db (event-service)
--- Kelompok 5 · Praktikum Microservices · WarTiket
--- Data & Persistence Engineer: Jusriadi Liwang
--- ============================================================
-
+-- DATASET: event_db | Kelompok 5 WarTiket | 30 Events
 INSERT INTO events (id, name, venue, event_date, status, description, banner_url, created_at) VALUES
-(1, 'Dewa 19 Reunion Tour 2026',      'Gelora Bung Karno, Jakarta',      '2026-10-15 19:00:00', 'on_sale', 'Reuni legendaris Dewa 19 setelah 10 tahun.',              NULL, NOW()),
-(2, 'Coldplay Music of the Spheres',  'Stadion Utama GBK, Jakarta',      '2026-11-03 20:00:00', 'on_sale', 'Coldplay hadir lagi ke Indonesia dengan show spektakuler.',NULL, NOW()),
-(3, 'EDC Jakarta 2026',               'Indonesia Arena, Jakarta',         '2026-09-20 22:00:00', 'on_sale', 'Festival EDM terbesar di Asia Tenggara.',                  NULL, NOW()),
-(4, 'Raisa Live in Concert',          'The Kasablanka Hall, Jakarta',     '2026-09-28 19:30:00', 'on_sale', 'Raisa hadir dengan set akustik intim.',                    NULL, NOW()),
-(5, 'Sound Drenaline 2026',           'Pantai Carnaval, Ancol Jakarta',   '2026-10-01 17:00:00', 'on_sale', 'Festival rock terbesar Indonesia.',                        NULL, NOW()),
-(6, 'BTS Yet to Come in Jakarta',     'Indonesia International Expo',     '2026-12-10 18:00:00', 'on_sale', 'ARMY siap? BTS hadir kembali ke Jakarta!',                 NULL, NOW())
+(1,  'Dewa 19 Reunion Tour 2026',       'Gelora Bung Karno, Jakarta',        '2026-10-15 19:00:00', 'on_sale',   'Reuni legendaris Dewa 19 setelah 10 tahun.',                          NULL, NOW()),
+(2,  'Coldplay Music of the Spheres',   'Stadion Utama GBK, Jakarta',        '2026-11-03 20:00:00', 'on_sale',   'Coldplay hadir lagi ke Indonesia dengan show spektakuler.',            NULL, NOW()),
+(3,  'EDC Jakarta 2026',                'Indonesia Arena, Jakarta',           '2026-09-20 22:00:00', 'on_sale',   'Festival EDM terbesar di Asia Tenggara.',                              NULL, NOW()),
+(4,  'Raisa Live in Concert',           'The Kasablanka Hall, Jakarta',       '2026-09-28 19:30:00', 'on_sale',   'Raisa hadir dengan set akustik intim.',                                NULL, NOW()),
+(5,  'Sound Drenaline 2026',            'Pantai Carnaval, Ancol Jakarta',     '2026-10-01 17:00:00', 'on_sale',   'Festival rock terbesar Indonesia.',                                    NULL, NOW()),
+(6,  'BTS Yet to Come in Jakarta',      'Indonesia International Expo',       '2026-12-10 18:00:00', 'on_sale',   'ARMY siap? BTS hadir kembali ke Jakarta!',                             NULL, NOW()),
+(7,  'Blackpink World Tour Jakarta',    'JIEXPO Kemayoran, Jakarta',          '2026-10-05 20:00:00', 'on_sale',   'K-pop spektakuler Blackpink Born Pink hadir di Jakarta.',              NULL, NOW()),
+(8,  'Noah World Tour 2026',            'Indonesia Arena, Jakarta',           '2026-09-27 19:30:00', 'on_sale',   'Noah hadir dengan setlist terbaik sepanjang karir.',                   NULL, NOW()),
+(9,  'Taylor Swift The Eras Tour',      'Gelora Bung Karno, Jakarta',        '2026-10-20 19:00:00', 'on_sale',   'Semua era Taylor Swift dalam satu panggung luar biasa.',               NULL, NOW()),
+(10, 'Metallica 72 Seasons Tour',       'Stadion Patriot, Bekasi',           '2026-12-05 18:00:00', 'on_sale',   'Metallica menggebrak Jakarta dengan tur 72 Seasons.',                  NULL, NOW()),
+(11, 'Tulus Live Concert',              'The Kasablanka Hall, Jakarta',       '2026-10-11 19:30:00', 'on_sale',   'Malam intim bersama Tulus — suara yang menghangatkan jiwa.',           NULL, NOW()),
+(12, 'We The Fest 2026',                'JIEXPO Kemayoran, Jakarta',          '2026-08-30 14:00:00', 'on_sale',   'Festival musik 3 hari, 50+ artis, satu pengalaman tak terlupakan.',   NULL, NOW()),
+(13, 'Sheila On 7 Reunion',             'Istora Senayan, Jakarta',            '2026-11-08 19:00:00', 'upcoming',  'Reuni Sheila On 7 — 25 tahun perjalanan musik.',                       NULL, NOW()),
+(14, 'Ed Sheeran Mathematics Tour',     'Stadion Utama GBK, Jakarta',        '2026-08-10 19:30:00', 'completed', 'Tur akhir karir Ed Sheeran.',                                          NULL, NOW()),
+(15, 'Java Jazz Festival 2026',         'Jakarta Convention Center',          '2026-07-04 14:00:00', 'cancelled', 'Festival jazz bergengsi — 3 hari, 5 panggung, 100+ penampil.',        NULL, NOW()),
+(16, 'Iwan Fals Konser Besar',          'Graha Sabha Pramana, Yogyakarta',   '2026-11-20 19:00:00', 'on_sale',   'Legenda musik Indonesia, Iwan Fals, hadir di Yogyakarta.',             NULL, NOW()),
+(17, 'Billie Eilish Hit Me Hard Tour',  'Indonesia Arena, Jakarta',           '2026-11-15 20:00:00', 'on_sale',   'Billie Eilish bawa tur Hit Me Hard And Soft ke Jakarta.',              NULL, NOW()),
+(18, 'Slank Konser 40 Tahun',           'Pantai Festival, Ancol Jakarta',     '2026-10-25 18:00:00', 'on_sale',   'Slank merayakan 40 tahun bermusik dengan konser akbar.',               NULL, NOW()),
+(19, 'Bruno Mars 24K Magic Tour',       'JIEXPO Kemayoran, Jakarta',          '2026-12-20 20:00:00', 'on_sale',   'Bruno Mars kembali ke Jakarta dengan show paling meriah.',             NULL, NOW()),
+(20, 'Ariana Grande Eternal Sunshine',  'Gelora Bung Karno, Jakarta',        '2027-01-10 19:30:00', 'on_sale',   'Ariana Grande perdana tampil di Indonesia.',                           NULL, NOW()),
+(21, 'Kahitna Anniversary Concert',     'Balai Sarbini, Jakarta',             '2026-10-18 19:00:00', 'on_sale',   'Kahitna merayakan ulang tahun dengan konser penuh kenangan.',          NULL, NOW()),
+(22, 'The Weeknd After Hours Tour',     'Indonesia Arena, Jakarta',           '2026-11-28 20:00:00', 'on_sale',   'The Weeknd bawa After Hours Tour pertama kalinya ke Indonesia.',       NULL, NOW()),
+(23, 'Gigi Band Reunion',               'Istora Senayan, Jakarta',            '2026-10-30 19:00:00', 'on_sale',   'Gigi Band kembali bersatu untuk konser reuni bersejarah.',             NULL, NOW()),
+(24, 'Harry Styles Love on Tour',       'Stadion Utama GBK, Jakarta',        '2026-12-01 19:30:00', 'on_sale',   'Harry Styles bawa Love on Tour ke Jakarta untuk pertama kali.',        NULL, NOW()),
+(25, 'Peterpan Reunion Show',           'Gelora Bung Karno, Jakarta',        '2026-11-12 19:00:00', 'on_sale',   'Peterpan kembali hadir dalam formasi lengkap.',                        NULL, NOW()),
+(26, 'Post Malone Twelve Carat Tour',   'Indonesia Arena, Jakarta',           '2026-12-15 20:00:00', 'on_sale',   'Post Malone bawa tur Twelve Carat Toothache ke Jakarta.',              NULL, NOW()),
+(27, 'Kotak Konser Malam Ini',          'Tennis Indoor Senayan, Jakarta',     '2026-10-08 19:30:00', 'on_sale',   'Kotak hadir dengan lagu-lagu terbaik rock Indonesia.',                 NULL, NOW()),
+(28, 'Imagine Dragons Loom Tour',       'Stadion Patriot, Bekasi',           '2026-12-28 19:00:00', 'upcoming',  'Imagine Dragons bawa Loom Tour perdana ke Indonesia.',                 NULL, NOW()),
+(29, 'Rizky Febian Intimate Concert',   'Graha Bhakti Budaya, Jakarta',      '2026-10-22 19:30:00', 'on_sale',   'Konser intim Rizky Febian menyapa penggemarnya.',                      NULL, NOW()),
+(30, 'Fifty Fifty World Tour Jakarta',  'JIEXPO Kemayoran, Jakarta',          '2026-11-25 19:00:00', 'on_sale',   'Fifty Fifty K-pop girl group hadir pertama kali di Jakarta.',          NULL, NOW())
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO seat_categories (id, event_id, name, price, total_seats, available_seats) VALUES
--- Dewa 19
-(1,  1, 'VVIP',      2500000,  200,   50),
-(2,  1, 'VIP',       1500000,  500,  150),
-(3,  1, 'Festival',   750000, 3000,  800),
--- Coldplay
-(4,  2, 'Cat 1',     4000000,  300,    0),
-(5,  2, 'Cat 2',     2500000,  600,   30),
-(6,  2, 'Cat 3',     1200000, 2000,  400),
--- EDC Jakarta
-(7,  3, 'VIP Loft',  3000000,  200,   80),
-(8,  3, 'General',    900000, 5000, 2500),
--- Raisa
-(9,  4, 'Premium',   1500000,  400,  120),
-(10, 4, 'Regular',    650000, 1200,  600),
--- Sound Drenaline
-(11, 5, 'Diamond',   2000000,  300,  100),
-(12, 5, 'Gold',      1000000, 1000,  450),
-(13, 5, 'Festival',   400000, 8000, 3000),
--- BTS
-(14, 6, 'R1',        5000000,  100,    5),
-(15, 6, 'R2',        3000000,  300,   50),
-(16, 6, 'R3',        1500000, 1000,  200),
-(17, 6, 'Fan Zone',   800000, 3000,  800)
+(1,1,'VVIP',2500000,200,45),(2,1,'VIP',1500000,500,140),(3,1,'Festival',750000,3000,780),
+(4,2,'Cat 1',4000000,300,0),(5,2,'Cat 2',2500000,600,25),(6,2,'Cat 3',1200000,2000,380),
+(7,3,'VIP Loft',3000000,200,70),(8,3,'General',900000,5000,2400),
+(9,4,'Premium',1500000,400,110),(10,4,'Regular',650000,1200,580),
+(11,5,'Diamond',2000000,300,90),(12,5,'Gold',1000000,1000,420),(13,5,'Festival',400000,8000,2900),
+(14,6,'R1',5000000,100,3),(15,6,'R2',3000000,300,45),(16,6,'R3',1500000,1000,190),(17,6,'Fan Zone',800000,3000,780),
+(18,7,'VVIP',3000000,150,20),(19,7,'VIP',900000,800,350),(20,7,'Festival',450000,8000,3200),
+(21,8,'VVIP',1500000,150,60),(22,8,'VIP',800000,400,180),(23,8,'Festival',350000,3000,1200),
+(24,9,'Cat 1',5000000,200,10),(25,9,'Cat 2',3000000,500,80),(26,9,'Cat 3',1500000,2000,450),(27,9,'Festival',750000,5000,1800),
+(28,10,'Pit',2000000,500,200),(29,10,'Tribun A',1000000,1000,400),(30,10,'Tribun B',500000,3000,1200),
+(31,11,'VIP Table',1200000,100,40),(32,11,'Regular',450000,800,320),
+(33,12,'3-Day Pass',2500000,500,180),(34,12,'Day Pass',900000,2000,750),(35,12,'Festival',450000,8000,3000),
+(36,16,'Platinum',2000000,200,80),(37,16,'Gold',1000000,600,250),(38,16,'Silver',500000,2000,800),
+(39,17,'VIP',3500000,300,120),(40,17,'Regular',1200000,2000,850),
+(41,18,'Diamond',1500000,400,160),(42,18,'Gold',750000,1500,600),(43,18,'Festival',350000,5000,2000),
+(44,19,'VVIP',4000000,200,50),(45,19,'VIP',2000000,800,300),(46,19,'Festival',800000,5000,2000),
+(47,20,'Cat 1',5500000,150,30),(48,20,'Cat 2',3000000,500,120),(49,20,'Festival',1000000,3000,900),
+(50,21,'Silver',600000,300,120),(51,21,'Bronze',350000,1000,450),
+(52,22,'VIP',4000000,300,100),(53,22,'Regular',1500000,2000,700),
+(54,23,'Gold',1200000,400,150),(55,23,'Silver',600000,1500,600),
+(56,24,'Cat 1',4500000,200,60),(57,24,'Cat 2',2500000,600,200),(58,24,'Festival',900000,3000,1000),
+(59,25,'VVIP',2000000,200,80),(60,25,'VIP',1000000,800,320),(61,25,'Festival',500000,5000,2000),
+(62,26,'VIP',3000000,300,100),(63,26,'General',1000000,2000,800),
+(64,27,'Gold',800000,300,120),(65,27,'Silver',400000,1000,400),
+(66,29,'VIP',900000,150,60),(67,29,'Regular',400000,600,250),
+(68,30,'VVIP',3500000,100,30),(69,30,'VIP',1500000,500,180),(70,30,'Festival',600000,3000,1200)
 ON CONFLICT (id) DO NOTHING;
