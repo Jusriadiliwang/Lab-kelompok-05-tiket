@@ -1,0 +1,279 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "War Tiket Konser — Kelompok 5",
+  "collectionId": "wartiket-kelompok5-2026",
+  "dateExported": "2026-08-22",
+  "version": "1.2",
+  "folders": [
+    { "id": "f-auth",    "name": "🔐 Auth",              "containerId": "" },
+    { "id": "f-events",  "name": "🎵 Events & Catalog",  "containerId": "" },
+    { "id": "f-tickets", "name": "🎫 Ticket — Lock Kursi","containerId": "" },
+    { "id": "f-payment", "name": "💳 Payment",            "containerId": "" },
+    { "id": "f-notif",   "name": "🔔 Notification",       "containerId": "" },
+    { "id": "f-erp",     "name": "📊 ERP Analytics",      "containerId": "" }
+  ],
+  "requests": [
+    {
+      "id": "req-01",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-auth",
+      "name": "Register User Baru",
+      "url": "http://localhost:3000/auth/register",
+      "method": "POST",
+      "sortNum": 1,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"userId\": \"demo_mahasiswa\",\n  \"name\": \"Demo Mahasiswa Unismuh\",\n  \"email\": \"demo@student.unismuh.ac.id\"\n}"
+      },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "201" },
+        { "type": "res-body", "custom": "token", "action": "contains", "value": "" }
+      ]
+    },
+    {
+      "id": "req-02",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-auth",
+      "name": "Login",
+      "url": "http://localhost:3000/auth/login",
+      "method": "POST",
+      "sortNum": 2,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"userId\": \"user_001\"\n}"
+      },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" },
+        { "type": "res-body", "custom": "token", "action": "contains", "value": "" }
+      ]
+    },
+    {
+      "id": "req-03",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-auth",
+      "name": "Health Check Gateway",
+      "url": "http://localhost:3000/health",
+      "method": "GET",
+      "sortNum": 3,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" },
+        { "type": "res-body", "custom": "status", "action": "contains", "value": "ok" }
+      ]
+    },
+    {
+      "id": "req-04",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-events",
+      "name": "GET Catalog (Redis cache 5s)",
+      "url": "http://localhost:3000/catalog",
+      "method": "GET",
+      "sortNum": 4,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" }
+      ]
+    },
+    {
+      "id": "req-05",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-events",
+      "name": "GET Event Detail (ID: 1)",
+      "url": "http://localhost:3000/events/1",
+      "method": "GET",
+      "sortNum": 5,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" },
+        { "type": "res-body", "custom": "name", "action": "contains", "value": "" }
+      ]
+    },
+    {
+      "id": "req-06",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-events",
+      "name": "GET Ketersediaan Kursi",
+      "url": "http://localhost:3000/events/1/seats",
+      "method": "GET",
+      "sortNum": 6,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" },
+        { "type": "res-body", "custom": "categories", "action": "contains", "value": "" }
+      ]
+    },
+    {
+      "id": "req-07",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-tickets",
+      "name": "POST Lock Kursi — WAR TIKET! (Redis NX EX)",
+      "url": "http://localhost:3000/orders",
+      "method": "POST",
+      "sortNum": 7,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{token}}" },
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "X-Correlation-ID", "value": "thunder-test-001" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"event_id\": 2,\n  \"seat_category_id\": 6,\n  \"user_id\": \"user_test\"\n}"
+      },
+      "tests": [
+        { "type": "res-body", "custom": "status", "action": "contains", "value": "locked" }
+      ]
+    },
+    {
+      "id": "req-08",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-tickets",
+      "name": "GET Status Order",
+      "url": "http://localhost:3000/orders/1",
+      "method": "GET",
+      "sortNum": 8,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" }
+      ]
+    },
+    {
+      "id": "req-09",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-tickets",
+      "name": "GET Semua Order User",
+      "url": "http://localhost:3000/orders?user_id=user_001",
+      "method": "GET",
+      "sortNum": 9,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" }
+      ]
+    },
+    {
+      "id": "req-10",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-payment",
+      "name": "POST Bayar Tiket (Trigger Saga RabbitMQ)",
+      "url": "http://localhost:3000/payments",
+      "method": "POST",
+      "sortNum": 10,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{token}}" },
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"order_id\": 1,\n  \"user_id\": \"user_test\",\n  \"method\": \"gopay\"\n}"
+      },
+      "tests": [
+        { "type": "res-body", "custom": "status", "action": "contains", "value": "success" }
+      ]
+    },
+    {
+      "id": "req-11",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-payment",
+      "name": "GET Status Pembayaran",
+      "url": "http://localhost:3000/payments/1",
+      "method": "GET",
+      "sortNum": 11,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" }
+      ]
+    },
+    {
+      "id": "req-12",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-payment",
+      "name": "GET Semua Pembayaran User",
+      "url": "http://localhost:3000/payments?user_id=user_001",
+      "method": "GET",
+      "sortNum": 12,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" }
+      ]
+    },
+    {
+      "id": "req-13",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-notif",
+      "name": "GET Notifikasi User",
+      "url": "http://localhost:3000/notifications/user_001",
+      "method": "GET",
+      "sortNum": 13,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" }
+      ]
+    },
+    {
+      "id": "req-14",
+      "colId": "wartiket-kelompok5-2026",
+      "containerId": "f-erp",
+      "name": "GET Analytics Event (ERP M4 — Live Stats)",
+      "url": "http://localhost:3000/erp/analytics/events/1",
+      "method": "GET",
+      "sortNum": 14,
+      "created": "2026-08-22",
+      "modified": "2026-08-22",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "body": { "type": "none", "raw": "" },
+      "tests": [
+        { "type": "res-code", "custom": "", "action": "equal", "value": "200" }
+      ]
+    }
+  ],
+  "settings": [],
+  "envs": [
+    {
+      "id": "env-wartiket",
+      "name": "War Tiket Local",
+      "data": [
+        { "name": "base_url",   "value": "http://localhost:3000", "isSecret": false },
+        { "name": "token",      "value": "",                      "isSecret": true  },
+        { "name": "user_id",    "value": "user_001",              "isSecret": false },
+        { "name": "order_id",   "value": "1",                     "isSecret": false },
+        { "name": "payment_id", "value": "1",                     "isSecret": false }
+      ]
+    }
+  ]
+}

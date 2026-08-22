@@ -1,0 +1,431 @@
+{
+  "info": {
+    "_postman_id": "wartiket-kelompok5-2026",
+    "name": "War Tiket Konser — Kelompok 5",
+    "description": "Collection API lengkap untuk sistem War Tiket Konser.\nUniversitas Muhammadiyah Makassar — Kelompok 5\n\nBase URL: http://localhost:3000\n\nAlur penggunaan:\n1. Jalankan 'Login' untuk mendapat token JWT\n2. Token otomatis tersimpan ke variable {{token}}\n3. Jalankan endpoint lain — token sudah ter-inject di Authorization header",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "token",    "value": "", "type": "string" },
+    { "key": "user_id",  "value": "user_test", "type": "string" },
+    { "key": "order_id", "value": "", "type": "string" },
+    { "key": "payment_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register User Baru",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('token', body.token);",
+                  "  pm.collectionVariables.set('user_id', body.userId);",
+                  "  pm.test('Register berhasil', () => pm.expect(body.token).to.be.a('string'));",
+                  "  pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"demo_user_2026\",\n  \"name\": \"Demo User Kelompok 5\",\n  \"email\": \"demo@unismuh.ac.id\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "description": "Daftar user baru. Token JWT akan otomatis tersimpan ke variable {{token}}."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('token', body.token);",
+                  "  pm.collectionVariables.set('user_id', body.userId);",
+                  "  pm.test('Login berhasil - token tersimpan', () => pm.expect(body.token).to.be.a('string'));",
+                  "  pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "  console.log('Token:', body.token.substring(0, 40) + '...');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user_001\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Login dengan User ID. Token JWT otomatis tersimpan ke {{token}}.\n\nUser yang tersedia di seed data:\n- user_001 sampai user_010\n- user_test"
+          }
+        },
+        {
+          "name": "Health Check Gateway",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] },
+            "description": "Cek status API Gateway + semua upstream service."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎵 Events & Catalog",
+      "item": [
+        {
+          "name": "GET Catalog (semua event)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response punya data', () => {",
+                  "  const body = pm.response.json();",
+                  "  const list = body.data || body;",
+                  "  pm.expect(Array.isArray(list)).to.be.true;",
+                  "  pm.expect(list.length).to.be.greaterThan(0);",
+                  "});",
+                  "pm.test('Latency < 200ms (Redis cache)', () => pm.expect(pm.response.responseTime).to.be.below(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/catalog", "host": ["{{base_url}}"], "path": ["catalog"] },
+            "description": "Ambil semua event. Di-cache Redis 5 detik (ADR-001).\nRequest kedua dalam 5 detik akan jauh lebih cepat (cache hit ~2ms)."
+          }
+        },
+        {
+          "name": "GET Event Detail",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/events/1", "host": ["{{base_url}}"], "path": ["events", "1"] },
+            "description": "Detail satu event berdasarkan ID.\nCoba ID: 1 (Konser Dewa 19), 2 (Blackpink), 3 (Slipknot)"
+          }
+        },
+        {
+          "name": "GET Ketersediaan Kursi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ada kategori kursi', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.categories).to.be.an('array');",
+                  "  pm.expect(body.categories.length).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/events/1/seats", "host": ["{{base_url}}"], "path": ["events", "1", "seats"] },
+            "description": "Lihat ketersediaan kursi per kategori untuk event ID 1.\nResponse berisi: categories[].available_seats"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎫 Ticket — Lock Kursi",
+      "item": [
+        {
+          "name": "POST Lock Kursi (WAR TIKET!)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('order_id', body.id.toString());",
+                  "  pm.test('Lock berhasil — kursi dikunci!', () => pm.expect(body.status).to.equal('locked'));",
+                  "  pm.test('Ada lock_expires_at', () => pm.expect(body.lock_expires_at).to.be.a('string'));",
+                  "  pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "  console.log('Order ID:', body.id, '| Expires:', body.lock_expires_at);",
+                  "} else if (pm.response.code === 409) {",
+                  "  pm.test('409 — Anti-oversell aktif (kursi sudah dikunci)', () => pm.expect(pm.response.code).to.equal(409));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Correlation-ID", "value": "postman-test-001" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_id\": 1,\n  \"seat_category_id\": 3,\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders", "host": ["{{base_url}}"], "path": ["orders"] },
+            "description": "Kunci kursi — INTI WAR TIKET!\n\nMenggunakan Redis SET NX EX (atomic lock, ADR-001):\n- Hanya 1 user yang bisa lock kursi yang sama\n- 409 = kursi sudah dikunci (NORMAL, bukan error)\n- TTL 15 menit — kadaluarsa otomatis jika tidak dibayar\n\nOrder ID otomatis tersimpan ke {{order_id}}."
+          }
+        },
+        {
+          "name": "GET Status Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ada status order', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(['locked','confirmed','expired','cancelled']).to.include(body.status);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/orders/{{order_id}}", "host": ["{{base_url}}"], "path": ["orders", "{{order_id}}"] },
+            "description": "Cek status order berdasarkan ID.\nStatus: locked → confirmed → expired/cancelled"
+          }
+        },
+        {
+          "name": "GET Semua Order User",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/orders?user_id={{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["orders"],
+              "query": [{ "key": "user_id", "value": "{{user_id}}" }]
+            },
+            "description": "Semua order milik user yang sedang login."
+          }
+        },
+        {
+          "name": "DELETE Lepas Lock (Batalkan)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Order berhasil dibatalkan', () => pm.expect([200, 204]).to.include(pm.response.code));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/orders/{{order_id}}", "host": ["{{base_url}}"], "path": ["orders", "{{order_id}}"] },
+            "description": "Batalkan order dan lepas Redis lock secara manual.\nKursi akan kembali tersedia untuk user lain."
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Payment — Pembayaran",
+      "item": [
+        {
+          "name": "POST Bayar Tiket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('payment_id', body.id.toString());",
+                  "  pm.test('Pembayaran berhasil!', () => pm.expect(body.status).to.equal('success'));",
+                  "  pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "  console.log('Payment ID:', body.id, '| Amount:', body.amount);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": {{order_id}},\n  \"user_id\": \"{{user_id}}\",\n  \"method\": \"gopay\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/payments", "host": ["{{base_url}}"], "path": ["payments"] },
+            "description": "Proses pembayaran tiket.\n\nSetelah sukses, sistem akan:\n1. Publish payment.confirmed ke RabbitMQ\n2. ticket-service UPDATE order status=confirmed\n3. notification-service generate e-ticket\n\nMetode: bank_transfer | credit_card | gopay | ovo | dana\n\nPayment ID otomatis tersimpan ke {{payment_id}}."
+          }
+        },
+        {
+          "name": "GET Status Pembayaran",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/payments/{{payment_id}}", "host": ["{{base_url}}"], "path": ["payments", "{{payment_id}}"] },
+            "description": "Cek status pembayaran berdasarkan ID."
+          }
+        },
+        {
+          "name": "GET Semua Pembayaran User",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/payments?user_id={{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["payments"],
+              "query": [{ "key": "user_id", "value": "{{user_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "POST Cancel Pembayaran (Refund)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/payments/{{payment_id}}/cancel", "host": ["{{base_url}}"], "path": ["payments", "{{payment_id}}", "cancel"] },
+            "description": "Batalkan pembayaran dan request refund."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔔 Notification",
+      "item": [
+        {
+          "name": "GET Notifikasi User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/notifications/{{user_id}}", "host": ["{{base_url}}"], "path": ["notifications", "{{user_id}}"] },
+            "description": "Ambil semua notifikasi user.\nTipe: ETICKET | REMINDER | FAILED_PAYMENT | PAYMENT_REFUNDED"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 ERP Analytics",
+      "item": [
+        {
+          "name": "GET Analytics Event (Live Stats)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test('Ada data analytics', () => pm.expect(body).to.have.property('ticketsSold'));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/erp/analytics/events/1", "host": ["{{base_url}}"], "path": ["erp", "analytics", "events", "1"] },
+            "description": "Live analytics dari ERP service (M4).\nMenampilkan: ticketsSold, ticketsAvailable, conversionRate, grossRevenue."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔥 Rate Limit Test",
+      "item": [
+        {
+          "name": "Test Rate Limit (kirim 5x cepat)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Rate limit response', () => {",
+                  "  pm.expect([200, 429]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code === 429) {",
+                  "  pm.test('429 — Rate limit aktif (ADR-005)', () => pm.expect(pm.response.code).to.equal(429));",
+                  "  const body = pm.response.json();",
+                  "  console.log('Rate limit message:', body.message);",
+                  "  console.log('Retry after:', body.retryAfter, 'detik');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/catalog", "host": ["{{base_url}}"], "path": ["catalog"] },
+            "description": "Klik 'Send' berkali-kali cepat untuk memicu rate limit (ADR-005).\nSetelah 100 request dalam 60 detik, akan mendapat HTTP 429.\n\nResponse 429:\n{\n  \"error\": \"too_many_requests\",\n  \"message\": \"Rate limit terlampaui\",\n  \"retryAfter\": 60\n}"
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-inject X-Correlation-ID ke setiap request (ADR-004)",
+          "const corrId = 'postman-' + Date.now();",
+          "pm.request.headers.add({ key: 'X-Correlation-ID', value: corrId });",
+          "pm.request.headers.add({ key: 'X-Client', value: 'postman-kelompok5' });"
+        ]
+      }
+    }
+  ]
+}
