@@ -1,25 +1,14 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "WarTiket",
+    "slug": "wartiket",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0a0a0f",
+    "splash": { "resizeMode": "contain", "backgroundColor": "#0a0a0f" },
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.kelompok5.wartiket" },
+    "android": { "package": "com.kelompok5.wartiket", "versionCode": 1, "adaptiveIcon": { "backgroundColor": "#0a0a0f" } },
+    "extra": { "apiUrl": "http://localhost:3000" }
   }
 }
