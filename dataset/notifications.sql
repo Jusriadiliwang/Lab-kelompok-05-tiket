@@ -1,16 +1,33 @@
--- ============================================================
--- DATASET: notification_db (notification-service)
--- ============================================================
-
+-- DATASET: notification_db | 30 Notifications
 INSERT INTO notifications (id, user_id, order_id, type, title, message, is_read, created_at) VALUES
-('NTF-001', 'USR-001', 'ORD-001', 'booking_confirm', 'Pemesanan Berhasil!',  'Tiket Dewa 19 VIP × 2 berhasil dipesan. Total: Rp 3.000.000',           true,  '2026-08-01 09:20:00'),
-('NTF-002', 'USR-001', 'ORD-001', 'payment_success', 'Pembayaran Diterima', 'Pembayaran Rp 3.000.000 via GoPay berhasil. Cek tiket kamu.',            true,  '2026-08-01 09:21:00'),
-('NTF-003', 'USR-002', 'ORD-002', 'booking_confirm', 'Pemesanan Berhasil!', 'Tiket Coldplay Cat 3 × 3 berhasil dipesan. Total: Rp 3.600.000',         true,  '2026-08-02 14:35:00'),
-('NTF-004', 'USR-002', 'ORD-002', 'payment_success', 'Pembayaran Diterima', 'Pembayaran Rp 3.600.000 via OVO berhasil.',                              true,  '2026-08-02 14:36:00'),
-('NTF-005', 'USR-003', 'ORD-003', 'booking_confirm', 'Pemesanan Berhasil!', 'Tiket EDC Jakarta General × 4 berhasil dipesan.',                        true,  '2026-08-03 11:05:00'),
-('NTF-006', 'USR-004', 'ORD-004', 'booking_confirm', 'Pemesanan Berhasil!', 'Tiket Raisa Premium × 1 berhasil dipesan.',                              true,  '2026-08-04 16:50:00'),
-('NTF-007', 'USR-005', 'ORD-005', 'booking_confirm', 'Pemesanan Berhasil!', 'Tiket Sound Drenaline Festival × 5 berhasil dipesan.',                   true,  '2026-08-05 10:25:00'),
-('NTF-008', 'USR-007', 'ORD-008', 'booking_confirm', 'Pesanan Menunggu',    'Tiket Coldplay Cat 2 × 2 menunggu pembayaran. Selesaikan dalam 15 mnt.', false, '2026-08-20 12:01:00'),
-('NTF-009', 'USR-008', 'ORD-009', 'payment_failed',  'Pembayaran Gagal',    'Pembayaran untuk EDC Jakarta VIP Loft gagal diproses.',                  false, '2026-08-08 17:05:00'),
-('NTF-010', 'USR-009', 'ORD-010', 'payment_success', 'Pembayaran Diterima', 'Pembayaran Rp 3.000.000 via Bank Transfer berhasil.',                    true,  '2026-08-09 13:16:00')
+('NTF-001','USR-001','ORD-001','booking_confirm','Pemesanan Berhasil!','Tiket Dewa 19 VIP x2 berhasil dipesan. Total: Rp 3.000.000',true,'2026-08-01 09:06:00'),
+('NTF-002','USR-001','ORD-001','payment_success','Pembayaran Diterima','Pembayaran Rp 3.000.000 via GoPay berhasil dikonfirmasi.',true,'2026-08-01 09:07:00'),
+('NTF-003','USR-002','ORD-002','booking_confirm','Pemesanan Berhasil!','Tiket Coldplay Cat 3 x3 berhasil dipesan. Total: Rp 3.600.000',true,'2026-08-02 10:06:00'),
+('NTF-004','USR-002','ORD-002','payment_success','Pembayaran Diterima','Pembayaran Rp 3.600.000 via Credit Card berhasil.',true,'2026-08-02 10:07:00'),
+('NTF-005','USR-003','ORD-003','booking_confirm','Pemesanan Berhasil!','Tiket EDC Jakarta General x4 berhasil dipesan.',true,'2026-08-03 11:06:00'),
+('NTF-006','USR-003','ORD-003','payment_success','Pembayaran Diterima','Pembayaran Rp 3.600.000 via DANA berhasil.',true,'2026-08-03 11:07:00'),
+('NTF-007','USR-004','ORD-004','booking_confirm','Pemesanan Berhasil!','Tiket Raisa Premium x1 berhasil dipesan.',true,'2026-08-04 12:06:00'),
+('NTF-008','USR-005','ORD-005','booking_confirm','Pemesanan Berhasil!','Tiket Sound Drenaline Festival x5 berhasil dipesan.',true,'2026-08-05 13:06:00'),
+('NTF-009','USR-006','ORD-007','booking_confirm','Pemesanan Berhasil!','Tiket Dewa 19 VVIP x1 berhasil dipesan. Total: Rp 2.500.000',true,'2026-08-07 15:06:00'),
+('NTF-010','USR-007','ORD-008','booking_confirm','Pesanan Menunggu Bayar','Tiket Coldplay Cat 2 x2 menunggu pembayaran dalam 15 menit.',false,'2026-08-20 12:02:00'),
+('NTF-011','USR-008','ORD-009','payment_failed','Pembayaran Gagal','Pembayaran untuk EDC Jakarta VIP Loft gagal diproses.',false,'2026-08-08 16:05:00'),
+('NTF-012','USR-008','ORD-009','order_cancelled','Pesanan Dibatalkan','Pesanan EDC Jakarta #ORD-009 telah dibatalkan.',false,'2026-08-08 16:10:00'),
+('NTF-013','USR-009','ORD-010','booking_confirm','Pemesanan Berhasil!','Tiket Sound Drenaline Gold x3 berhasil dipesan.',true,'2026-08-09 17:06:00'),
+('NTF-014','USR-010','ORD-011','booking_confirm','Pemesanan Berhasil!','Tiket Blackpink VVIP x2 berhasil dipesan. Total: Rp 6.000.000',true,'2026-08-10 09:06:00'),
+('NTF-015','USR-010','ORD-011','payment_success','Pembayaran Diterima','Pembayaran Rp 6.000.000 via OVO berhasil dikonfirmasi.',true,'2026-08-10 09:07:00'),
+('NTF-016','USR-011','ORD-012','booking_confirm','Pemesanan Berhasil!','Tiket Noah VIP x1 berhasil dipesan.',true,'2026-08-10 10:06:00'),
+('NTF-017','USR-012','ORD-013','booking_confirm','Pemesanan Berhasil!','Tiket Taylor Swift Cat 1 x1 berhasil dipesan. Total: Rp 5.000.000',true,'2026-08-11 09:06:00'),
+('NTF-018','USR-013','ORD-014','booking_confirm','Pemesanan Berhasil!','Tiket Metallica Pit x2 berhasil dipesan.',true,'2026-08-11 10:06:00'),
+('NTF-019','USR-014','ORD-015','booking_confirm','Pemesanan Berhasil!','Tiket Tulus VIP Table x1 berhasil dipesan.',true,'2026-08-11 11:06:00'),
+('NTF-020','USR-015','ORD-016','booking_confirm','Pemesanan Berhasil!','Tiket We The Fest 3-Day Pass x2 berhasil dipesan.',true,'2026-08-12 09:06:00'),
+('NTF-021','USR-016','ORD-017','booking_confirm','Pemesanan Berhasil!','Tiket Billie Eilish Regular x2 berhasil dipesan.',true,'2026-08-12 10:06:00'),
+('NTF-022','USR-017','ORD-018','booking_confirm','Pemesanan Berhasil!','Tiket Slank Diamond x3 berhasil dipesan. Total: Rp 4.500.000',true,'2026-08-12 11:06:00'),
+('NTF-023','USR-018','ORD-019','booking_confirm','Pemesanan Berhasil!','Tiket Bruno Mars VVIP x1 berhasil dipesan.',true,'2026-08-13 09:06:00'),
+('NTF-024','USR-019','ORD-020','booking_confirm','Pemesanan Berhasil!','Tiket Ariana Grande Cat 1 x2 berhasil dipesan. Total: Rp 11.000.000',true,'2026-08-13 10:06:00'),
+('NTF-025','USR-020','ORD-021','booking_confirm','Pemesanan Berhasil!','Tiket Kahitna Silver x2 berhasil dipesan.',true,'2026-08-13 11:06:00'),
+('NTF-026','USR-021','ORD-022','booking_confirm','Pemesanan Berhasil!','Tiket The Weeknd VIP x1 berhasil dipesan.',true,'2026-08-14 09:06:00'),
+('NTF-027','USR-022','ORD-023','booking_confirm','Pemesanan Berhasil!','Tiket Gigi Band Gold x2 berhasil dipesan.',true,'2026-08-14 10:06:00'),
+('NTF-028','USR-023','ORD-024','booking_confirm','Pemesanan Berhasil!','Tiket Harry Styles Cat 1 x1 berhasil dipesan.',true,'2026-08-14 11:06:00'),
+('NTF-029','USR-024','ORD-025','booking_confirm','Pemesanan Berhasil!','Tiket Peterpan VVIP x2 berhasil dipesan.',true,'2026-08-15 09:06:00'),
+('NTF-030','USR-029','ORD-030','order_expiring','Pesanan Kedaluwarsa','Pesanan BTS Fan Zone #ORD-030 kedaluwarsa karena tidak dibayar.',false,'2026-08-16 11:20:00')
 ON CONFLICT (id) DO NOTHING;
