@@ -6,6 +6,224 @@
 ---
 
 ## Daftar Isi
+1. [Login](#1-login)
+2. [Lock Kursi — WAR TIKET!](#2-lock-kursi--war-tiket)
+3. [Bayar Tiket](#3-bayar-tiket)
+4. [Konfirmasi Order](#4-konfirmasi-order)
+5. [Anti-Oversell 409](#5-anti-oversell-409)
+
+---
+
+> **Cara pakai:**
+> 1. Jalankan `docker compose up -d` di folder project
+> 2. Buka Postman → jalankan request sesuai urutan
+> 3. Semua request (kecuali Login) butuh header: `Authorization: Bearer <token>`
+
+---
+
+## 1. Login
+
+Mendapatkan token JWT untuk mengakses semua endpoint.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/auth/login` |
+| **Auth** | Tidak diperlukan |
+
+**Body (raw JSON):**
+```json
+{
+  "userId": "user_001"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "userId": "user_001",
+  "name": "user_001",
+  "role": "user",
+  "message": "Selamat datang kembali, user_001!"
+}
+```
+
+📸 **Screenshot:**
+
+---
+
+## 2. Lock Kursi — WAR TIKET!
+
+Mengunci kursi menggunakan Redis `SET NX EX` — inti anti-oversell sistem (ADR-001).
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/orders` |
+| **Auth** | `Bearer <token>` |
+
+**Headers:**
+| Key | Value |
+|---|---|
+| Authorization | `Bearer <token dari step 1>` |
+| Content-Type | `application/json` |
+
+**Body (raw JSON):**
+```json
+{
+  "event_id": 1,
+  "seat_category_id": 3,
+  "user_id": "user_test"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 110,
+  "event_name": "Konser Dewa 19 Reuni",
+  "seat_category_name": "Festival",
+  "price": "350000.00",
+  "status": "locked",
+  "lock_expires_at": "2026-08-22T06:03:52.279Z",
+  "message": "Kursi dikunci selama 15 menit. Segera bayar sebelum kedaluwarsa."
+}
+```
+
+> 📌 Catat nilai `id` (contoh: `110`) — dipakai di step 3 & 4.
+
+📸 **Screenshot:**
+
+---
+
+## 3. Bayar Tiket
+
+Memproses pembayaran. Setelah sukses, sistem akan otomatis:
+- Publish `payment.confirmed` ke **RabbitMQ** (Saga — ADR-004)
+- `ticket-service` update order → `confirmed`
+- `notification-service` kirim e-ticket
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/payments` |
+| **Auth** | `Bearer <token>` |
+
+**Body (raw JSON):**
+```json
+{
+  "order_id": 110,
+  "user_id": "user_test",
+  "method": "gopay"
+}
+```
+
+> Ganti `110` dengan `id` dari Step 2.  
+> Metode: `bank_transfer` · `credit_card` · `gopay` · `ovo` · `dana`
+
+**Response (201 Created):**
+```json
+{
+  "id": 51,
+  "order_id": 110,
+  "amount": "350000.00",
+  "method": "gopay",
+  "status": "success",
+  "paid_at": "2026-08-22T05:49:09.019Z",
+  "message": "Pembayaran berhasil! E-tiket akan segera dikirim."
+}
+```
+
+📸 **Screenshot:**
+
+---
+
+## 4. Konfirmasi Order
+
+Memverifikasi status order berubah dari `locked` → `confirmed` setelah pembayaran (bukti RabbitMQ Saga berjalan).
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **URL** | `http://localhost:3000/orders/110` |
+| **Auth** | `Bearer <token>` |
+
+> Ganti `110` dengan `id` dari Step 2.
+
+**Response (200 OK):**
+```json
+{
+  "id": 110,
+  "status": "confirmed",
+  "event_name": "Konser Dewa 19 Reuni",
+  "seat_category_name": "Festival",
+  "price": "350000.00"
+}
+```
+
+📸 **Screenshot:**
+
+---
+
+## 5. Anti-Oversell 409
+
+Membuktikan sistem mencegah double-booking — Redis `SET NX EX` hanya mengizinkan 1 user mengunci kursi yang sama.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **URL** | `http://localhost:3000/orders` |
+| **Auth** | `Bearer <token>` |
+
+**Body (raw JSON) — user berbeda, event & kategori SAMA:**
+```json
+{
+  "event_id": 1,
+  "seat_category_id": 3,
+  "user_id": "user_lain"
+}
+```
+
+**Response (409 Conflict):**
+```json
+{
+  "error": "duplicate_order",
+  "message": "Kamu sudah memiliki pesanan aktif untuk konser ini"
+}
+```
+
+> ℹ️ **409 bukan error** — ini adalah fitur anti-oversell yang bekerja dengan benar.
+
+📸 **Screenshot:**
+
+---
+
+## Ringkasan Alur
+
+```
+POST /auth/login     → Dapat token JWT
+        ↓
+POST /orders         → Lock kursi (Redis NX EX) → dapat order_id
+        ↓
+POST /payments       → Bayar → trigger RabbitMQ Saga
+        ↓
+GET  /orders/{id}    → Status berubah: locked → confirmed ✅
+        ↓
+POST /orders (lagi)  → User lain coba beli kursi sama → 409 ❌
+```
+
+---
+
+*Kelompok 5 | Praktikum Microservices | Universitas Muhammadiyah Makassar*
+
+**Kelompok 5 | Universitas Muhammadiyah Makassar**  
+**Base URL:** `http://localhost:3000`  
+**Tool:** Postman
+
+---
+
+## Daftar Isi
 1. [Health Check](#1-health-check)
 2. [Login](#2-login)
 3. [Catalog Event](#3-catalog-event)
