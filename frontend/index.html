@@ -3307,5 +3307,334 @@ function openModal(id) {
   </div>
 </div>
 
+
+<!-- ═══════ ENHANCED AUTH MODAL ═══════ -->
+<style>
+.auth-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:20px}
+.auth-overlay.open{display:flex}
+.auth-box{background:#12121a;border:1px solid rgba(255,255,255,0.08);border-radius:28px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6)}
+.auth-hero{background:linear-gradient(135deg,#ff4d00,#ff0066,#6c63ff);padding:28px 24px 20px;text-align:center}
+.auth-hero-icon{font-size:40px;margin-bottom:8px}
+.auth-hero-title{font-size:24px;font-weight:900;color:#fff;margin-bottom:4px}
+.auth-hero-sub{font-size:13px;color:rgba(255,255,255,0.75)}
+.auth-tabs{display:flex;background:#0a0a0f;border-bottom:1px solid rgba(255,255,255,0.06)}
+.auth-tab{flex:1;padding:14px;text-align:center;font-size:13px;font-weight:600;color:rgba(255,255,255,0.4);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.auth-tab.active{color:#ff4d00;border-bottom-color:#ff4d00;background:rgba(255,77,0,0.06)}
+.auth-content{padding:24px}
+.auth-panel{display:none}
+.auth-panel.active{display:block}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.auth-input-wrap{display:flex;align-items:center;background:#1a1a28;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0 14px;transition:border-color .2s}
+.auth-input-wrap:focus-within{border-color:#ff4d00}
+.auth-input-wrap span{font-size:16px;margin-right:8px;opacity:.5}
+.auth-inp{flex:1;background:transparent;border:none;outline:none;color:#fff;padding:13px 0;font-size:15px}
+.auth-inp::placeholder{color:rgba(255,255,255,0.25)}
+.auth-btn-main{width:100%;padding:14px;background:linear-gradient(135deg,#ff4d00,#ff0066);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:900;cursor:pointer;margin-top:6px;transition:all .2s;letter-spacing:.3px}
+.auth-btn-main:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,77,0,0.4)}
+.auth-forgot{text-align:right;margin-bottom:14px}
+.auth-forgot a{color:#ff4d00;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none}
+.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:rgba(255,255,255,0.4)}
+.auth-switch a{color:#ff4d00;font-weight:600;cursor:pointer;text-decoration:none}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:16px 0}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,0.08)}
+.auth-divider span{font-size:12px;color:rgba(255,255,255,0.3)}
+.auth-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.auth-social-btn{padding:10px;background:#16161f;border:1px solid rgba(255,255,255,0.08);border-radius:10px;text-align:center;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.6);transition:all .2s}
+.auth-social-btn:hover{border-color:rgba(255,77,0,0.4);color:#fff}
+.auth-close-btn{position:absolute;top:16px;right:16px;width:36px;height:36px;background:rgba(255,255,255,0.1);border:none;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.auth-box{position:relative}
+.otp-inputs{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.otp-inp{width:48px;height:56px;background:#1a1a28;border:1px solid rgba(255,255,255,0.1);border-radius:12px;text-align:center;font-size:24px;font-weight:700;color:#fff;outline:none;transition:border-color .2s}
+.otp-inp:focus{border-color:#ff4d00}
+.strength-bar{height:4px;border-radius:99px;background:rgba(255,255,255,0.1);margin-top:6px;overflow:hidden}
+.strength-fill{height:100%;border-radius:99px;transition:all .3s}
+.step-indicator{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:#1a1a28;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);transition:all .3s}
+.step-dot.done{background:#ff4d00;color:#fff;border-color:#ff4d00}
+.step-dot.current{background:rgba(255,77,0,0.2);color:#ff4d00;border-color:#ff4d00}
+.step-line{flex:1;max-width:32px;height:2px;background:rgba(255,255,255,0.1)}
+.step-line.done{background:#ff4d00}
+.auth-error{background:rgba(255,61,113,0.1);border:1px solid rgba(255,61,113,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#ff3d71;margin-bottom:12px;display:none}
+.auth-success{background:rgba(0,214,143,0.1);border:1px solid rgba(0,214,143,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#00d68f;margin-bottom:12px;display:none}
+</style>
+
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <button class="auth-close-btn" onclick="closeAuthOverlay()">✕</button>
+    <!-- Hero -->
+    <div class="auth-hero">
+      <div class="auth-hero-icon">🎫</div>
+      <div class="auth-hero-title">WarTiket</div>
+      <div class="auth-hero-sub">Platform Tiket Konser Terpercaya</div>
+    </div>
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')" id="tab-login">Masuk</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')" id="tab-register">Daftar</div>
+      <div class="auth-tab" onclick="switchAuthTab('forgot')" id="tab-forgot">Lupa Password</div>
+    </div>
+    <div class="auth-content">
+      <!-- Error/Success -->
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-success" id="authSuccess"></div>
+
+      <!-- LOGIN -->
+      <div class="auth-panel active" id="panel-login">
+        <div class="auth-field">
+          <label>Username / Email</label>
+          <div class="auth-input-wrap"><span>👤</span><input class="auth-inp" id="loginUser" placeholder="masukkan username" autocomplete="username"/></div>
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <div class="auth-input-wrap"><span>🔒</span><input class="auth-inp" id="loginPass" type="password" placeholder="masukkan password" autocomplete="current-password"/></div>
+        </div>
+        <div class="auth-forgot"><a onclick="switchAuthTab('forgot')">Lupa password?</a></div>
+        <button class="auth-btn-main" onclick="doLoginNew()">🎫 Masuk Sekarang</button>
+        <div class="auth-divider"><span>atau masuk dengan</span></div>
+        <div class="auth-social">
+          <div class="auth-social-btn" onclick="demoLogin()">🎭 Demo Mode</div>
+          <div class="auth-social-btn" onclick="adminLoginPrompt()">⚙️ Admin</div>
+        </div>
+        <div class="auth-switch">Belum punya akun? <a onclick="switchAuthTab('register')">Daftar gratis</a></div>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="auth-panel" id="panel-register">
+        <div class="auth-field">
+          <label>Username</label>
+          <div class="auth-input-wrap"><span>👤</span><input class="auth-inp" id="regUser" placeholder="pilih username unik"/></div>
+        </div>
+        <div class="auth-field">
+          <label>Email</label>
+          <div class="auth-input-wrap"><span>📧</span><input class="auth-inp" id="regEmail" type="email" placeholder="email@contoh.com"/></div>
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <div class="auth-input-wrap"><span>🔒</span><input class="auth-inp" id="regPass" type="password" placeholder="min. 8 karakter" oninput="checkStrength(this.value)"/></div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0%;background:#ff3d71"></div></div>
+        </div>
+        <div class="auth-field">
+          <label>Konfirmasi Password</label>
+          <div class="auth-input-wrap"><span>🔐</span><input class="auth-inp" id="regConfirm" type="password" placeholder="ulangi password"/></div>
+        </div>
+        <button class="auth-btn-main" onclick="doRegisterNew()">🚀 Buat Akun</button>
+        <div class="auth-switch">Sudah punya akun? <a onclick="switchAuthTab('login')">Masuk</a></div>
+      </div>
+
+      <!-- FORGOT PASSWORD -->
+      <div class="auth-panel" id="panel-forgot">
+        <div class="step-indicator" id="forgotSteps">
+          <div class="step-dot current" id="fstep1">1</div>
+          <div class="step-line" id="fline1"></div>
+          <div class="step-dot" id="fstep2">2</div>
+          <div class="step-line" id="fline2"></div>
+          <div class="step-dot" id="fstep3">✓</div>
+        </div>
+        <!-- Step 1: Email -->
+        <div id="forgotStep1">
+          <p style="color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:16px;text-align:center">Masukkan email untuk menerima kode OTP</p>
+          <div class="auth-field">
+            <label>Email Terdaftar</label>
+            <div class="auth-input-wrap"><span>📧</span><input class="auth-inp" id="forgotEmail" type="email" placeholder="email@contoh.com"/></div>
+          </div>
+          <button class="auth-btn-main" onclick="forgotStep1()">Kirim Kode OTP →</button>
+        </div>
+        <!-- Step 2: OTP -->
+        <div id="forgotStep2" style="display:none">
+          <p style="color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:4px;text-align:center">Kode OTP dikirim ke</p>
+          <p id="forgotEmailShow" style="color:#ff4d00;font-size:14px;font-weight:700;text-align:center;margin-bottom:16px"></p>
+          <div class="otp-inputs">
+            <input class="otp-inp" maxlength="1" oninput="otpNav(this,0)" id="otp0"/>
+            <input class="otp-inp" maxlength="1" oninput="otpNav(this,1)" id="otp1"/>
+            <input class="otp-inp" maxlength="1" oninput="otpNav(this,2)" id="otp2"/>
+            <input class="otp-inp" maxlength="1" oninput="otpNav(this,3)" id="otp3"/>
+            <input class="otp-inp" maxlength="1" oninput="otpNav(this,4)" id="otp4"/>
+            <input class="otp-inp" maxlength="1" oninput="otpNav(this,5)" id="otp5"/>
+          </div>
+          <button class="auth-btn-main" onclick="forgotStep2()">Verifikasi OTP →</button>
+          <p style="text-align:center;margin-top:12px"><a style="color:#ff4d00;font-size:13px;cursor:pointer" onclick="forgotResend()">Kirim ulang kode</a></p>
+        </div>
+        <!-- Step 3: New Password -->
+        <div id="forgotStep3" style="display:none">
+          <p style="color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:16px;text-align:center">Buat password baru yang kuat</p>
+          <div class="auth-field">
+            <label>Password Baru</label>
+            <div class="auth-input-wrap"><span>🔒</span><input class="auth-inp" id="newPass" type="password" placeholder="min. 8 karakter"/></div>
+          </div>
+          <div class="auth-field">
+            <label>Konfirmasi Password Baru</label>
+            <div class="auth-input-wrap"><span>🔐</span><input class="auth-inp" id="newPass2" type="password" placeholder="ulangi password"/></div>
+          </div>
+          <button class="auth-btn-main" onclick="forgotStep3()">✅ Reset Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Auth Overlay ───────────────────────────────────────────────
+function openAuthOverlay(tab='login') {
+  document.getElementById('authOverlay').classList.add('open');
+  switchAuthTab(tab);
+  document.getElementById('authError').style.display='none';
+  document.getElementById('authSuccess').style.display='none';
+}
+function closeAuthOverlay() {
+  document.getElementById('authOverlay').classList.remove('open');
+}
+function switchAuthTab(tab) {
+  ['login','register','forgot'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('panel-'+t).classList.toggle('active',t===tab);
+  });
+  document.getElementById('authError').style.display='none';
+}
+function showAuthError(msg) {
+  const el=document.getElementById('authError');
+  el.textContent=msg; el.style.display='block';
+  document.getElementById('authSuccess').style.display='none';
+}
+function showAuthSuccess(msg) {
+  const el=document.getElementById('authSuccess');
+  el.textContent=msg; el.style.display='block';
+  document.getElementById('authError').style.display='none';
+}
+
+// ── Login ─────────────────────────────────────────────────────
+async function doLoginNew() {
+  const user=document.getElementById('loginUser').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!user) return showAuthError('Username tidak boleh kosong.');
+  if(!pass) return showAuthError('Password tidak boleh kosong.');
+  const btn=document.querySelector('#panel-login .auth-btn-main');
+  btn.textContent='Memproses...'; btn.disabled=true;
+  await new Promise(r=>setTimeout(r,800));
+  btn.textContent='🎫 Masuk Sekarang'; btn.disabled=false;
+  currentUser={id:'usr_'+Date.now(),username:user,email:user+'@wartiket.id'};
+  localStorage.setItem('wt_user',JSON.stringify(currentUser));
+  closeAuthOverlay();
+  updateAuthUI();
+  showToast('Selamat datang, '+user+'! 🎉','success');
+}
+function demoLogin() {
+  currentUser={id:'demo_'+Date.now(),username:'demouser',email:'demo@wartiket.id',demo:true};
+  localStorage.setItem('wt_user',JSON.stringify(currentUser));
+  closeAuthOverlay();
+  updateAuthUI();
+  showToast('Mode demo aktif 🎭','info');
+}
+function adminLoginPrompt() {
+  closeAuthOverlay();
+  openAdminLogin && openAdminLogin();
+}
+
+// ── Register ──────────────────────────────────────────────────
+async function doRegisterNew() {
+  const u=document.getElementById('regUser').value.trim();
+  const e=document.getElementById('regEmail').value.trim();
+  const p=document.getElementById('regPass').value;
+  const c=document.getElementById('regConfirm').value;
+  if(!u||!e||!p) return showAuthError('Semua field wajib diisi.');
+  if(!e.includes('@')) return showAuthError('Format email tidak valid.');
+  if(p.length<6) return showAuthError('Password minimal 6 karakter.');
+  if(p!==c) return showAuthError('Konfirmasi password tidak cocok.');
+  const btn=document.querySelector('#panel-register .auth-btn-main');
+  btn.textContent='Mendaftarkan...'; btn.disabled=true;
+  await new Promise(r=>setTimeout(r,1000));
+  btn.textContent='🚀 Buat Akun'; btn.disabled=false;
+  currentUser={id:'usr_'+Date.now(),username:u,email:e};
+  localStorage.setItem('wt_user',JSON.stringify(currentUser));
+  closeAuthOverlay();
+  updateAuthUI();
+  showToast('Akun berhasil dibuat! Selamat datang, '+u+' 🎉','success');
+}
+
+// ── Password Strength ─────────────────────────────────────────
+function checkStrength(p) {
+  let s=0;
+  if(p.length>=6)s++;if(p.length>=10)s++;
+  if(/[A-Z]/.test(p))s++;if(/[0-9]/.test(p))s++;if(/[^a-zA-Z0-9]/.test(p))s++;
+  const colors=['#ff3d71','#ff3d71','#ffaa00','#6c63ff','#00d68f'];
+  const fill=document.getElementById('strengthFill');
+  fill.style.width=(s*20)+'%';fill.style.background=colors[s-1]||'#ff3d71';
+}
+
+// ── Forgot Password ───────────────────────────────────────────
+let forgotCurrentStep=1;
+async function forgotStep1() {
+  const em=document.getElementById('forgotEmail').value.trim();
+  if(!em.includes('@')) return showAuthError('Masukkan email yang valid.');
+  const btn=document.querySelector('#forgotStep1 .auth-btn-main');
+  btn.textContent='Mengirim...'; btn.disabled=true;
+  await new Promise(r=>setTimeout(r,1200));
+  btn.textContent='Kirim Kode OTP →'; btn.disabled=false;
+  document.getElementById('forgotStep1').style.display='none';
+  document.getElementById('forgotStep2').style.display='block';
+  document.getElementById('forgotEmailShow').textContent=em;
+  document.getElementById('fstep1').className='step-dot done';
+  document.getElementById('fline1').className='step-line done';
+  document.getElementById('fstep2').className='step-dot current';
+  document.getElementById('authError').style.display='none';
+  showAuthSuccess('Kode OTP telah dikirim ke '+em);
+  document.getElementById('otp0').focus();
+}
+function otpNav(el,idx) {
+  if(el.value&&idx<5) document.getElementById('otp'+(idx+1)).focus();
+}
+async function forgotStep2() {
+  const otp=[0,1,2,3,4,5].map(i=>document.getElementById('otp'+i).value).join('');
+  if(otp.length<6) return showAuthError('Masukkan 6 digit kode OTP.');
+  const btn=document.querySelector('#forgotStep2 .auth-btn-main');
+  btn.textContent='Memverifikasi...'; btn.disabled=true;
+  await new Promise(r=>setTimeout(r,1000));
+  btn.textContent='Verifikasi OTP →'; btn.disabled=false;
+  document.getElementById('forgotStep2').style.display='none';
+  document.getElementById('forgotStep3').style.display='block';
+  document.getElementById('fstep2').className='step-dot done';
+  document.getElementById('fline2').className='step-line done';
+  document.getElementById('fstep3').className='step-dot current';
+  document.getElementById('authError').style.display='none';
+  showAuthSuccess('OTP valid! Buat password baru.');
+}
+function forgotResend() {
+  [0,1,2,3,4,5].forEach(i=>document.getElementById('otp'+i).value='');
+  showAuthSuccess('Kode OTP baru telah dikirim.');
+  document.getElementById('otp0').focus();
+}
+async function forgotStep3() {
+  const p=document.getElementById('newPass').value;
+  const c=document.getElementById('newPass2').value;
+  if(p.length<6) return showAuthError('Password minimal 6 karakter.');
+  if(p!==c) return showAuthError('Konfirmasi password tidak cocok.');
+  const btn=document.querySelector('#forgotStep3 .auth-btn-main');
+  btn.textContent='Menyimpan...'; btn.disabled=true;
+  await new Promise(r=>setTimeout(r,1000));
+  document.getElementById('fstep3').className='step-dot done';
+  document.getElementById('authError').style.display='none';
+  showAuthSuccess('✅ Password berhasil direset!');
+  setTimeout(()=>{
+    forgotCurrentStep=1;
+    ['forgotStep1','forgotStep2','forgotStep3'].forEach((s,i)=>
+      document.getElementById(s).style.display=i===0?'block':'none');
+    ['fstep1','fstep2','fstep3'].forEach(s=>
+      document.getElementById(s).className='step-dot');
+    ['fline1','fline2'].forEach(s=>
+      document.getElementById(s).className='step-line');
+    document.getElementById('fstep1').className='step-dot current';
+    switchAuthTab('login');
+  },2000);
+}
+
+// Override old openAuth to use new overlay
+window.openAuth = function(tab='login') { openAuthOverlay(tab); }
+
+// Close on backdrop
+document.getElementById('authOverlay').addEventListener('click',function(e){
+  if(e.target===this) closeAuthOverlay();
+});
+</script>
+
 </body>
 </html>

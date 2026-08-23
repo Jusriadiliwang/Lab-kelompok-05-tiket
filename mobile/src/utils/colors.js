@@ -1,0 +1,16 @@
+export default {
+  bg:       "#0a0a0f",
+  bg2:      "#12121a",
+  bg3:      "#1a1a28",
+  card:     "#16161f",
+  border:   "rgba(255,255,255,0.08)",
+  primary:  "#ff4d00",
+  primary2: "#ff7a00",
+  accent:   "#6c63ff",
+  success:  "#00d68f",
+  danger:   "#ff3d71",
+  warning:  "#ffaa00",
+  text1:    "#ffffff",
+  text2:    "rgba(255,255,255,0.7)",
+  text3:    "rgba(255,255,255,0.4)",
+};
