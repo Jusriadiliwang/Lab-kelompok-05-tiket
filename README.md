@@ -1,6 +1,6 @@
 # War Tiket Konser — Kelompok 5
 
-> Sistem penjualan tiket konser dengan antrean virtual dan kursi terbatas.
+> Sistem penjualan tiket konser berbasis microservices dengan anti-oversell 4 lapis, ERP back-office, dan mobile app.
 
 ## Tim
 
@@ -10,6 +10,31 @@
 | Ashabul Kahfi | 105841108523 | Backend/API Engineer |
 | Jusriadi Liwang | 105841117023 | Data & Persistence Engineer |
 | Marhepi Rahmadani | 105841109523 | QA, Load-Test & Dokumentasi |
+
+---
+
+## Mobile App (Expo React Native)
+
+Aplikasi mobile dibangun dengan **Expo SDK 54 + TypeScript** — tersedia untuk iOS & Android via Expo Go.
+
+| Login | Home | Event Detail |
+|---|---|---|
+| ![Login](docs/mobile/gambar/login.jpeg) | ![Home](docs/mobile/gambar/home.png) | ![Detail](docs/mobile/gambar/event-detail.png) |
+
+| Queue | My Tickets |
+|---|---|
+| ![Queue](docs/mobile/gambar/queue.jpeg) | ![Tiket](docs/mobile/gambar/my-tickets.jpeg) |
+
+**Cara jalankan:**
+```bash
+cd mobile
+npx expo start
+# Scan QR dari Expo Go (iPhone/Android) atau buka http://localhost:8081
+```
+
+📖 [Dokumentasi Mobile Lengkap](docs/mobile/README.md)
+
+---
 
 ## Arsitektur
 
@@ -136,3 +161,16 @@ Request masuk
 
 ### notification_db
 - `notifications` — Notifikasi per user (e-ticket, gagal bayar, dll)
+
+---
+
+## Dokumentasi
+
+| Dokumen | Link |
+|---|---|
+| 📱 Mobile App | [docs/mobile/README.md](docs/mobile/README.md) |
+| 🧪 Pengujian API (Postman) | [docs/api-test/README.md](docs/api-test/README.md) |
+| 📊 Hasil Load Test | [load-test/hasil-test.md](load-test/hasil-test.md) |
+| 🏗️ Arsitektur Sistem | [docs/arsitektur-war-tiket-konser.md](docs/arsitektur-war-tiket-konser.md) |
+| 👥 Kontribusi Anggota | [docs/anggota/](docs/anggota/) |
+| 📋 Laporan Gabungan | [LAPORAN.md](LAPORAN.md) |
