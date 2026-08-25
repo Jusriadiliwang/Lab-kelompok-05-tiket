@@ -82,21 +82,15 @@ function MainTabs() {
       <Tab.Screen name="Events"    component={HomeStack}       options={{ title: 'Events' }} />
       <Tab.Screen name="MyTickets" component={MyTicketsScreen} options={{
         title: 'My Tickets',
-        headerShown: true,
-        headerStyle: { backgroundColor: Colors.surfaceContainerLowest },
-        headerTitleStyle: { ...(Typography.headlineMd as any), color: Colors.pureBlack },
+        headerShown: false,
       }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{
         title: 'Notifikasi',
-        headerShown: true,
-        headerStyle: { backgroundColor: Colors.surfaceContainerLowest },
-        headerTitleStyle: { ...(Typography.headlineMd as any), color: Colors.pureBlack },
+        headerShown: false,
       }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{
         title: 'Profile',
-        headerShown: true,
-        headerStyle: { backgroundColor: Colors.surfaceContainerLowest },
-        headerTitleStyle: { ...(Typography.headlineMd as any), color: Colors.pureBlack },
+        headerShown: false,
       }} />
     </Tab.Navigator>
   );

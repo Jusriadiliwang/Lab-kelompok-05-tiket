@@ -4,6 +4,7 @@ import {
   TextInput, Image, RefreshControl, ActivityIndicator,
   ScrollView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,6 +28,7 @@ function formatPrice(n: number) {
 
 export default function HomeScreen() {
   const nav = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
   const [events, setEvents]     = useState<CatalogEvent[]>([]);
   const [loading, setLoading]   = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -64,8 +66,8 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.root}>
-      {/* Header */}
-      <View style={styles.header}>
+      {/* Header — dengan safe area top untuk iPhone notch */}
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={styles.headerTitle}>War Tiket</Text>
         <Ionicons name="search-outline" size={24} color={Colors.onBackground} />
       </View>

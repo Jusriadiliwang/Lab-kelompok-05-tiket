@@ -1,6 +1,7 @@
 ﻿import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getUserNotifications } from '../api/notifications';
 import { useAuth } from '../context/AuthContext';
 import type { Notification } from '../types';
@@ -11,6 +12,7 @@ const POLL_INTERVAL = 30_000;
 
 export default function NotificationsScreen() {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [notifs, setNotifs]           = useState<Notification[]>([]);
   const [loading, setLoading]         = useState(true);
   const [refreshing, setRefreshing]   = useState(false);
@@ -45,7 +47,7 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.root}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={styles.headerTitle}>Notifikasi</Text>
         <View style={styles.headerRight}>
           {unreadCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text></View>}
@@ -126,3 +128,4 @@ const styles = StyleSheet.create({
   emptyTitle:   { ...Typography.headlineMd, color: Colors.onBackground, textAlign: 'center' },
   emptySub:     { ...Typography.bodySm, color: Colors.onSurfaceVariant, textAlign: 'center' },
 });
+

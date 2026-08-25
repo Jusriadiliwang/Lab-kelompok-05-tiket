@@ -1,13 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
+﻿import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getUserOrders } from '../api/tickets';
 import { Colors, Typography, Spacing, Radius, Shadows } from '../theme';
 import { formatPrice, isOrderConfirmed } from '../utils/helpers';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const insets = useSafeAreaInsets();
   const [stats, setStats] = useState({ total: 0, confirmed: 0, revenue: 0 });
 
   const loadStats = useCallback(async () => {
@@ -44,7 +46,7 @@ export default function ProfileScreen() {
   return (
     <ScrollView style={styles.root} showsVerticalScrollIndicator={false}>
       {/* Hero */}
-      <View style={styles.heroSection}>
+      <View style={[styles.heroSection, { paddingTop: insets.top + 12 }]}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{initials}</Text>
         </View>
@@ -102,7 +104,7 @@ export default function ProfileScreen() {
         <Ionicons name="log-out-outline" size={20} color={Colors.pureWhite} />
         <Text style={styles.logoutText}>Keluar dari Akun</Text>
       </TouchableOpacity>
-      <Text style={styles.version}>War Tiket v2.0 · Kelompok 5 · Unismuh Makassar</Text>
+      <Text style={styles.version}>War Tiket v2.0 Â· Kelompok 5 Â· Unismuh Makassar</Text>
     </ScrollView>
   );
 }
@@ -164,3 +166,4 @@ const styles = StyleSheet.create({
   emptyTitle: { ...Typography.headlineMd, color: Colors.onBackground },
   emptySub:   { ...Typography.bodySm, color: Colors.onSurfaceVariant },
 });
+

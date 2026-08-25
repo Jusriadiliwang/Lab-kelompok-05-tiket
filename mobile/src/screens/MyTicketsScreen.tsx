@@ -6,6 +6,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { getUserOrders, releaseOrder } from '../api/tickets';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cancelPayment, getPayment } from '../api/payments';
 import { useAuth } from '../context/AuthContext';
 import type { Order } from '../types';
@@ -14,6 +15,7 @@ import { formatDate, formatPrice, ORDER_STATUS_LABEL, ORDER_STATUS_COLOR, isOrde
 
 export default function MyTicketsScreen() {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [orders, setOrders]         = useState<Order[]>([]);
   const [loading, setLoading]       = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -64,7 +66,7 @@ export default function MyTicketsScreen() {
 
   return (
     <View style={styles.root}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={styles.headerTitle}>My Tickets</Text>
         <Text style={styles.headerSub}>{confirmed.length} tiket aktif</Text>
       </View>
@@ -183,3 +185,4 @@ const styles = StyleSheet.create({
   emptyTitle:    { ...Typography.headlineMd, color: Colors.onBackground },
   emptySubtitle: { ...Typography.bodySm, color: Colors.onSurfaceVariant, textAlign: 'center' },
 });
+
