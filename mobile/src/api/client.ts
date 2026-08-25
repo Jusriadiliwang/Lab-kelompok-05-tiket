@@ -19,8 +19,12 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Gunakan IP lokal jika test di device fisik: 'http://192.168.x.x:3000'
-export const API_GATEWAY_URL = 'http://localhost:3000';
+// Deteksi environment: web (localhost) vs mobile device (pakai IP WiFi laptop)
+// Untuk test di iPhone/Android fisik: pastikan satu WiFi dengan laptop
+const isWeb = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
+export const API_GATEWAY_URL = isWeb
+  ? 'http://localhost:3000'           // Web browser di laptop
+  : 'http://10.126.205.34:3000';     // Mobile device fisik (pakai IP WiFi laptop)
 
 // Generate UUID v4 sederhana (tidak perlu library)
 function generateCorrelationId(): string {
